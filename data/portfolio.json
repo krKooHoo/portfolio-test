@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-10-21",
+  "profile": {
+    "name": "홍길동",
+    "nameEn": "Gildong Hong",
+    "headline": "구조를 설명할 줄 아는 유니티 클라이언트 개발자",
+    "intro": "설계 의도를 문서로 설명하는 습관을 가진 유니티 개발자입니다.\n기능을 \"만드는 것\"보다 \"왜 이렇게 만들었는지 설명할 수 있는 것\"을 목표로 공부하고 있습니다.",
+    "email": "you@example.com",
+    "github": "https://github.com/your-id",
+    "links": [{ "label": "블로그", "url": "https://your-blog.example.com" }]
+  },
+  "settings": {
+    "layout": "project",
+    "accent": "#2F6FEB"
+  },
+  "skills": [
+    {
+      "name": "Unity",
+      "evidence": [
+        { "text": "Animator Tag 기반 FSM으로 플레이어·몬스터 상태 제어", "project": "1-action-platformer" },
+        { "text": "보드 빌더 도구로 Board.json 기반 36칸 보드 런타임 생성", "project": "2-Yggdrasil" },
+        { "text": "OnEnable/OnDisable 짝으로 제작 이벤트 구독·해제 관리", "project": "00-example-crafting" }
+      ]
+    },
+    {
+      "name": "C#",
+      "evidence": [
+        { "text": "축 분리 BoxCast로 Kinematic 이동 충돌을 직접 해결", "project": "1-action-platformer" },
+        { "text": "제네릭 `DataTable<DTO, Def>`로 TSV 표 로딩 공통화", "project": "2-Yggdrasil" },
+        { "text": "LINQ 레시피 조회 + `roll` 주입으로 확률 판정 테스트", "project": "00-example-crafting" }
+      ]
+    },
+    {
+      "name": "디자인 패턴",
+      "evidence": [
+        { "text": "Strategy + Factory로 칸 효과 7종을 매니저에 위임", "project": "2-Yggdrasil" },
+        { "text": "중재자(`CombatManager`)로 모든 피격 처리 일원화", "project": "1-action-platformer" },
+        { "text": "`MonoSingleton<T>`로 매니저 5개 싱글톤 구성", "project": "0-Tidy-Mommy" }
+      ]
+    },
+    {
+      "name": "ASP.NET Core WebSocket",
+      "evidence": [
+        { "text": "서버 게임 로직·전원 보고 대기·결투 흐름 구현", "project": "2-Yggdrasil" }
+      ]
+    },
+    {
+      "name": "ScriptableObject",
+      "evidence": [
+        { "text": "이동 조작 수치를 SO로 분리해 인스펙터에서 튜닝", "project": "1-action-platformer" },
+        { "text": "블록 타입 → 스프라이트·머티리얼 매핑 라이브러리", "project": "0-Tidy-Mommy" }
+      ]
+    },
+    {
+      "name": "오브젝트 풀링",
+      "evidence": [
+        { "text": "블록 36개를 미리 배치해 Queue 풀로 재사용", "project": "0-Tidy-Mommy" },
+        { "text": "Queue 기반 풀로 대시 잔상 생성·파괴 반복 제거", "project": "1-action-platformer" }
+      ]
+    },
+    {
+      "name": "확률·난이도 설계",
+      "evidence": [
+        { "text": "지수 가중치 스폰으로 10단계 난이도 곡선 설계", "project": "0-Tidy-Mommy" }
+      ]
+    }
+  ],
+  "projects": ["00-example-crafting", "0-Tidy-Mommy", "1-action-platformer", "2-Yggdrasil"]
+}

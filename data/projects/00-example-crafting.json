@@ -1,0 +1,66 @@
+{
+  "id": "00-example-crafting",
+  "doc": "기술문서.md",
+  "title": "크래프팅 시스템 (CraftingSystem)",
+  "tagline": "재료를 소비해 아이템을 확률적으로 제작하는, UI와 분리된 이벤트 기반 크래프팅 시스템",
+  "cover": null,
+  "team": { "type": "solo", "size": "1인", "role": "" },
+  "meta": [
+    { "label": "장르", "value": "생존 게임의 제작(크래프팅) 시스템" },
+    { "label": "기간", "value": "2025.06 ~ 2025.07 (개인 프로젝트)" },
+    { "label": "인원", "value": "1인" },
+    { "label": "환경", "value": "Unity 2022.3 LTS (C# 10), Rider" }
+  ],
+  "tags": ["Unity 2022.3 LTS", "C# 10", "이벤트 기반 아키텍처", "인터페이스 의존(DIP)", "LINQ", "확률 판정 주입"],
+  "links": {
+    "github": "",
+    "video": "",
+    "extra": []
+  },
+  "highlights": [
+    {
+      "title": "제작 요청 `RequestCraft`",
+      "what": "레시피를 조회하고 재료를 검증한 뒤 확률을 판정해, 성공/실패에 따라 재료를 소비하고 결과를 이벤트로 발행",
+      "how": "LINQ(`FirstOrDefault`)로 레시피 조회 → 소비 전에 `HasIngredients`로 재료 검증 → 주입된 `roll`로 확률 판정 → `success ? 1.0f : 0.5f` 소비율로 `Consume` 후 `CraftingResult` 발행",
+      "why": "소비 전에 먼저 검증해 재료 유실 없이 안전하게 중단하고, 확률 판정을 주입된 `roll`로 분리해 테스트 시 결정론적으로 검증하기 위해",
+      "section": "3.2 핵심 동작"
+    },
+    {
+      "title": "이벤트 기반 결과 전파 `OnCraftCompleted`",
+      "what": "Manager는 제작 결과가 나왔다는 사실만 이벤트로 알리고, UI는 이를 구독해 결과를 표시",
+      "how": "`CraftingUI`는 `RequestCraft`로 요청만 보내고, `OnEnable`/`OnDisable`에서 `OnCraftCompleted` 구독·해제를 짝지어 관리하며 `HandleResult`로 결과를 표시",
+      "why": "Manager가 UI를 직접 갱신하면 강하게 결합되어 결과를 쓰는 곳이 늘 때마다 Manager를 고쳐야 하지만, 이벤트는 구독자만 추가하면 됨. 결과를 쓸 대상이 연출·사운드·업적 등으로 늘어날 것으로 판단해 이벤트를 선택",
+      "section": "4. 고민과 선택: 제작 결과를 어떻게 전파할 것인가"
+    },
+    {
+      "title": "인터페이스 의존(DIP) 구조",
+      "what": "`CraftingUI`가 구현체 `CraftingManager`가 아닌 계약 `ICraftingService`에 의존",
+      "how": "`CraftingManager`가 `ICraftingService`를 구현하고, `CraftingUI`는 `ICraftingService`만 참조해 `RequestCraft` 호출과 `OnCraftCompleted` 구독에 사용",
+      "why": "UI를 건드리지 않고도 제작 로직 구현을 교체·테스트할 수 있게 하기 위해",
+      "section": "2.3 핵심 클래스 역할 분담"
+    }
+  ],
+  "troubleshooting": [
+    {
+      "title": "실패해도 재료가 100% 사라지는 문제",
+      "problem": "제작 실패 시에도 재료가 100% 사라짐",
+      "cause": "확률 판정 결과와 무관하게 소비율을 `1.0f` 고정으로 넘기고 있었음",
+      "solution": "`success ? 1.0f : 0.5f`로 소비율을 분기하고, 이 규칙을 테스트로 고정",
+      "result": "실패 페널티(50% 소비) 규칙이 의도대로 동작, 회귀 방지",
+      "section": "5.2 트러블슈팅: 실패해도 재료가 100% 사라지는 문제"
+    }
+  ],
+  "screenshots": [],
+  "retro": {
+    "achieved": [
+      "개요의 문제였던 '제작 로직과 UI의 결합'을 해소. 새 레시피 추가 시 UI 코드 수정 0줄로 데이터(`Recipe`)만 추가하면 되도록 개선.",
+      "`roll`을 주입 가능하게 설계해, 확률 성공/실패 경로를 단위 테스트로 검증 가능."
+    ],
+    "regrets": [
+      "`Recipe`가 코드에 하드코딩되어 있어, 기획자가 직접 수정할 수 없음."
+    ],
+    "plans": [
+      "`ScriptableObject` 기반 데이터로 전환해, 코드 없이 레시피를 편집·밸런싱할 수 있게 개선 예정."
+    ]
+  }
+}

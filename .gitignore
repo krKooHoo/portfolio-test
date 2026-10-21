@@ -1,0 +1,8 @@
+# 점검 리포트 (로컬 전용 — /portfolio-build, /portfolio-check가 생성)
+report.md
+
+# OS·에디터
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
