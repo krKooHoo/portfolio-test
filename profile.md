@@ -35,5 +35,5 @@
   <!-- project = 프로젝트 중심 (프로젝트가 여러 개일 때) / stack = 기술 스택 중심 (특정 기술을 강조할 때) -->
 - 강조색: #2F6FEB
   <!-- 버튼·링크·태그에 쓰이는 색 하나. 예) #2F6FEB 블루, #0F9D76 그린, #D9480F 오렌지, #7048E8 퍼플 -->
-- 프로젝트 순서: 0-Tidy-Mommy, 1-action-platformer, 2-Yggdrasil
+- 프로젝트 순서:
   <!-- 비워 두면 src/ 폴더 이름 순서. 바꾸려면 폴더 이름을 쉼표로: 2-Yggdrasil, 1-action-platformer -->

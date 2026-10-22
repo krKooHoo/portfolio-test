@@ -28,9 +28,27 @@ flowchart LR
 
 ## 사용법 (5단계)
 
-### 1. 템플릿으로 내 레포 만들기
+### 1. 내 레포 만들기
 
-이 레포 오른쪽 위 **Use this template → Create a new repository** → 공개(Public)로 생성 → 내 PC로 clone.
+아래 두 방법 중 하나를 고르세요. 어느 쪽이든 내 레포는 **공개(Public)**여야 무료 플랜에서 Pages가 동작합니다.
+
+**방법 A. Fork (추천)**
+
+1. 이 레포 오른쪽 위 **Fork → Create fork**를 누릅니다. "Copy the `main` branch only"는 체크된 그대로 둡니다.
+2. 레포 이름은 바꿔도 됩니다(예: `portfolio`). 영문 소문자·숫자·하이픈을 권합니다.
+3. 내 레포 화면의 **Code → HTTPS 주소**로 내 PC에 clone합니다.
+
+나중에 템플릿이 업데이트되면, 내 레포 화면의 **Sync fork** 버튼으로 받아올 수 있습니다.
+내가 고친 파일과 겹치면 충돌이 날 수 있으니, 받기 전에 커밋해 두세요.
+
+**방법 B. 새 레포를 만들고 파일 복사**
+
+1. GitHub에서 **New repository**로 빈 공개 레포를 만들고 내 PC에 clone합니다.
+2. 이 레포에서 **Code → Download ZIP**으로 받아 압축을 풉니다.
+3. 압축을 푼 폴더 안의 내용(숨김 파일 `.claude/`, `.gitignore`, `.nojekyll` 포함)을 **모두** 내 레포 폴더로 복사한 뒤 commit · push합니다.
+   - 숨김 파일이 빠지면 Claude 명령(`/portfolio-build` 등)과 Pages 동작이 깨집니다. 탐색기에서 **보기 → 숨긴 항목**을 켜고 복사하세요.
+
+> 유지관리자가 이 레포를 Template repository로 설정해 두었다면 **Use this template → Create a new repository**도 쓸 수 있습니다(방법 A와 비슷하지만 Sync fork는 없습니다).
 
 ### 2. 소스 넣기
 
@@ -59,6 +77,10 @@ src/
 
 이름·연락처·자기소개·강조색·구성 방식(프로젝트 중심 / 기술 스택 중심)을 **직접** 씁니다.
 
+- 들어 있는 값(홍길동, `you@example.com` 등)은 **예시**입니다. 모두 내 정보로 바꾸세요.
+- **프로젝트 순서**는 비워 두면 `src/` 폴더 이름 순서로 실립니다. 순서를 정하거나 일부만 싣고 싶을 때만 폴더 이름을 쉼표로 적으세요(예: `2-my-rpg, 1-my-game`).
+- 이 레포는 공개라서 `profile.md`의 내용은 누구나 볼 수 있습니다. 전화번호·주소 같은 개인정보는 넣지 마세요.
+
 ### 4. Claude로 만들기
 
 레포 폴더에서 Claude Code를 열고:
@@ -85,8 +107,25 @@ Claude가 하는 일:
 
 ### 5. 배포
 
-변경 사항을 commit · push → 레포 **Settings → Pages → Deploy from a branch → `main` / `(root)` → Save**.
+변경 사항을 commit · push → 레포 **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: `main` / `(root)` → Save**.
 1~2분 뒤 `https://<아이디>.github.io/<레포>/` 에서 열립니다. 자세한 내용과 문제 해결은 [format/06-deploy.md](format/06-deploy.md).
+
+**5분이 지나도 404라면**
+
+1. 레포의 **Actions** 탭에 "pages build and deployment"가 있는지 봅니다.
+2. 없다면 설정만 저장되고 배포가 시작되지 않은 것입니다. 아무 파일이나 조금 고쳐 다시 commit · push하거나, 터미널에서 아래 두 줄을 실행하면 배포가 시작됩니다.
+
+   ```bash
+   git commit --allow-empty -m "Pages 배포 시작"
+   ```
+
+   ```bash
+   git push
+   ```
+
+3. 그래도 안 되면 Source가 `GitHub Actions`나 다른 브랜치로 되어 있지 않은지, 레포가 공개(Public)인지 확인하세요.
+
+배포 직후에는 브라우저가 예전 화면을 보여 줄 수 있습니다. 최대 10분 기다리거나 **Ctrl+F5**로 새로 고치세요.
 
 > 기업 보안 정책상 외부 링크가 막힌 곳도 있습니다. 각 페이지에서 **Ctrl+P → PDF로 저장**해 PDF 사본도 준비하세요.
 
