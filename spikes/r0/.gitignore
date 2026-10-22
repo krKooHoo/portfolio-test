@@ -1,0 +1,6 @@
+# R0 스파이크 산출물(PDF·PNG·로그)은 커밋하지 않습니다
+out/
+*.pdf
+*.png
+node_modules/
+.profiles/

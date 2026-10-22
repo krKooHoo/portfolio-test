@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>A3 잘림 띠 시험</title>
+<!-- A3 ③: 축소(15px 하한)로도 안 들어가는 장면 → 원칙 5 ③ 잘림 띠(.pf-clipped)가 화면과 PDF 모두에 보이는지.
+     렌더러와 같은 경로(pf-common.js의 PF.scene → PF.shrinkOrClip, 키트 mount)를 씁니다. 01 §9-3 head 순서 -->
+<script src="../../kit/scene-kit.js"></script>
+<link rel="stylesheet" href="../../kit/scene-kit.css" />
+<link rel="stylesheet" href="../../pages/pf-scenes.css" />
+</head>
+<body>
+<main class="pf-deck" id="deck"></main>
+<script src="../../pages/pf-common.js"></script>
+<script>
+(() => {
+  const deck = document.getElementById('deck');
+  const info = (PFScene.info = { page: 'a3-clip-band', overflow: [] });
+  const make = (i, html) => {
+    const s = PF.scene({ tpl: 'P3', eyebrow: 'A3 FIXTURE', title: `잘림 띠 시험 ${i}`, foot: 'A3 · 잘림 띠', titleId: `a3-t${i}` });
+    PF.body(s).innerHTML = html;
+    return s;
+  };
+  const para = (n) => Array.from({ length: n }, (_, k) => `<p style="margin:0 0 6px">문단 ${k + 1}: 이 장면에는 본문 상자(1152×544)에 들어가지 않을 만큼 긴 내용이 들어 있습니다. 축소 하한(15/16)까지 줄여도 넘칩니다.</p>`).join('');
+  PFScene.track((async () => {
+    await PF.loadFonts();
+    const s1 = make(1, '<p>정상 장면</p>');
+    const s2 = PF.shrinkOrClip(make(2, para(40)), PFScene.refUrl('a3-t2'), info.overflow);
+    const s3 = make(3, '<p>정상 장면</p>');
+    deck.append(s1, s2, s3);
+  })().finally(() => { PF.dropMeasure(); PFScene.mount({ deck: '#deck' }); }));
+})();
+</script>
+</body>
+</html>
