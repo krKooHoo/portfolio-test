@@ -1,0 +1,96 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   장면 키트 CSS (assets/scene-kit.css) — 렌더러 소유. 덱 페이지(index.html·project.html)만 싣습니다. doc.html은 싣지 않습니다
+   (결정 #14의 인쇄 규칙이 덱 밖 요소를 숨기므로, 흐르는 문서에 실으면 A4 인쇄가 빈 쪽이 됨 — portfolio-structure §4-8).
+   출처: spikes/deck/kit/scene-kit.css(= spikes/r0/kit/scene-kit.css)
+   ① 01 §8-1 "scene-kit.css (장면 계약 부분 전문)" 글자 그대로
+   ② R0 A3 수정 1~3, 【R0 결정 #14】 덱 밖 숨김, 측정 컨테이너·감사 통로·포커스·건너뛰기 링크
+   화면 보기(덱 보기·한 번에 보기)·HUD·개요는 deck-kit.css가 정합니다(모두 @media screen).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── ① 01 §8-1 원문 시작 ─────────────────────────────────────────────────── */
+:root { --pf-k: 1; --pf-gap: 16px; }
+@page { size: 1280px 720px; margin: 0 !important; }        /* 8의 배수 px. !important는 뒤에 오는 다른 @page를 이김 */
+html, body { margin: 0; padding: 0; }
+
+.pf-scene {
+  position: relative; box-sizing: border-box;
+  width: 1280px; height: 720px;
+  overflow: hidden;                 /* 넘침 차단 + BFC(첫 자식 margin이 새어 나오지 않음) + shrink-to-fit 방지 */
+  container: pf-scene / inline-size;
+  background: var(--bg, #F7F7F5);   /* 장면 배경 = 스타일 계약의 --bg */
+  break-inside: avoid;
+  print-color-adjust: exact; -webkit-print-color-adjust: exact;
+}
+/* 장면 "사이"에만 쪽을 나눔 → 꼬리 빈 쪽이 생길 수 없음. 인쇄에서 빠지는 장면(.pf-skip)은 세지 않음 */
+.pf-scene:not(.pf-skip) ~ .pf-scene:not(.pf-skip) { break-before: page; }
+/* 최후 수단(§4-3 원칙 5): 조용히 잘리지 않게 보이는 띠. 화면·인쇄 모두 표시 */
+.pf-clipped { position: absolute; left: 64px; right: 64px; bottom: 44px; padding: 4px 8px;
+              font: 700 13px/1.4 sans-serif; color: #FFFFFF; background: #B42318; }
+.pf-n-print { display: none; }
+
+@media screen {
+  html, body { background: var(--deck-bg, #E4E5E8); }                                   /* 장면 사이·레터박스 */
+  .pf-deck            { display: flex; flex-direction: column; align-items: center;
+                        gap: var(--pf-gap); padding: var(--pf-gap) 0; }
+  .pf-deck > .pf-scene { flex: none; transform: scale(var(--pf-k)); transform-origin: 0 0;   /* 측정용 장면에는 안 걸림 */
+                        margin: 0 calc(1280px * (var(--pf-k) - 1)) calc(720px * (var(--pf-k) - 1)) 0;
+                        box-shadow: 0 2px 14px rgba(20, 22, 30, .14); }
+  html.pf-hud-pill { scroll-padding-bottom: 72px; }
+  html.pf-present .pf-deck { gap: 0; padding: 0; }
+}
+
+@media print {
+  html, body { margin: 0 !important; padding: 0 !important; border: 0 !important; }
+  .pf-deck  { display: block !important; margin: 0 !important; padding: 0 !important; gap: 0 !important;
+              height: auto !important; overflow: visible !important; zoom: 1 !important;
+              transform: none !important; scroll-snap-type: none !important; }
+  .pf-scene { width: 1280px !important; height: 720px !important; min-height: 0 !important; max-height: none !important;
+              overflow: hidden !important; margin: 0 auto !important; transform: none !important;
+              box-shadow: none !important; border-radius: 0 !important; outline: 0 !important;
+              content-visibility: visible !important;
+              zoom: 1 !important;
+              zoom: min(calc(100vw / 1280px), calc(100vh / 720px)) !important; }   /* 여백 최소·맞춤 대응(지원 브라우저만) */
+  .pf-skip, .pf-screen-only, .pf-hud, .topbar, dialog, [popover] { display: none !important; }
+  .pf-n-screen { display: none !important; } .pf-n-print { display: inline !important; }   /* 인쇄 집합 기준 번호(§8-4) */
+  [data-pf-reveal] { opacity: 1 !important; transform: none !important; }      /* 화면 전용 등장 효과는 인쇄에서 최종 상태 */
+  *, *::before, *::after { animation-duration: 0s !important; animation-delay: 0s !important;
+                           transition: none !important; }
+  html[data-pf-ready="no"] .pf-deck,
+  html[data-pf-ready="timeout"]:not([data-pf-print-anyway]) .pf-deck { display: none !important; }
+  html[data-pf-ready="no"] body::before,
+  html[data-pf-ready="timeout"]:not([data-pf-print-anyway]) body::before {
+    content: "아직 페이지를 그리는 중입니다. 화면이 다 나타난 뒤 다시 인쇄(Ctrl+P)하거나 [PDF로 저장] 버튼을 눌러 주세요.";
+    display: block; padding: 48px; font: 700 28px/1.5 sans-serif; }
+}
+/* ── ① 01 §8-1 원문 끝 ───────────────────────────────────────────────────── */
+
+/* ── ② R0 A3 수정 1~3(인쇄만): @page size !important, html·body 높이·overflow 초기화, 장면 box-sizing·position 고정 ── */
+@page { size: 1280px 720px !important; }
+@media print {
+  html, body { height: auto !important; min-height: 0 !important; max-height: none !important; overflow: visible !important; }
+  .pf-scene { box-sizing: border-box !important; position: relative !important; }
+}
+
+/* ── 【R0 결정 #14】 인쇄에서 덱 밖과 덱 안의 장면 아닌 것은 숨김(화면 감사 outside-deck가 대신 알림) ── */
+@media print {
+  :is(body, body :has(.pf-deck)) > :not(.pf-deck, :has(.pf-deck)) { display: none !important; }
+  .pf-deck > :not(.pf-scene, :has(.pf-scene)) { display: none !important; }
+  /* 화면 낭독기 전용 글자("(새 탭)" 등)는 PDF 글자 층에 넣지 않음. 위치 지정 1px 상자라 빼도 줄바꿈은 그대로 */
+  .pf-scene .pf-sr-only { display: none !important; }
+}
+
+/* 측정용 컨테이너(01 §6-2). 이 안의 .pf-scene은 .pf-deck의 직계 자식이 아니라 배율이 걸리지 않음(k=1) */
+.pf-measure { position: fixed; left: 0; top: 0; width: 1px; height: 1px; overflow: hidden; visibility: hidden; }
+@media print { .pf-measure { display: none !important; } }
+
+/* 감사 결과 통로(?pf-audit=1). 화면·인쇄 모두 보이지 않음(--dump-dom으로 읽음) */
+#pf-audit { display: none !important; }
+
+/* 장면 포커스(키보드 이동) */
+.pf-scene:focus { outline: none; }
+.pf-scene:focus-visible { outline: 3px solid var(--accent, #2F6FEB); outline-offset: -3px; }
+
+/* 건너뛰기 링크(HUD보다 앞, 같은 탭) — 포커스될 때만 보임 */
+.pf-skiplink { position: absolute; left: 8px; top: -60px; z-index: 1001; padding: 8px 12px; border-radius: 8px;
+               background: #17181C; color: #fff; font: 700 14px/1.4 system-ui, sans-serif; text-decoration: none; }
+.pf-skiplink:focus { top: 8px; }

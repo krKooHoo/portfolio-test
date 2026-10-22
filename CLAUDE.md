@@ -18,9 +18,10 @@
 │   └── code/                #    (선택) 핵심 소스코드 .cs
 ├── format/                  # 📏 가이드 판정 기준 (읽기 전용)
 ├── data/                    # 🤖 /portfolio-build가 생성 (portfolio.json, projects/*.json)
-├── index.html               # 🖥 고정 렌더러 — 포트폴리오 요약(랜딩)
-├── project.html             # 🖥 고정 렌더러 — 프로젝트 상세 (?p=<폴더 이름>)
-├── assets/                  # 🖥 렌더러 CSS·JS
+├── index.html               # 🖥 고정 렌더러 — 포트폴리오 덱 (16:9 슬라이드, 제출 PDF)
+├── project.html             # 🖥 고정 렌더러 — 프로젝트 요약 덱 (?p=<폴더 이름>)
+├── doc.html                 # 🖥 고정 렌더러 — 상세 기술문서 (?p=<폴더 이름>, src/의 기술 문서 md를 직접 읽음)
+├── assets/                  # 🖥 렌더러 CSS·JS (덱 키트·장면 키트·상세 문서)
 ├── custom/                  # 🎨 /portfolio-custom 결과 (직접 생성 모드)
 └── report.md                # 📋 점검 리포트 (git 제외, 로컬 전용)
 ```
@@ -39,7 +40,8 @@ flowchart LR
     F["format/ 판정 기준"] --> B
     B --> D["data/*.json"]
     B --> R["report.md"]
-    D --> I["index.html · project.html"]
+    D --> I["index.html 포트폴리오 덱 · project.html 요약 덱 · doc.html 상세 문서"]
+    S -.->|"기술 문서 md (doc.html 전문 · project.html 제목)"| I
     D -.->|"직접 입력 시만"| C["/portfolio-custom → custom/index.html"]
 ```
 
@@ -63,7 +65,7 @@ flowchart LR
 3. **Claude가 요약한 문장은 표시한다.** 원문을 그대로 옮기지 않고 Claude가 압축한 문장(한 줄 소개, 기술 스택 근거 등)은
    리포트의 "확인해 주세요" 목록에 넣어 수강생이 직접 검토하게 합니다.
 4. **고칠 곳은 소스다.** 페이지 내용이 틀리면 `data/`를 손으로 고치기보다 `src/`·`profile.md`를 고치고 다시 빌드하도록 안내합니다.
-5. **렌더러는 건드리지 않는다.** `index.html`, `project.html`, `assets/`는 사용자가 요청할 때만 수정합니다.
+5. **렌더러는 건드리지 않는다.** `index.html`, `project.html`, `doc.html`, `assets/`는 사용자가 요청할 때만 수정합니다.
    디자인 변경 요청은 ① `profile.md`의 강조색 ② `/portfolio-custom` 순으로 안내합니다.
 6. **경로는 상대경로, 대소문자 정확히.** GitHub Pages(리눅스)는 대소문자를 구분합니다.
 
