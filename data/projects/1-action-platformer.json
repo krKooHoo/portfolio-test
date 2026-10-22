@@ -4,37 +4,14 @@
   "title": "Switch Strike",
   "tagline": "교대 한 번으로 위기를 반격 기회로 바꾸는 2D 사이드뷰 액션 플랫포머",
   "cover": "images/cover.png",
-  "team": {
-    "type": "solo",
-    "size": "1인",
-    "role": ""
-  },
+  "team": { "type": "solo", "size": "1인", "role": "" },
   "meta": [
-    {
-      "label": "장르",
-      "value": "2D 사이드뷰 액션 플랫포머"
-    },
-    {
-      "label": "기간",
-      "value": "2주 (2026.06.24 ~ 2026.07.07)"
-    },
-    {
-      "label": "인원",
-      "value": "1인 개발 (개인 평가 프로젝트)"
-    },
-    {
-      "label": "환경",
-      "value": "Unity 6.3 (6000.3.15f1), C#, Rider"
-    }
+    { "label": "장르", "value": "2D 사이드뷰 액션 플랫포머" },
+    { "label": "기간", "value": "2주 (2026.06.24 ~ 2026.07.07)" },
+    { "label": "인원", "value": "1인 개발 (개인 평가 프로젝트)" },
+    { "label": "환경", "value": "Unity 6.3 (6000.3.15f1), C#, Rider" }
   ],
-  "tags": [
-    "Unity 6.3",
-    "C#",
-    "Kinematic 이동",
-    "Animator FSM",
-    "QTE",
-    "중재자(CombatManager)"
-  ],
+  "tags": ["Unity 6.3", "C#", "Kinematic 이동 컨트롤러", "Animator 기반 FSM", "캐릭터 교대 & QTE", "중재자 기반 전투 처리", "ScriptableObject"],
   "links": {
     "github": "https://github.com/chesherneko/2D-Action-Platformer",
     "video": "https://www.youtube.com/watch?v=qtJYxDbJ-fQ",
@@ -43,106 +20,88 @@
   "highlights": [
     {
       "title": "Kinematic 이동 컨트롤러",
-      "what": "Rigidbody 속도 대신 이동량을 매 프레임 직접 계산하고 충돌도 직접 해결해, 정점 체공·고정 거리 대시·벽 매달리기를 구현",
-      "how": "`PlayerController`는 `RequestJump()`·`RequestDash()` 같은 요청만 보내고 `PlayerMove`가 `FixedUpdate`에서 적용. 축별 BoxCast로 X를 먼저 검사한 뒤 그 위치에서 Y를 검사하며, 조작 수치는 `PlayerMoveSettings`(ScriptableObject)로 분리",
-      "why": "Rigidbody 물리 이동은 충돌 처리를 엔진이 해 주지만 점프 곡선 같은 세밀한 움직임을 만들기 어려움. 목표가 \"콘텐츠 볼륨보다 조작감\"이라 충돌 처리를 직접 책임지는 대가를 감수하고 직접 구현을 선택",
-      "section": "3. 이동 컨트롤러"
+      "what": "Rigidbody 속도 대신 이동량을 매 프레임 직접 계산하고 충돌도 직접 해결해, 정점 체공·고정 거리 대시·벽 매달리기 같은 움직임을 수치 단위로 설계합니다.",
+      "how": "캐릭터 콜라이더 크기의 박스를 이동 방향으로 쏘는 BoxCast로 X축을 먼저 검사하고, 실제로 이동할 X 위치로 박스를 옮긴 뒤 Y축을 검사합니다. 조작 수치는 `PlayerMoveSettings`(ScriptableObject)로 분리했습니다.",
+      "why": "Rigidbody 물리 이동은 충돌 처리를 엔진이 해 주지만 점프 곡선 같은 세밀한 움직임을 원하는 대로 만들기 어렵습니다. 목표가 \"콘텐츠 볼륨보다 조작감\"이었기 때문에 충돌 해결을 직접 책임지는 대가를 감수하고 Kinematic 방식을 선택했습니다.",
+      "section": "3.4 핵심 동작: 축 분리 충돌 해결"
+    },
+    {
+      "title": "Animator 기반 FSM",
+      "what": "플레이어와 몬스터가 공유하는 FSM 베이스로, 매 프레임 Animator의 현재 상태 Tag를 읽어 Dictionary에 매핑된 코드 State를 실행합니다.",
+      "how": "`AnimationStateController`가 `tagHash`로 State를 찾고, 상태가 바뀐 프레임에만 Exit → Enter를 호출합니다. State는 `normalizedTime`을 받아 콤보 입력 창 같은 진행도 기반 로직을 처리합니다.",
+      "why": "애니메이션이 스프라이트 시트라 사실상 모션 = 상태였기 때문에, 코드와 Animator 두 상태 머신을 맞추는 코드 주도 FSM 대신 Animator 하나를 기준으로 삼는 Animator 주도 FSM을 선택했습니다.",
+      "section": "2.4 Animator 기반 FSM의 동작"
     },
     {
       "title": "캐릭터 교대 & QTE",
-      "what": "두 캐릭터를 번갈아 꺼내 쓰며, 교대 무적은 방어 수단, 게이지 MAX 상태의 QTE 등장 공격은 반격 수단이 되도록 설계",
-      "how": "`PlayerSwitchManager`가 퇴장·등장 코루틴을 동시에 시작해 둘 다 끝날 때까지 대기하고, HP·수평 속도·방향을 전용 구조체로 넘겨 끊김 없이 교대. 완벽 회피는 `CanTakeDamage` 단계에서 피해를 무시하고 게이지 ×4를 지급",
-      "why": "현재 플레이어 참조는 대상 주입 구조 대신 `Player.Local` 정적 참조를 선택. 조작 캐릭터가 항상 한 명이고 HP도 공유하므로, 2주 기간·규모에서 변경 전파 구조는 과한 설계라고 판단",
-      "section": "4. 캐릭터 교대 & QTE"
+      "what": "두 캐릭터를 번갈아 꺼내 쓰며, 교대 무적은 방어 수단, 게이지가 가득 찬 상태의 QTE 등장 공격은 공격 수단이 되도록 했습니다.",
+      "how": "퇴장 코루틴과 등장 코루틴을 동시에 시작해 둘 다 끝날 때까지 기다리고, HP·수평 속도·바라보는 방향을 다음 캐릭터에 넘깁니다. 현재 조작 캐릭터는 `Player.Local` 하나에 두어 교대 시 이것만 바꿉니다.",
+      "why": "대상 주입 구조는 결합도가 낮지만 교대마다 변경을 전파하는 코드가 필요합니다. 조작 중인 캐릭터가 항상 한 명이고 HP도 공유하므로, 2주 기간과 규모를 고려해 `Player.Local` 정적 참조를 선택했습니다.",
+      "section": "4.3 핵심 동작"
     },
     {
       "title": "중재자 기반 전투 처리",
-      "what": "플레이어·몬스터·보스·투사체가 모두 같은 전투 흐름을 사용하도록, HitBox와 HurtBox 사이를 `CombatManager`가 중재",
-      "how": "HitBox가 레이어·중복 타격을 검사하고 Dictionary에 캐싱된 HurtBox를 찾아 `CombatEvent`를 전달. `CombatManager`가 피해 수용 여부 확인 → 히트스탑 → 피해 적용 순으로 처리",
-      "why": "HitBox가 직접 판정하면 히트스탑·무적 같은 공통 규칙이 공격 종류마다 흩어짐. 중재자를 두면 문제가 생겼을 때 볼 곳이 하나이고, 완벽 회피도 `CanTakeDamage`에 조건 하나로 구현 가능",
-      "section": "5. 전투 처리 흐름"
-    },
-    {
-      "title": "Animator 주도 FSM과 대상별 제어 방식",
-      "what": "플레이어·몬스터는 Animator 기반 FSM, 보스는 패턴 오브젝트 단위의 GameObject 기반 FSM으로 대상별 요구사항에 맞춰 제어",
-      "how": "공통 부모 `AnimationStateController`가 매 프레임 Animator 현재 상태의 Tag 해시로 코드 State를 찾아 실행하고, `normalizedTime`을 넘겨 콤보 입력 창 같은 진행도 기반 로직을 작성",
-      "why": "스프라이트 시트 애니메이션이라 사실상 모션 = 상태였기 때문에, 코드와 Animator 두 상태 머신을 맞추기보다 Animator 하나를 기준으로 삼는 편이 낫다고 판단. 보스는 패턴 오브젝트를 켜는 것만으로 단독 테스트할 수 있어 GameObject 기반을 선택",
-      "section": "2.4 Animator 기반 FSM의 동작"
+      "what": "플레이어·몬스터·보스·투사체가 같은 전투 흐름을 쓰며, HitBox와 HurtBox 사이를 `CombatManager`가 중재합니다.",
+      "how": "HitBox는 레이어·중복 타격을 검사한 뒤 `CombatEvent`를 만들어 전달하고, `CombatManager`가 `CanTakeDamage` 확인 → 히트스탑 → `TakeDamage` 순으로 처리합니다. Collider → HurtBox는 Dictionary로 캐싱합니다.",
+      "why": "HitBox가 직접 판정하면 히트스탑·무적 판정 같은 공통 규칙이 공격 종류마다 흩어집니다. 중재자를 두면 문제가 생겼을 때 볼 곳이 하나이고, 완벽 회피도 `CanTakeDamage`에 조건 하나를 넣는 것만으로 구현할 수 있었습니다.",
+      "section": "5.3 핵심 동작"
     }
   ],
   "troubleshooting": [
     {
       "title": "점프 이동 중 타일 모서리에 끼는 문제",
-      "problem": "점프하며 대각선으로 이동하다 타일 모서리 부근에 착지하면 캐릭터가 모서리에 끼어 움직이지 않음",
-      "cause": "X축과 Y축의 이동 가능 여부를 둘 다 이동 전의 같은 위치에서 검사해, 두 이동을 합친 대각선 경로의 타일을 걸러내지 못함",
-      "solution": "X축을 먼저 검사해 이동량을 확정하고, 검사용 박스를 그 위치로 옮긴 다음 Y축을 검사하도록 변경",
+      "problem": "점프하며 대각선으로 이동하다가 타일 모서리 부근에 착지하면, 캐릭터가 모서리에 끼어 움직이지 않았습니다.",
+      "cause": "X축과 Y축의 이동 가능 여부를 둘 다 이동 전의 같은 위치에서 검사해, 두 이동을 합친 대각선 경로에 있는 타일을 걸러내지 못했습니다.",
+      "solution": "X축을 먼저 검사해 실제로 이동할 양을 확정하고, 검사용 박스를 그 위치로 옮긴 다음 Y축을 검사하도록 바꿨습니다.",
       "result": "",
-      "section": "3.8 트러블슈팅: 점프 이동 중 타일 모서리에 끼는 문제",
-      "lesson": "충돌 검사는 각 축이 따로 가능한가가 아니라 실제로 이동할 경로가 가능한가를 확인해야 한다는 것을 배움"
+      "lesson": "충돌 검사는 각 축이 따로 가능한가가 아니라 실제로 이동할 경로가 가능한가를 확인해야 하며, 앞 축의 결과가 다음 축 검사의 시작점이 되어야 합니다.",
+      "section": "3.8 트러블슈팅: 점프 이동 중 타일 모서리에 끼는 문제"
     },
     {
       "title": "소비되지 않은 Trigger가 남아 생긴 문제 2건",
-      "problem": "낙하 중 QTE 교대 후 땅에 서 있는데 Fall 모션이 재생되고, 몬스터가 부활하자마자 허공에 공격함",
-      "cause": "FALL 트리거와 공격 트리거가 QTE·사망으로 상태가 강제로 끊기면서 소비되지 않은 채 남아 있다가 뒤늦게 소비됨",
-      "solution": "QTE 상태를 나갈 때 접지 상태면 FALL 트리거를 `ResetTrigger`로 정리하고, 사망 상태 진입 시 공격 요청 플래그와 공격 트리거를 초기화",
+      "problem": "낙하 중 QTE 교대 후 땅에 서 있는데도 Fall 모션이 재생되고, 몬스터가 부활하자마자 허공에 공격하는 현상이 있었습니다.",
+      "cause": "FALL 트리거와 공격 트리거가 QTE 모션·사망으로 상태가 강제로 끊기면서 소비되지 않은 채 남아 있다가, 뒤늦게 소비됐습니다.",
+      "solution": "QTE 상태를 나갈 때 접지 상태라면 FALL 트리거를 `ResetTrigger`로 정리하고, 사망 상태에 들어갈 때 공격 요청 플래그와 공격 트리거를 초기화했습니다.",
       "result": "",
-      "section": "7.2 소비되지 않은 Trigger가 남아 생긴 문제 2건",
-      "lesson": "Trigger는 소비될 때까지 남는 예약이며, 상태가 강제로 끊기는 지점에서는 남은 Trigger를 반드시 정리해야 한다는 것을 배움"
+      "lesson": "Animator의 Trigger는 소비될 때까지 남아 있는 예약이며, 상태가 강제로 끊기는 지점에서는 남아 있을 수 있는 Trigger를 반드시 정리해야 합니다.",
+      "section": "7.2 소비되지 않은 Trigger가 남아 생긴 문제 2건"
     },
     {
       "title": "공중 공격·스킬 모션이 Jump/Fall 모션에 덮이는 문제",
-      "problem": "공중에서 공격이나 스킬을 쓰면 모션 도중 Jump/Fall 모션으로 넘어가 공격 모션이 덮어씌워짐",
-      "cause": "`PlayerController`가 공중 상태가 바뀔 때 바깥에서 트리거를 쏘는 구조라, 공격 도중 Y 속도가 바뀌면 Jump/Fall 트리거가 그대로 들어감",
-      "solution": "가드 Bool `CAN_JUMP_OR_FALL`을 두고 공격·스킬·QTE·사망 상태에 들어갈 때 끄고 나올 때 켜서, 꺼져 있으면 트리거를 쏘지 않도록 함",
+      "problem": "공중에서 공격이나 스킬을 쓰면, 모션 도중에 Jump/Fall 모션으로 넘어가 공격 모션이 덮어씌워졌습니다.",
+      "cause": "`PlayerController`가 공중 상태가 바뀔 때 바깥에서 트리거를 쏘는 구조라, 공격 도중에도 Y 속도가 바뀌면 Jump/Fall 트리거가 들어가 공격 모션을 끊었습니다.",
+      "solution": "`CAN_JUMP_OR_FALL` 가드 Bool을 두고 공격·스킬·QTE·사망 상태에 들어갈 때 끄고 나올 때 켜, 꺼져 있으면 Jump/Fall 트리거를 쏘지 않도록 했습니다.",
       "result": "",
-      "section": "7.1 공중 공격·스킬 모션이 Jump/Fall 모션에 덮이는 문제",
-      "lesson": "가드 파라미터를 추가하기 전에 Animator 트랜지션의 Interruption Source 설정부터 확인해 봤어야 했다고 회고"
+      "lesson": "가드 파라미터를 추가하기 전에 Animator 트랜지션의 Interruption Source 설정부터 확인해 봤어야 했다고 회고합니다.",
+      "section": "7.1 공중 공격·스킬 모션이 Jump/Fall 모션에 덮이는 문제"
     }
   ],
   "screenshots": [
-    {
-      "src": "images/switch_qte.gif",
-      "caption": "교대와 QTE"
-    },
-    {
-      "src": "images/perfect_dodge.gif",
-      "caption": "완벽 회피"
-    },
-    {
-      "src": "images/jump_compare.gif",
-      "caption": "점프 비교 — 조작감 보정 기법"
-    },
-    {
-      "src": "images/wall_dash.gif",
-      "caption": "벽 점프와 대시"
-    },
-    {
-      "src": "images/monster_spearman.gif",
-      "caption": "창병 — 힘을 모으는 동작이 다음 공격의 예고 신호"
-    },
-    {
-      "src": "images/boss_special1.gif",
-      "caption": "보스 특수 1 · 눈과 빔"
-    }
+    { "src": "images/jump_compare.gif", "caption": "점프 비교" },
+    { "src": "images/wall_dash.gif", "caption": "벽 점프와 대시" },
+    { "src": "images/switch_qte.gif", "caption": "교대와 QTE" },
+    { "src": "images/perfect_dodge.gif", "caption": "완벽 회피" },
+    { "src": "images/boss_special2.gif", "caption": "특수 2 · 미니언 스포너 (2.5배속)" },
+    { "src": "images/boss_intro.gif", "caption": "보스방 진입 연출 (2배속)" }
   ],
   "retro": {
     "achieved": [
       "기획서의 필수 구현 범위를 모두 구현 (패링은 판단에 따라 제외)",
-      "기획서의 목표 경험 4가지(조작의 손맛·전투의 리듬감·반격의 쾌감·판단의 재미)를 시스템으로 옮김",
+      "기획서가 정의한 네 가지 목표 경험(조작의 손맛·전투의 리듬감·반격의 쾌감·판단의 재미)을 시스템으로 옮김",
       "이동 관련 조작 수치를 ScriptableObject로 분리해, 코드 수정 없이 인스펙터에서 반복 튜닝",
       "플레이테스트 피드백을 반영한 조정: 완벽 회피 판정 0.1초 → 0.05초, 몬스터 히트박스 1프레임 선행, 대시 잔상 생성 기준 변경"
     ],
     "regrets": [
-      "투사체가 대시 중인 플레이어를 통과함 (원인을 완전히 규명하지 못함)",
-      "히트스탑이 `timeScale` 0 방식이라 게임 전체를 멈춤",
-      "Animator 그래프가 복잡해지고, Tag 누락 같은 실수가 에러 없이 조용히 묻힘",
-      "보스에 HP 기반 페이즈가 없음"
+      "투사체가 대시 중인 플레이어를 통과함 (무적 타이밍이 아닌데도)",
+      "Animator 그래프가 복잡해지고, 실수가 조용히 묻힘",
+      "교대할 때마다 QTE 게이지가 초기화됨",
+      "히트스탑이 게임 전체를 멈춤"
     ],
     "plans": [
-      "프레임 사이의 이동 경로 전체를 검사하도록 개선해 투사체 통과 원인을 좁혀 볼 계획",
-      "공격자와 피격 대상의 애니메이션·이동만 멈추는 대상 단위 히트스탑으로 전환",
-      "매핑되지 않은 Tag 경고 로그 출력, 이벤트성 전이는 Trigger·지속 상태는 Bool로 파라미터 기준 정립",
-      "패턴 선택 단계에 HP 비율 조건을 추가해 페이즈별 패턴 목록 사용"
+      "프레임 사이의 이동 경로 전체를 검사하도록 개선해 원인을 좁혀 볼 계획",
+      "매핑되지 않은 Tag로 기본 상태에 빠지면 경고 로그 출력, 이벤트성 전이는 Trigger·지속 상태는 Bool로 파라미터 기준 정립",
+      "게이지를 유지해, 남은 게이지를 활용하는 교대 템포 기술로 발전",
+      "공격자와 피격 대상의 애니메이션·이동만 멈추는 대상 단위 히트스탑으로 전환"
     ]
   }
 }

@@ -17,51 +17,27 @@
     {
       "name": "Unity",
       "evidence": [
-        { "text": "Animator Tag 기반 FSM으로 플레이어·몬스터 상태 제어", "project": "1-action-platformer" },
-        { "text": "보드 빌더 도구로 Board.json 기반 36칸 보드 런타임 생성", "project": "2-Yggdrasil" },
+        { "text": "BoxCast 축 분리 충돌로 Kinematic 이동 컨트롤러 구현", "project": "1-action-platformer" },
+        { "text": "Unity 6로 2~4인 온라인 보드게임의 보드 시스템 구현", "project": "2-Yggdrasil" },
+        { "text": "ScriptableObject로 블록 타입→스프라이트·머티리얼 매핑", "project": "0-Tidy-Mommy" },
         { "text": "OnEnable/OnDisable 짝으로 제작 이벤트 구독·해제 관리", "project": "00-example-crafting" }
       ]
     },
     {
       "name": "C#",
       "evidence": [
-        { "text": "축 분리 BoxCast로 Kinematic 이동 충돌을 직접 해결", "project": "1-action-platformer" },
-        { "text": "제네릭 `DataTable<DTO, Def>`로 TSV 표 로딩 공통화", "project": "2-Yggdrasil" },
-        { "text": "LINQ 레시피 조회 + `roll` 주입으로 확률 판정 테스트", "project": "00-example-crafting" }
+        { "text": "퇴장·등장 코루틴을 동시에 실행해 끊김 없는 캐릭터 교대 구현", "project": "1-action-platformer" },
+        { "text": "제네릭 `DataTable<DTO, Def>`로 TSV 표 불러오기를 하나로 통합", "project": "2-Yggdrasil" },
+        { "text": "C# `event`로 제작 결과 전파, 확률 판정 `roll` 주입으로 테스트", "project": "00-example-crafting" }
       ]
     },
     {
       "name": "디자인 패턴",
       "evidence": [
-        { "text": "Strategy + Factory로 칸 효과 7종을 매니저에 위임", "project": "2-Yggdrasil" },
-        { "text": "중재자(`CombatManager`)로 모든 피격 처리 일원화", "project": "1-action-platformer" },
-        { "text": "`MonoSingleton<T>`로 매니저 5개 싱글톤 구성", "project": "0-Tidy-Mommy" }
-      ]
-    },
-    {
-      "name": "ASP.NET Core WebSocket",
-      "evidence": [
-        { "text": "서버 게임 로직·전원 보고 대기·결투 흐름 구현", "project": "2-Yggdrasil" }
-      ]
-    },
-    {
-      "name": "ScriptableObject",
-      "evidence": [
-        { "text": "이동 조작 수치를 SO로 분리해 인스펙터에서 튜닝", "project": "1-action-platformer" },
-        { "text": "블록 타입 → 스프라이트·머티리얼 매핑 라이브러리", "project": "0-Tidy-Mommy" }
-      ]
-    },
-    {
-      "name": "오브젝트 풀링",
-      "evidence": [
-        { "text": "블록 36개를 미리 배치해 Queue 풀로 재사용", "project": "0-Tidy-Mommy" },
-        { "text": "Queue 기반 풀로 대시 잔상 생성·파괴 반복 제거", "project": "1-action-platformer" }
-      ]
-    },
-    {
-      "name": "확률·난이도 설계",
-      "evidence": [
-        { "text": "지수 가중치 스폰으로 10단계 난이도 곡선 설계", "project": "0-Tidy-Mommy" }
+        { "text": "Strategy + Factory로 칸 효과 7종을 클래스로 분리", "project": "2-Yggdrasil" },
+        { "text": "중재자(`CombatManager`)로 모든 피격 처리 흐름을 일원화", "project": "1-action-platformer" },
+        { "text": "`MonoSingleton<T>`로 싱글톤 매니저 5개의 중복 코드 축소", "project": "0-Tidy-Mommy" },
+        { "text": "이벤트 기반 구조·인터페이스 의존(DIP)으로 UI와 제작 로직 분리", "project": "00-example-crafting" }
       ]
     }
   ],
