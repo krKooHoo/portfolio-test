@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>상세 기술문서 · 시안</title>
+<!-- 상세 기술문서 레이아웃 시안 (R0.5): doc.html?p=<폴더>&layout=1|2|3
+     내용은 ../../data/projects/<폴더>.json + ../../src/<폴더>/<doc>에서 읽습니다. 문서 처리는 assets/project.js renderDoc과 같은 라이브러리·버전입니다. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<link rel="stylesheet" media="screen" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/github-dark.min.css" />
+<link rel="stylesheet" media="print" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/github.min.css" />
+<link rel="stylesheet" href="doc.css" />
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+</head>
+<body>
+<div id="top"></div>
+<a class="skip-link" href="#main">본문으로 건너뛰기</a>
+<div id="app"><p class="loading">불러오는 중…</p></div>
+<script src="../../assets/common.js"></script>
+<script src="doc.js"></script>
+</body>
+</html>

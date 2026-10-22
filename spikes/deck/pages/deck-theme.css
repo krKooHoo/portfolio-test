@@ -1,0 +1,330 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   덱 스파이크 장면 테마 (spikes/deck/pages/deck-theme.css) — R0 pf-scenes.css 자리(렌더러 CSS). 인쇄 규칙 없음(인쇄는 키트만).
+   시각 체계는 참고 덱(가이드 발표 덱 46장)의 색 토큰·글자 단계·모티프를 포트폴리오 내용에 맞게 옮겼습니다.
+   - 바꾼 곳: 글자 대비 4.5:1 미만이던 --muted(#71768F → #666B85), 상태색 글자(--ok #2FA36B → #1B7A4B, --amber #CC8207 → #8F5A00).
+     --faint(#9AA0B8, 2.59:1)는 선·장식에만 씀
+   - 코드 블록: 고정폭 글꼴(D2Coding 실제 로드) + white-space:pre-wrap(참고 덱의 가변폭·들여쓰기 사라짐 버그를 고침)
+   - 장면 격자: 왼쪽·오른쪽 72px(참고 덱 52/72), 머리·본문·바닥글 상자는 아래 "격자" 절
+   장면 안 금지(§9-4): vw·vh, 뷰포트 @media, fixed·sticky, overflow:auto 상자, CSS background-image
+   ════════════════════════════════════════════════════════════════════════════ */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+@import url('https://cdn.jsdelivr.net/npm/d2coding@1.3.2/d2coding-subset.css');
+
+:root {
+  --ink: #20233A; --muted: #666B85; --faint: #9AA0B8;
+  --line: #E7E9F4; --paper: #FFFFFF; --bg: #FFFFFF; --deck-bg: #EEF0F8; --card: #FBFBFE; --zebra: #F7F8FD;
+  --indigo: #5B6AD0; --indigo-deep: #3E4CAB; --indigo-mid: #8B95E4; --indigo-soft: #EDEFFB; --indigo-chip: #E0E4FA;
+  --code-bg: #1E2138; --code-fg: #E6E8F5; --code-dim: #8890BE;
+  --ok: #1B7A4B; --ok-fill: #2FA36B; --amber: #8F5A00;
+  --sans: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'D2Coding', Consolas, monospace;
+  --measure: 820px;
+  --accent: var(--indigo); --accent-ink: var(--indigo-deep); --accent-soft: var(--indigo-soft);   /* R0 이름과의 호환 */
+}
+body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: antialiased; }
+.pf-scene, .pf-flow { font-family: var(--sans); color: var(--ink); font-size: 16px; line-height: 1.6; word-break: keep-all; overflow-wrap: break-word; }
+.pf-scene *, .pf-flow * { box-sizing: border-box; }
+.pf-scene :where(h1, h2, h3, h4, h5, h6, p, ul, ol, dl, dd, dt, figure, blockquote, pre, table),
+.pf-flow :where(h1, h2, h3, h4, h5, h6, p, ul, ol, dl, dd, dt, figure, blockquote, pre, table) { margin: 0; padding: 0; }
+.pf-scene code, .pf-flow code { font-family: var(--mono); font-size: .88em; background: var(--indigo-soft); color: var(--indigo-deep);
+  padding: 1px 6px; border-radius: 6px; overflow-wrap: anywhere; }
+.pf-scene a { color: var(--indigo-deep); }
+
+/* ── 격자 ──
+   sum(요약 장면): 머리 top 44(eyebrow 줄 + 제목 줄) · 본문 top 152, 1136×516
+   doc(문서 장면): 머리 top 30(eyebrow 줄만) · 본문 top 84, 1136×584
+   bare(표지·목차·디바이더·맺음): 머리 없음 · 본문 top 56, 1136×612
+   바닥글: 아래 44px(이름 · 프로젝트, 장면 번호) */
+.pf-head { position: absolute; left: 72px; right: 72px; top: 0; }
+.pf-sum > .pf-head { top: 44px; }
+.pf-doc > .pf-head { top: 30px; }
+.pf-headrow { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.pf-eyebrow { font-size: 15px; font-weight: 800; line-height: 20px; color: var(--indigo); letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; }
+.pf-rlabel, .pf-crumb { font-size: 15px; font-weight: 600; line-height: 20px; color: var(--muted); text-align: right; min-width: 0; }
+.pf-crumb b { color: var(--ink); font-weight: 700; }
+.pf-crumb .pf-cont { color: var(--muted); font-weight: 600; }
+.pf-titlerow { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
+.pf-title { font-size: 32px; font-weight: 800; letter-spacing: -.02em; line-height: 1.2; color: var(--ink); }
+.pf-title .pf-part { font-size: 16px; font-weight: 700; color: var(--muted); margin-left: 12px; letter-spacing: 0; }
+.pf-body { position: absolute; left: 72px; width: 1136px; top: 152px; height: 516px; overflow: hidden; }
+.pf-doc > .pf-body { top: 84px; height: 584px; contain: size layout style paint; }
+.pf-bare > .pf-body { top: 56px; height: 612px; }
+.pf-foot { position: absolute; left: 72px; right: 72px; bottom: 0; height: 44px; display: flex; align-items: center;
+           justify-content: space-between; gap: 24px; font-size: 13px; line-height: 1.3; font-weight: 600; color: var(--muted); }
+.pf-foot .pf-num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ── 모티프(참고 덱) ── */
+.pill { display: inline-flex; align-items: center; gap: 8px; flex: none; border: 1.5px solid var(--ink); border-radius: 999px; padding: 5px 16px;
+        font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--ink); white-space: nowrap; }
+.banner { display: inline-block; background: var(--indigo); color: #fff; border-radius: 10px; padding: 8px 18px; font-size: 17px; font-weight: 700; }
+.chip { display: inline-block; background: var(--indigo-soft); color: var(--indigo-deep); border-radius: 7px; padding: 1px 9px; font-weight: 700; white-space: nowrap; }
+.dotrule { display: flex; align-items: center; }
+.dotrule .ln { height: 2px; background: var(--indigo); flex: 1; }
+.dotrule .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--indigo); margin-left: -2px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
+.labelchip { display: inline-flex; align-items: center; justify-content: center; text-align: center; background: var(--code-bg); color: #fff;
+             border-radius: 10px; padding: 8px 12px; font-size: 14px; font-weight: 700; line-height: 1.35; }
+.labelchip.indigo { background: var(--indigo-deep); }
+.labelchip.ok { background: var(--ok); }
+.arrow { color: var(--indigo); font-size: 24px; font-weight: 800; line-height: 1; }
+.note { background: #FAFBFF; border: 1px solid var(--line); border-left: 4px solid var(--indigo-mid); border-radius: 0 12px 12px 0; padding: 12px 18px; }
+.note .nlabel { font-size: 12px; font-weight: 800; letter-spacing: .1em; color: var(--indigo-deep); }
+.note .nbody { margin-top: 4px; font-size: 16px; line-height: 1.6; color: var(--ink); }
+.callout { background: var(--indigo-soft); border-radius: 12px; padding: 14px 20px; color: var(--indigo-deep); }
+.bignum { font-size: 120px; font-weight: 800; line-height: .9; letter-spacing: -.03em; color: var(--indigo-chip); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; }
+.tags li { font-size: 13px; font-weight: 700; padding: 2px 9px; border-radius: 7px; background: var(--indigo-soft); color: var(--indigo-deep); }
+.badge { display: inline-block; white-space: nowrap; font-size: 13px; font-weight: 700; padding: 2px 10px; border-radius: 999px; border: 1.5px solid var(--ink); color: var(--ink); background: var(--paper); }
+.badge.team { background: var(--indigo); color: #fff; border-color: var(--indigo); }
+.url { font-family: var(--mono); font-size: 14px; color: var(--indigo-deep); overflow-wrap: anywhere; }
+.ph { display: grid; place-items: center; width: 100%; height: 100%; font-size: 44px; font-weight: 800; color: var(--indigo-deep); background: var(--indigo-soft); }
+.media { background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.media img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+.pf-xref { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--indigo-deep); text-decoration: none; overflow-wrap: anywhere; }
+.pf-xref .pf-n-screen, .pf-xref .pf-n-print { font-family: var(--mono); font-weight: 400; }
+table.mini { border-collapse: collapse; width: 100%; font-size: 15px; line-height: 1.55; table-layout: fixed; background: var(--paper); }
+table.mini th { background: var(--indigo); color: #fff; font-weight: 700; text-align: left; padding: 9px 14px; font-size: 14px; }
+table.mini td { padding: 9px 14px; border-bottom: 1px solid var(--line); color: var(--ink); vertical-align: top; overflow-wrap: anywhere; }
+table.mini tbody tr:nth-child(even) td { background: var(--zebra); }
+table.mini caption { caption-side: top; text-align: left; font-size: 13px; font-weight: 700; color: var(--muted); padding-bottom: 4px; }
+
+/* ── 머리 없는 장면의 윗줄(표지·맺음·프로젝트 표지) ── */
+.toprow { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; border-bottom: 1px solid var(--line); padding-bottom: 14px; }
+.toprow .rl { font-size: 15px; font-weight: 700; color: var(--muted); }
+
+/* ── L1 표지(참고 덱 A) ── */
+.t-L1 .pf-body { display: flex; flex-direction: column; }
+.cv-mid { flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
+.cv-h { font-size: 56px; font-weight: 800; line-height: 1.16; letter-spacing: -.03em; color: var(--ink); max-width: 1000px; }
+.cv-intro { margin-top: 22px; font-size: 21px; font-weight: 600; line-height: 1.55; color: var(--muted); max-width: 900px; }
+.cv-bot { display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; }
+.cv-lb { font-size: 14px; font-weight: 800; letter-spacing: .12em; color: var(--muted); }
+.cv-name { font-size: 32px; font-weight: 800; color: var(--ink); margin-top: 4px !important; line-height: 1.25; }
+.cv-name span { color: var(--indigo); margin-left: 8px; font-size: 24px; }
+table.kv { border-collapse: collapse; font-size: 15px; }
+table.kv th { color: var(--muted); font-weight: 800; letter-spacing: .08em; text-align: left; padding: 5px 22px 5px 0; white-space: nowrap; vertical-align: top; }
+table.kv td { color: var(--ink); font-weight: 600; border-left: 2px solid var(--indigo); padding: 5px 0 5px 16px; overflow-wrap: anywhere; }
+table.kv td.role { color: var(--indigo-deep); font-weight: 800; }
+
+/* ── L2 기술 스택(카드 격자) ── */
+.skills { display: grid; gap: 20px; height: 100%; }
+.skills.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.skills.rows { grid-template-columns: 1fr; gap: 10px; align-content: start; }
+.skill { padding: 22px 24px; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.skill h3 { font-size: 24px; font-weight: 800; letter-spacing: -.01em; color: var(--ink); }
+.skill .dotrule { margin-bottom: 4px; }
+.skill ul { list-style: none; display: grid; gap: 14px; }
+.skill li { font-size: 16px; line-height: 1.55; color: var(--ink); }
+.skill li .chip { display: table; margin-top: 4px; font-size: 13px; }
+.skills.rows .skill { display: grid; grid-template-columns: 180px 1fr; align-items: start; gap: 18px; padding: 14px 20px; }
+.skills.rows .skill .dotrule { display: none; }
+.skills.rows .skill ul { gap: 4px; }
+.skills.rows .skill li { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; font-size: 15px; }
+.skills.rows .skill li .chip { display: inline-block; margin: 0; }
+
+/* ── L3 프로젝트 카드 ── */
+.cards { display: grid; gap: 20px; height: 100%; }
+.cards.n1 { grid-template-columns: 7fr 5fr; } .cards.n2 { grid-template-columns: 1fr 1fr; }
+.cards.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .cards.n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pcard { overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+.pcard .media { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; aspect-ratio: 16 / 9; flex: none; background: #fff; }
+.pcard .cb { padding: 14px 18px 16px; display: flex; flex-direction: column; gap: 7px; min-height: 0; }
+.pcard .kick { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-size: 13px; color: var(--muted); font-weight: 600; }
+.pcard h3 { font-size: 21px; font-weight: 800; letter-spacing: -.02em; line-height: 1.3; }
+.pcard h3 a { color: var(--ink); text-decoration: none; }
+.pcard .tagline { font-size: 15px; color: var(--ink); line-height: 1.55; }
+.pcard .role { font-size: 14px; color: var(--ink); line-height: 1.5; }
+.pcard .role b { color: var(--indigo-deep); margin-right: 6px; }
+
+/* ── L4 한눈에 보기 표 ── */
+.t-L4 table.mini td:first-child { font-weight: 800; }
+
+/* ── L5 맺음(참고 덱 A, 맺음) ── */
+.t-L5 .pf-body { display: flex; flex-direction: column; }
+.cl-mid { flex: 1; display: grid; grid-template-columns: 5fr 7fr; gap: 48px; align-items: center; min-height: 0; }
+.cl-name { font-size: 48px; font-weight: 800; letter-spacing: -.03em; line-height: 1.15; }
+.cl-me .dotrule { margin: 22px 0 18px; max-width: 360px; }
+.cl-me p + p { margin-top: 6px !important; }
+.cl-me .em { font-size: 19px; font-weight: 600; }
+.cl-lk { display: grid; gap: 12px; }
+.cl-lk > div { border-bottom: 1px solid var(--line); padding-bottom: 10px; font-size: 15px; line-height: 1.6; }
+.cl-lk b { display: block; font-size: 18px; font-weight: 800; margin-bottom: 2px; }
+.cl-lk .none { color: var(--muted); font-size: 14px; }
+
+/* ── P1 프로젝트 표지 ── */
+.t-P1 .pf-body { display: flex; flex-direction: column; }
+.pc-main { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); grid-template-rows: minmax(0, 100%); gap: 40px; margin-top: 26px; min-height: 0; }
+.t-P1.portrait .pc-main { grid-template-columns: minmax(0, 1fr) 300px; }
+.t-P1.nocover .pc-main { grid-template-columns: 1fr; }
+.pc-text { display: flex; flex-direction: column; min-height: 0; }
+.pc-text h1 { font-size: 50px; font-weight: 800; letter-spacing: -.03em; line-height: 1.12; color: var(--ink); }
+.pc-text .tagline { font-size: 20px; font-weight: 600; color: var(--muted); margin-top: 12px !important; line-height: 1.5; }
+.pc-text .tags { margin-top: 16px; }
+.pc-text table.kv { margin-top: 20px; font-size: 15px; }
+.pc-links { margin-top: 14px; display: grid; gap: 4px; font-size: 15px; }
+.pc-links b { font-size: 13px; font-weight: 800; letter-spacing: .06em; color: var(--muted); margin-right: 8px; }
+.pc-right { display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.pc-right .media { width: 100%; flex: none; border-radius: 16px; box-shadow: 0 18px 40px -24px rgba(30, 33, 58, .45); }
+.t-P1.portrait .pc-main > .media { height: 100%; min-height: 0; max-width: 100%; border-radius: 16px; }
+.t-P1.portrait .media img { width: 100%; height: 100%; object-fit: contain; }
+
+/* ── P2 목차(참고 덱 B: CONTENTS + 점 선 + 번호 격자) ── */
+.t-P2 .pf-body { display: flex; flex-direction: column; }
+.toc-top { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; }
+.toc-h { font-size: 56px; font-weight: 800; letter-spacing: -.02em; line-height: 1; color: var(--ink); }
+.toc-sub { font-size: 16px; font-weight: 700; color: var(--muted); }
+.t-P2 .dotrule { margin: 18px 0 26px; }
+.toc-cols { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 0 56px; align-content: start; min-height: 0; }
+.toc-lb { font-size: 13px; font-weight: 800; letter-spacing: .12em; color: var(--muted); margin-bottom: 8px !important; }
+.toc-list { list-style: none; display: grid; gap: 0; }
+.toc-list a { display: flex; align-items: center; gap: 16px; padding: 9px 0; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; }
+.toc-list .n { width: 40px; height: 40px; border-radius: 12px; background: var(--indigo-soft); color: var(--indigo-deep); display: flex; align-items: center; justify-content: center;
+               font-weight: 800; font-size: 18px; flex: none; font-variant-numeric: tabular-nums; }
+.toc-list .tx { flex: 1; min-width: 0; }
+.toc-list .t { display: block; font-size: 20px; font-weight: 800; line-height: 1.3; }
+.toc-list .d { display: block; font-size: 14px; color: var(--muted); line-height: 1.4; }
+.toc-list .pg { flex: none; font-family: var(--mono); font-size: 15px; color: var(--indigo-deep); white-space: pre; }
+.toc-list.sub .n { width: 30px; height: 30px; border-radius: 9px; font-size: 14px; }
+.toc-list.sub a { padding: 6px 0 6px 0; gap: 12px; }
+.toc-list.sub .t { font-size: 16px; font-weight: 700; }
+.t-P2.compact .toc-list a { padding: 5px 0; }
+.t-P2.compact .toc-list .t { font-size: 17px; }
+.t-P2.compact .toc-list .n { width: 32px; height: 32px; font-size: 15px; }
+.t-P2.compact .toc-list.sub .t { font-size: 15px; }
+.t-P2.compact .toc-list.sub .n { width: 26px; height: 26px; font-size: 13px; }
+
+/* ── 디바이더(참고 덱 C: 인디고 전면 + 오른쪽 아젠다 카드 + bignum) ── */
+.pf-scene.t-DIV { background: var(--indigo); }
+.t-DIV .pf-foot { color: #fff; }
+.t-DIV .pf-body { display: flex; align-items: center; }
+.dv { max-width: 660px; }
+.dv .bignum { color: var(--indigo-mid); font-size: 150px; margin-bottom: 10px; }
+.dv-part { color: #fff; font-weight: 800; letter-spacing: .16em; font-size: 20px; }
+.dv-title { color: #fff; font-size: 60px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; margin-top: 10px !important; }
+.dv-sub { color: #fff; font-size: 20px; font-weight: 600; margin-top: 18px !important; }
+.dv-card { position: absolute; right: 0; top: 60px; bottom: 60px; width: 440px; border-top-right-radius: 0; border-bottom-right-radius: 0;
+           padding: 40px 44px; display: flex; flex-direction: column; justify-content: center; background: #fff; border: 0; }
+.dv-card .lb { align-self: flex-end; font-size: 30px; font-weight: 800; color: var(--indigo-deep); }
+.dv-card .dotrule { margin: 14px 0 20px; }
+.dv-card ul { list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 18px; font-weight: 600; color: var(--ink); }
+.dv-card li { position: relative; padding-left: 18px; line-height: 1.4; }
+.dv-card li::before { content: ''; position: absolute; left: 2px; top: .58em; width: 6px; height: 6px; border-radius: 50%; background: var(--indigo-mid); }
+.dv-card.compact ul { gap: 6px; font-size: 16px; }
+
+/* ── P5 스크린샷(참고 덱 H: 카드 나란히 + 캡션, 좌표는 project.js가 계산) ── */
+.gal { position: relative; width: 100%; height: 100%; }
+.gal figure { position: absolute; margin: 0; display: flex; flex-direction: column; }
+.gal figure .media { flex: none; border-radius: 12px; background: #fff; box-shadow: 0 10px 26px -18px rgba(30, 33, 58, .5); }
+.gal figure .media img { width: 100%; height: 100%; object-fit: contain; }
+.gal figcaption { font-size: 14px; line-height: 1.45; color: var(--muted); padding-top: 6px; text-align: center; overflow: hidden; }
+
+/* ── P3 핵심 구현(한 장에 하나: 라벨칩 → 설명, 선택 이유는 콜아웃) ── */
+.hl { display: flex; flex-direction: column; gap: 18px; height: 100%; justify-content: flex-start; padding-top: 6px; }
+.hl-row { display: grid; grid-template-columns: 124px 30px minmax(0, 1fr); align-items: start; gap: 12px; }
+.hl-row .labelchip { width: 124px; }
+.hl-row .arrow { padding-top: 6px; text-align: center; }
+.hl-row p { font-size: 17px; line-height: 1.62; color: var(--ink); padding-top: 3px; }
+.hl .callout { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 0 54px; align-items: start; }   /* 본문 글자 시작(178px)을 위 줄과 맞춤: 20 + 104 + 54 */
+.hl .callout .lb { font-size: 14px; font-weight: 800; color: var(--indigo-deep); padding-top: 4px; }
+.hl .callout p { font-size: 17px; line-height: 1.62; color: var(--ink); }
+.hl .pf-xref { align-self: flex-start; margin-left: 178px; }
+.hl.tight { gap: 12px; }
+.hl.tight .hl-row p, .hl.tight .callout p { font-size: 15.5px; line-height: 1.58; }
+
+/* ── P4 이슈 해결(한 장에 하나: 문제 → 원인 → 해결 → 결과 흐름 + 배운 점) ── */
+.ts { display: flex; flex-direction: column; gap: 18px; height: 100%; justify-content: flex-start; padding-top: 6px; }
+.ts-flow { display: grid; align-items: stretch; gap: 0 10px; }
+.ts-flow > .arrow { align-self: center; }
+.ts-step { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.ts-step .labelchip { align-self: flex-start; padding: 5px 12px; font-size: 13px; }
+.ts-step p { font-size: 16px; line-height: 1.6; color: var(--ink); }
+.ts-step.res { background: #F3FBF6; border-color: #C3E6D2; }
+.ts .pf-xref { align-self: flex-start; }
+.ts.stack .ts-flow { grid-template-columns: 1fr !important; gap: 10px; }
+.ts.stack .ts-flow > .arrow { display: none; }
+.ts.stack .ts-step { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 16px; align-items: start; padding: 12px 16px; }
+.ts.stack .ts-step .labelchip { align-self: start; justify-content: center; }
+.ts.stack .ts-step p { font-size: 15.5px; line-height: 1.58; }
+
+/* ── P6 결과와 회고(참고 덱 K) ── */
+.rt { display: grid; grid-template-columns: 2fr 3fr; gap: 24px; height: 100%; align-items: start; }
+.rt.one { grid-template-columns: 1fr; }
+.rt-ach { padding: 20px 24px; }
+.rt-h { font-size: 20px; font-weight: 800; }
+.rt-h.ok { color: var(--ok); }
+.rt-ach ul { list-style: none; display: grid; gap: 10px; margin-top: 12px !important; }
+.rt-ach li { position: relative; padding-left: 30px; font-size: 16px; line-height: 1.6; color: var(--ink); }
+.rt-ach li::before { content: '✓'; position: absolute; left: 0; top: 1px; width: 20px; height: 20px; border-radius: 6px; background: var(--indigo-soft); color: var(--indigo-deep);
+                     font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.rt table.mini td { font-size: 15px; }
+.rt table.mini td.p { color: var(--indigo-deep); font-weight: 600; }
+
+/* ── 상태 장면(데이터 없음 등) ── */
+.t-msg .pf-body { display: flex; flex-direction: column; justify-content: center; gap: 12px; font-size: 18px; color: var(--ink); }
+.t-msg h1 { font-size: 36px; font-weight: 800; }
+
+/* ── 문서 장면(D1~D3) 타이포: em 기준. 참고 덱의 글자 단계(제목 29~34, 소제목 19 인디고, 본문 16/1.62)를 따름 ── */
+.pf-md { font-size: 16px; line-height: 1.62; color: var(--ink); }
+.pf-body.pf-md > :first-child { margin-top: 0 !important; }
+.pf-body.pf-md > :last-child { margin-bottom: 0 !important; }
+.pf-md h1 { font-size: 1.875em; font-weight: 800; letter-spacing: -.02em; line-height: 1.25; margin: .6em 0 .4em; }
+.pf-md h2 { font-size: 1.875em; font-weight: 800; letter-spacing: -.02em; line-height: 1.25; margin: 1.1em 0 .5em; padding-bottom: .3em; border-bottom: 2px solid var(--indigo-chip); color: var(--ink); }
+.pf-md h3 { font-size: 1.1875em; font-weight: 800; line-height: 1.35; margin: 1em 0 .4em; color: var(--indigo-deep); }
+.pf-md h4, .pf-md h5, .pf-md h6 { font-size: 1.0625em; font-weight: 800; line-height: 1.4; margin: .9em 0 .3em; color: var(--ink); }
+.pf-md p { margin: .55em 0; max-width: var(--measure); }
+.pf-md ul, .pf-md ol { margin: .55em 0; padding-left: 1.5em; max-width: var(--measure); }
+.pf-md ol { padding-left: 2.4em; }
+.pf-md li { margin: .22em 0; }
+.pf-md li > ul, .pf-md li > ol { margin: .2em 0; }
+.pf-md li > p { margin: .2em 0; }
+.pf-md ul > li::marker { color: var(--indigo-mid); }
+.pf-md ol > li::marker { color: var(--indigo-deep); font-weight: 700; }
+.pf-md li.pf-tail { list-style: none; }
+.pf-md .pf-inl { display: block; }
+.pf-md strong { color: var(--indigo-deep); font-weight: 800; }
+.pf-md a { color: var(--indigo-deep); text-underline-offset: 3px; }
+.pf-md hr { border: 0; border-top: 1px solid var(--line); margin: 1.2em 0; }
+.pf-md blockquote { margin: .8em 0; padding: .6em 1.1em; background: #FAFBFF; border: 1px solid var(--line); border-left: 4px solid var(--indigo-mid); border-radius: 0 12px 12px 0; max-width: var(--measure); }
+.pf-md blockquote p { color: var(--ink); margin: .3em 0; }
+.pf-md pre { margin: .8em 0; border-radius: 12px; background: var(--code-bg); overflow: hidden; }
+.pf-md pre code { display: block; padding: .9em 1.25em; font-family: var(--mono); font-size: .875em; line-height: 1.6; background: transparent; color: var(--code-fg);
+                  white-space: pre-wrap; overflow-wrap: anywhere; word-break: normal; border-radius: 0; tab-size: 4; }
+.pf-md pre code.hljs { background: transparent; padding: .9em 1.25em; }
+.pf-md pre.pf-tail::before, .pf-md pre.pf-more::after { display: block; font: 700 13px/1.5 var(--sans); color: #AEB4DA; padding: 0 1.4em; }
+.pf-md pre.pf-tail::before { content: '이어서 ↑'; padding-top: .6em; }
+.pf-md pre.pf-more::after { content: '다음 장에 계속 ↓'; text-align: right; padding-bottom: .6em; }
+.pf-md table { border-collapse: collapse; margin: .8em 0; font-size: .9375em; line-height: 1.55; max-width: 100%; background: var(--paper); }
+.pf-md caption.pf-cap { caption-side: top; text-align: left; font-size: 13px; font-weight: 700; color: var(--muted); padding-bottom: .3em; background: var(--paper); }
+.pf-md th { text-align: left; background: var(--indigo); color: #fff; font-weight: 700; padding: .5em .8em; border: 1px solid var(--indigo); overflow-wrap: anywhere; vertical-align: top; }
+.pf-md td { padding: .5em .8em; border: 0; border-bottom: 1px solid var(--line); vertical-align: top; overflow-wrap: anywhere; }
+.pf-md tbody tr:nth-child(even) td { background: var(--zebra); }
+.pf-md td code, .pf-md th code { white-space: normal; }
+.pf-md th code { background: rgba(255, 255, 255, .92); }
+.pf-md td img { margin: 0 auto; }
+.pf-md img { display: block; max-width: 100%; height: auto; margin: .8em auto; border-radius: 12px; border: 1px solid var(--line); }
+.pf-md p.pf-fig { margin: .8em 0; max-width: none; }
+.pf-md p.pf-fig img { margin: 0 auto; box-shadow: 0 10px 26px -18px rgba(30, 33, 58, .5); }
+.pf-md .mermaid { display: flex; justify-content: center; margin: .9em 0; padding: .8em; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+.pf-md .mermaid svg { display: block; }
+.pf-md .pf-mmd-error { font-family: var(--mono); font-size: 13px; white-space: pre-wrap; color: #B42318; }
+.pf-md .pf-shrink img, .pf-md .pf-shrink svg { max-height: var(--pf-mh); width: auto; }
+.pf-md .pf-tight { line-height: 1.5; }
+.pf-md p.pf-tight, .pf-md ul.pf-tight, .pf-md ol.pf-tight, .pf-md .pf-tight p { margin-top: .35em; margin-bottom: .35em; }
+.pf-md h2.pf-tight { margin: .7em 0 .35em; }
+.pf-md h3.pf-tight, .pf-md h4.pf-tight { margin: .6em 0 .3em; }
+.pf-md pre.pf-tight, .pf-md table.pf-tight, .pf-md .mermaid.pf-tight, .pf-md p.pf-fig.pf-tight, .pf-md blockquote.pf-tight { margin: .5em 0; }
+.pf-md pre.pf-tight code { line-height: 1.5; }
+
+/* highlight.js 색: 참고 덱 코드 색(키워드 #C4A0FF, 타입 #7FE0C0, 문자열 #F2B37D, 주석 #8890BE). 배경 대비 모두 5:1 이상 */
+.pf-md .hljs-keyword, .pf-md .hljs-built_in, .pf-md .hljs-literal, .pf-md .hljs-meta .hljs-keyword { color: #C4A0FF; }
+.pf-md .hljs-type, .pf-md .hljs-title.class_, .pf-md .hljs-title.class_.inherited__ { color: #7FE0C0; }
+.pf-md .hljs-string, .pf-md .hljs-number, .pf-md .hljs-regexp, .pf-md .hljs-char.escape_ { color: #F2B37D; }
+.pf-md .hljs-comment, .pf-md .hljs-doctag, .pf-md .hljs-meta { color: #9AA2D4; }
+.pf-md .hljs-title.function_, .pf-md .hljs-function .hljs-title { color: #9CC7FF; }
+.pf-md .hljs-attr, .pf-md .hljs-attribute, .pf-md .hljs-variable, .pf-md .hljs-params, .pf-md .hljs-property { color: var(--code-fg); }
+
+/* §4-3 원칙 5 ② 축소용 감싸개 */
+.pf-zoomwrap { display: inherit; flex-direction: inherit; justify-content: inherit; align-items: inherit; align-content: inherit;
+               grid-template-columns: inherit; grid-template-rows: inherit; gap: inherit; }
+/* 측정용 흐름(블록 높이 _h 측정. 문서 본문 폭 1136, 높이 자유) */
+.pf-flow { position: absolute; left: 0; top: 0; width: 1136px; }
