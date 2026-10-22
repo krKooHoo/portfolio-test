@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-21",
+  "generatedAt": "2026-10-22",
   "profile": {
     "name": "홍길동",
     "nameEn": "Gildong Hong",
@@ -17,29 +17,27 @@
     {
       "name": "Unity",
       "evidence": [
-        { "text": "BoxCast 축 분리 충돌로 Kinematic 이동 컨트롤러 구현", "project": "1-action-platformer" },
-        { "text": "Unity 6로 2~4인 온라인 보드게임의 보드 시스템 구현", "project": "2-Yggdrasil" },
-        { "text": "ScriptableObject로 블록 타입→스프라이트·머티리얼 매핑", "project": "0-Tidy-Mommy" },
-        { "text": "OnEnable/OnDisable 짝으로 제작 이벤트 구독·해제 관리", "project": "00-example-crafting" }
+        { "text": "Instantiate/Destroy 대신 씬에 미리 둔 블록 36개를 `Queue`로 재사용", "project": "0-Tidy-Mommy" },
+        { "text": "Rigidbody 대신 축별 BoxCast로 충돌을 해결하는 Kinematic 이동 구현", "project": "1-action-platformer" },
+        { "text": "보드 빌더로 칸 배치를 `Board.json`에 저장하고 게임 시작 시 보드 생성", "project": "2-Yggdrasil" }
       ]
     },
     {
       "name": "C#",
       "evidence": [
-        { "text": "퇴장·등장 코루틴을 동시에 실행해 끊김 없는 캐릭터 교대 구현", "project": "1-action-platformer" },
-        { "text": "제네릭 `DataTable<DTO, Def>`로 TSV 표 불러오기를 하나로 통합", "project": "2-Yggdrasil" },
-        { "text": "C# `event`로 제작 결과 전파, 확률 판정 `roll` 주입으로 테스트", "project": "00-example-crafting" }
+        { "text": "게이지를 `ref`로 받는 함수 하나로 폭탄·피버 게이지 감소를 공통 처리", "project": "0-Tidy-Mommy" },
+        { "text": "`abstract` 메서드로 캐릭터별 스킬 State만 자식이 주입하는 확장 구조", "project": "1-action-platformer" },
+        { "text": "제네릭 `DataTable<DTO, Def>`로 TSV 표 읽기를 하나로 통합", "project": "2-Yggdrasil" }
       ]
     },
     {
       "name": "디자인 패턴",
       "evidence": [
-        { "text": "Strategy + Factory로 칸 효과 7종을 클래스로 분리", "project": "2-Yggdrasil" },
-        { "text": "중재자(`CombatManager`)로 모든 피격 처리 흐름을 일원화", "project": "1-action-platformer" },
-        { "text": "`MonoSingleton<T>`로 싱글톤 매니저 5개의 중복 코드 축소", "project": "0-Tidy-Mommy" },
-        { "text": "이벤트 기반 구조·인터페이스 의존(DIP)으로 UI와 제작 로직 분리", "project": "00-example-crafting" }
+        { "text": "싱글톤 매니저 5개의 중복 코드를 `MonoSingleton<T>`로 축소", "project": "0-Tidy-Mommy" },
+        { "text": "중재자(`CombatManager`)로 피격 처리 순서를 한 곳에 모음", "project": "1-action-platformer" },
+        { "text": "Strategy + Factory로 칸 효과 7종을 `ITileEffect` 클래스로 분리", "project": "2-Yggdrasil" }
       ]
     }
   ],
-  "projects": ["00-example-crafting", "0-Tidy-Mommy", "1-action-platformer", "2-Yggdrasil"]
+  "projects": ["0-Tidy-Mommy", "1-action-platformer", "2-Yggdrasil"]
 }
