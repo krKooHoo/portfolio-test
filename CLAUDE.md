@@ -15,7 +15,8 @@
 ├── src/<NN-프로젝트>/        # ✍ 수강생의 원천 소스 (입력)
 │   ├── 기술문서.md           #    기술 문서 (폴더 안의 .md 하나. README.md여도 됨)
 │   ├── images/              #    스크린샷·GIF
-│   └── code/                #    (선택) 핵심 소스코드 .cs
+│   ├── code/                #    (선택) 핵심 소스코드 .cs
+│   └── _intake/             #    (/portfolio-intake) 재료집·촬영목록 — 기술 문서가 아님, git 제외, build·check가 읽지 않음
 ├── format/                  # 📏 가이드 판정 기준 (읽기 전용)
 ├── data/                    # 🤖 /portfolio-build가 생성 (portfolio.json, projects/*.json)
 ├── index.html               # 🖥 고정 렌더러 — 포트폴리오 덱 (16:9 슬라이드, 제출 PDF)
@@ -23,7 +24,8 @@
 ├── doc.html                 # 🖥 고정 렌더러 — 상세 기술문서 (?p=<폴더 이름>, src/의 기술 문서 md를 직접 읽음)
 ├── assets/                  # 🖥 렌더러 CSS·JS (덱 키트·장면 키트·상세 문서·md-blocks.js = 기술 문서 md 해석과 원문 블록 찾기, 발표 덱·상세 문서 공용)
 ├── custom/                  # 🎨 /portfolio-custom 결과 (직접 생성 모드)
-└── report.md                # 📋 점검 리포트 (git 제외, 로컬 전용)
+├── report.md                # 📋 점검 리포트 (git 제외, 로컬 전용)
+└── report-intake.md         # 📋 /portfolio-intake 리포트 (git 제외 — 비밀값 위치·작성자 정보)
 ```
 
 - `src/` 아래에서 이름이 `_`로 시작하는 폴더는 무시합니다(초안·보관용).
@@ -52,6 +54,7 @@ flowchart LR
 | `/portfolio-build [폴더]` | 소스를 읽어 `data/` 생성 + 점검 리포트 + 미리보기. 폴더를 주면 그 프로젝트만 |
 | `/portfolio-check [폴더]` | 기술 문서를 가이드 기준으로 점검만 (데이터는 안 건드림) |
 | `/portfolio-custom [디자인 요청]` | 직접 생성 모드. **사용자가 직접 입력했을 때만** 실행 |
+| `/portfolio-intake <레포 주소\|폴더>` | GitHub 레포에서 핵심 `.cs`·재료집(사실 + 질문)·촬영 목록을 `src/<NN>/`에 만듦. 기술 문서는 만들지 않음. **사용자가 직접 입력했을 때만** 실행 |
 
 ---
 
