@@ -1,5 +1,6 @@
 /* ─────────────────────────────────────────────────────────────
    상세 기술문서 — doc.html 전용 (portfolio-structure §4, 결정 F2·F3·F6)
+   주석의 설계 근거(docs/design/…의 portfolio-structure·deck-vs-scroll·01 §, R0, 결정 F·Q·# 번호)와 원본 시안(spikes/…)은 템플릿 유지관리용 maintainer 브랜치에 있습니다. 이 레포에 없어도 정상입니다.
    레이아웃 ① 가운데 정렬(spikes/doc-layout/doc.html?layout=1 그대로): 최대 폭 1840 · 목차 260 · 본문 칸 · 레일 300(1800px 이상),
    본문 글줄 40rem을 본문 칸 가운데에, 코드·표는 글줄 왼쪽에서 오른쪽으로 넓힘, 도식·그림은 가운데 최대 1200.
    1200px 미만은 목차를 [목차] 서랍으로, 720px 미만은 휴대폰 한 열. 인쇄는 A4(코드·그림이 쪽 사이에서 잘리지 않게만, 빈칸 0은 보장 안 함).
@@ -35,7 +36,7 @@ code { font-family: var(--mono); font-size: .88em; background: var(--accent-soft
            clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
 .print-only { display: none; }
 .loading { color: var(--faint); padding: 40px 0; }
-.error { color: #C0392B; }
+.error { color: #C0392B; overflow-wrap: anywhere; }
 .notice { max-width: 640px; margin: 96px auto; padding: 32px 36px; border: 1px solid var(--line); border-radius: var(--radius); }
 .notice h1 { font-size: 22px; margin-bottom: 12px; }
 .notice p + p, .notice ol { margin-top: 10px; }
@@ -278,9 +279,9 @@ dialog.lightbox::backdrop { background: rgba(10, 11, 14, .82); }
   /* .fade-r(화면용 흐림 mask)이 인쇄에 남으면 코드가 그림으로 바뀌고 글자가 두 번 들어감(시안 검증에서 발견) → 인쇄에서 mask를 끔 */
   .md pre, .md pre.fade-r { white-space: pre-wrap; overflow: visible; background: #F6F8FA; border: 1px solid #D8DEE4; -webkit-mask-image: none; mask-image: none; }
   .md pre code, .md pre code.hljs { white-space: pre-wrap; word-break: break-all; width: auto; min-width: 0; font-size: 8.5pt; color: #24292E; padding: 8pt 10pt; }
-  .table-wrap { overflow: visible; }
+  .md > :is(pre, .table-wrap) { overflow: visible; }     /* 화면 규칙 .md > :is(pre, .table-wrap)의 overflow-x:auto와 구체성이 같고 뒤에 와서 이김 */
   .md table { font-size: 9pt; }
-  .md th, .md td { padding: 4pt 6pt; }
+  .md th, .md td { padding: 4pt 6pt; white-space: normal; overflow-wrap: anywhere; }   /* 넓은 표도 A4 글줄 안에서 줄바꿈(오른쪽이 잘리지 않게) */
   thead { display: table-header-group; }
   .mmd .mermaid { border: 0; padding: 0; overflow: visible; }
   .mermaid svg, .md img { max-width: 100% !important; height: auto; max-height: 230mm; }

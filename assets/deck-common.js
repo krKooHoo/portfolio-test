@@ -1,5 +1,6 @@
 // 덱 장면 공통 — index.html(포트폴리오 덱)·project.html(요약 덱)이 common.js 다음에 싣습니다. 출처: spikes/deck/pages/pf-common.js
 //   장면 틀 scene(), 측정 후 고르기 pack(), 넘침 처리 shrinkOrClip()(§4-3 원칙 5: 변형 → 축소(15px까지) → 보이는 잘림 띠), 글꼴·이미지 크기 대기
+//   주석의 설계 근거(docs/design/…의 portfolio-structure·deck-vs-scroll·01 §, R0, 결정 F·Q·# 번호)와 원본 시안(spikes/…)은 템플릿 유지관리용 maintainer 브랜치에 있습니다. 이 레포에 없어도 정상입니다.
 (() => {
   const { esc, inline } = PF;
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

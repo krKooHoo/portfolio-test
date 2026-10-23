@@ -1,5 +1,6 @@
 // 상세 기술문서 — doc.html?p=<폴더>  (portfolio-structure §4, 링크 §5, 결정 F2·F3·F6·F10)
 //   흐르는 읽기 문서. 레이아웃 ① 가운데 정렬(spikes/doc-layout/doc.html?layout=1). 출처: spikes/doc-layout/doc.js
+//   주석의 설계 근거(docs/design/…의 portfolio-structure·deck-vs-scroll·01 §, R0, 결정 F·Q·# 번호)와 원본 시안(spikes/…)은 템플릿 유지관리용 maintainer 브랜치에 있습니다. 이 레포에 없어도 정상입니다.
 //   문서 처리 순서: marked 12.0.2(gfm) → 상대경로 → GitHub식 slug(PF.slugger)·목차 → 요약 덱 장면 연결 → Mermaid 11.4.1 → highlight.js 11.9.0
 //   주소: #<제목 slug>(요약 덱·옛 project.html 조각이 이 형식으로 옴) · #sec=<절 제목>(제목을 찾아 #<slug>로 바꿈)
 //   요약 덱으로 되돌아가기: 머리 [요약 덱으로 ↗], 절 머리 칩 → project.html?p=<폴더>#s=hl-<n> / #s=ts-<n>(새 탭)

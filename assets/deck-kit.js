@@ -1,7 +1,8 @@
 // ════════════════════════════════════════════════════════════════════════════
 // 덱 키트 JS (assets/deck-kit.js) — 덱 페이지(index.html·project.html)의 <head>에서 동기 로드, 가장 먼저
 //   출처: spikes/deck/kit/deck-kit.js(블록 A는 spikes/r0/kit/scene-kit.js 그대로)
-//   블록 A: 01 §8-2 준비 게이트(R0 【시험대 1~5】 포함)
+//   주석의 설계 근거(docs/design/…의 portfolio-structure·deck-vs-scroll·01 §, R0, 결정 F·Q·# 번호)와 원본 시안(spikes/…)은 템플릿 유지관리용 maintainer 브랜치에 있습니다. 이 레포에 없어도 정상입니다.
+//   블록 A: docs/design/01 §8-2 준비 게이트(R0 【시험대 1~5】 포함)
 //   블록 B: 덱 키트 — 덱 보기(기본)·한 번에 보기, 배율 k = min(vw/1280, (vh−HUD)/720), HUD 띠, 키보드·휠·터치·가장자리 클릭,
 //           주소(#s=<장면 id> · #n · #s-n), 개요 격자, 포커스·aria-live, 세로 화면 안내, [PDF로 저장], 감사(audit·outside-deck)
 //   deck-vs-scroll §3 알려진 결함 중 요약 덱에 해당하는 것을 고침:
@@ -411,7 +412,7 @@
       <button type="button" data-a="help" aria-expanded="false" aria-controls="pf-hud-help" aria-label="PDF 저장 안내" title="PDF 저장 안내">?</button>
       <button type="button" data-a="view"><span class="l"></span><span class="s"></span></button>
       <button type="button" data-a="anyway" hidden>그래도 인쇄</button>
-      ${isLocal ? '<span class="pf-hud-badge" hidden title="PFScene.audit() 문제 수(localhost에서만 표시)"></span>' : ''}
+      ${isLocal ? '<span class="pf-hud-badge" hidden title="미리보기에서만 보이는 장면 배치 점검 결과(찾은 항목 수). 배포된 페이지·PDF에는 나오지 않습니다. 슬라이드에 &quot;내용이 잘렸습니다&quot; 띠가 있으면 src/의 그 부분을 줄이고 /portfolio-build를 다시 실행하세요."></span>' : ''}
       <span class="pf-hud-msg" role="status" aria-live="polite"></span>
       <div class="pf-hud-help" id="pf-hud-help" hidden>${HELP}</div>
       <span class="pf-sr" aria-live="polite" aria-atomic="true"></span>`;
@@ -453,6 +454,7 @@
   function badge() {
     const b = hud?.querySelector('.pf-hud-badge'); if (!b) return;
     const n = audit().length; b.textContent = String(n); b.hidden = n === 0;
+    b.setAttribute('aria-label', `미리보기 배치 점검 ${n}건`);
   }
 
   // ── 개요(모든 슬라이드 격자, dialog) ──
@@ -576,6 +578,8 @@
     const br = body ? body.getBoundingClientRect() : sr;
     if (body && (body.scrollHeight > body.clientHeight || body.scrollWidth > body.clientWidth))
       add('body-scroll', `본문 넘침 ${body.scrollWidth}×${body.scrollHeight} > ${body.clientWidth}×${body.clientHeight}`);
+    const head = s.querySelector(':scope > .pf-head');
+    if (head && body) { const hb = head.getBoundingClientRect().bottom; if (hb > br.top + tol) add('head-overlap', `머리(제목)가 본문과 겹침 ${((hb - br.top) / k).toFixed(1)}px`); }
     const clipAnc = (e, stop) => { for (let a = e.parentElement; a && a !== stop; a = a.parentElement) { const c = getComputedStyle(a); if (c.overflowX !== 'visible' || c.overflowY !== 'visible') return true; } return false; };
     s.querySelectorAll('*').forEach((e) => {
       if (e.closest('[data-pf-bleed], [data-pf-allow-clip], .pf-sr-only')) return;   // .pf-sr-only: 화면 낭독기 전용 글자(일부러 1px로 자름)

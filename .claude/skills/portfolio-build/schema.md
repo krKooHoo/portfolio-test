@@ -1,6 +1,6 @@
 # 데이터 스키마 (data/)
 
-고정 렌더러(`index.html`, `project.html`)가 읽는 데이터 형식입니다. **이 형식을 정확히 지킵니다.**
+고정 렌더러(`index.html`, `project.html`, `doc.html`)가 읽는 데이터 형식입니다. **이 형식을 정확히 지킵니다.**
 값이 없으면 문자열은 `""`, 배열은 `[]`, 객체 필드는 `null` — **추측해서 채우지 않습니다.**
 
 ## `data/portfolio.json`

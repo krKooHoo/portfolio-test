@@ -27,8 +27,8 @@
 ```
 
 - `src/` 아래에서 이름이 `_`로 시작하는 폴더는 무시합니다(초안·보관용).
-- 템플릿에는 샘플 프로젝트 4개(`00-example-crafting`, `0-Tidy-Mommy`, `1-action-platformer`, `2-Yggdrasil`)와
-  그 `data/`가 들어 있습니다. 수강생 프로젝트가 생기면 샘플 폴더를 지우고 다시 빌드하라고 안내합니다
+- 템플릿에는 샘플 프로젝트 4개(`00-example-crafting`, `0-Tidy-Mommy`, `1-action-platformer`, `2-Yggdrasil`)가 들어 있고,
+  `data/`에는 그중 `00-example-crafting`을 뺀 3개의 빌드 결과가 들어 있습니다. 수강생 프로젝트가 생기면 샘플 폴더를 지우고 다시 빌드하라고 안내합니다
   (지운 프로젝트의 `data/projects/*.json`도 함께 정리). 샘플은 동의를 받은 선배 작품이므로 내용을 수강생 문서에 옮기지 않습니다.
 
 ## 데이터 흐름

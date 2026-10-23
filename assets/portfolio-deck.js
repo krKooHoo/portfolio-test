@@ -2,6 +2,7 @@
 //   장면: 표지 → 자기소개 → 기술 스택 → 프로젝트마다 2장(소개 + 핵심 요약) → 한눈에 보기 → 맺음(연락처·링크)
 //   이력서·자기소개서(에세이) 장면은 만들지 않습니다: 학생이 직접 쓴 원천(resume.md·essay)이 아직 없기 때문입니다(F7, 원칙 1 지어내지 않음).
 //   모든 글은 data/portfolio.json·data/projects/*.json에 있는 값 그대로입니다. 장면 이름·라벨만 UI 글자입니다.
+//   주석의 설계 근거(docs/design/…의 portfolio-structure·deck-vs-scroll·01 §, R0, 결정 F·Q·# 번호)와 원본 시안(spikes/…)은 템플릿 유지관리용 maintainer 브랜치에 있습니다. 이 레포에 없어도 정상입니다.
 (() => {
   const deck = document.getElementById('deck');
   const info = (PFScene.info = { page: 'index', t: {}, summary: {}, overflow: [], errors: [] });

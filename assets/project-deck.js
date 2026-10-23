@@ -4,6 +4,7 @@
 //   핵심 구현·이슈 해결 장면마다 "상세 문서에서 보기 ↗" → doc.html?p=<폴더>#<그 절 제목의 slug>(새 탭).
 //   slug는 상세 문서와 같은 파이프라인(marked → 제목 글자 → PF.slugger)으로 기술 문서 md에서 계산합니다. md는 그리지 않고 제목만 읽습니다.
 //   내용(글)은 모두 data/projects/<id>.json과 src/<id>/기술문서.md(제목)에서 옴. 새 문장·수치를 만들지 않음(장면 이름·라벨은 UI 글자)
+//   주석의 설계 근거(docs/design/…의 portfolio-structure·deck-vs-scroll·01 §, R0, 결정 F·Q·# 번호)와 원본 시안(spikes/…)은 템플릿 유지관리용 maintainer 브랜치에 있습니다. 이 레포에 없어도 정상입니다.
 (() => {
   const Q = new URLSearchParams(location.search);
   const id = Q.get('p');

@@ -26,7 +26,9 @@ disable-model-invocation: true
 - **데이터는 `fetch('../data/portfolio.json')`로 읽어 렌더**합니다. JSON 내용을 HTML에 복사해 넣지 않습니다
   → 다음에 `/portfolio-build`만 다시 하면 이 페이지도 자동으로 최신이 됩니다.
 - 내용은 데이터에 있는 것만. 문구를 새로 지어내지 않습니다 (섹션 제목·버튼 문구 같은 UI 텍스트는 예외).
-- 프로젝트 상세는 새로 만들지 않고 `../project.html?p=<id>`로 링크합니다.
+- 프로젝트 페이지는 새로 만들지 않고 링크합니다: 요약 덱 `../project.html?p=<id>`, 상세 기술문서(전문) `../doc.html?p=<id>`.
+  `format/05` 규칙 3은 기술 문서 전문을 `project.html`로 링크하라고 되어 있지만, 렌더러가 바뀐 뒤 전문은 `doc.html`에 있으므로
+  `format/`이 새 렌더러에 맞춰 고쳐질 때까지는 이 줄을 따릅니다.
 - 이미지 경로: `../src/<id>/<cover 또는 screenshots[].src>` (상대경로).
 - 강조색은 `settings.accent`를 기본으로 하되, 디자인 요청에 다른 색이 있으면 그 색.
 - 반응형(모바일 375px에서 가로 스크롤 없음), 3색 이내, 여백·타이포그래피 중심.

@@ -1,5 +1,6 @@
 /* ════════════════════════════════════════════════════════════════════════════
    덱 키트 CSS (assets/deck-kit.css) — scene-kit.css 다음에 싣습니다. 출처: spikes/deck/kit/deck-kit.css
+   주석의 설계 근거(docs/design/…의 portfolio-structure·deck-vs-scroll·01 §, R0, 결정 F·Q·# 번호)와 원본 시안(spikes/…)은 템플릿 유지관리용 maintainer 브랜치에 있습니다. 이 레포에 없어도 정상입니다.
    여기 규칙은 모두 @media screen 안입니다. 인쇄는 scene-kit.css만 정하므로 덱 보기·한 번에 보기 어디서 인쇄해도 "장면 1개 = PDF 1쪽"이 같습니다.
    - html[data-view="deck"]   : 한 번에 한 장. .pf-deck을 화면에 고정하고 장면을 같은 자리에 겹쳐 둔 뒤 지금 장면(.pf-cur)만 보임
    - html[data-view="scroll"] : 한 번에 보기(모든 장면을 세로로 쌓음, scene-kit.css의 형제 + 여백 보정 transform)
@@ -57,7 +58,7 @@
   .pf-hud .pf-hud-msg:empty { display: none; }
   .pf-hud .pf-hud-badge { flex: none; min-width: 1.6em; padding: 2px 6px; border-radius: 999px; background: #B42318; color: #fff; text-align: center; font-variant-numeric: tabular-nums; }
   .pf-hud [hidden] { display: none !important; }
-  /* PDF 저장 안내(? 단추) — 01 §8-8 문구 */
+  /* PDF 저장 안내(? 단추) — docs/design/01 §8-8 문구 */
   .pf-hud .pf-hud-help { position: absolute; right: 12px; bottom: calc(100% + 8px); width: min(460px, calc(100vw - 24px)); max-height: calc(100vh - 80px); overflow: auto;
     box-sizing: border-box; padding: 14px 16px; border-radius: 12px; background: #fff; border: 1px solid #E1E4EE; box-shadow: 0 18px 50px -18px rgba(30, 33, 58, .45);
     font: 500 13px/1.6 'Pretendard', system-ui, sans-serif; color: #20233A; white-space: normal; }
