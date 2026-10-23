@@ -290,8 +290,8 @@ dialog.lightbox::backdrop { background: rgba(10, 11, 14, .82); }
   .mmd .mermaid { border: 0; padding: 0; overflow: visible; }
   .mermaid svg, .md img { max-width: 100% !important; height: auto; max-height: 230mm; }
   .md a { color: inherit; text-decoration: none; }
-  .link-list { margin-top: 18pt; border-top: 1px solid #ccc; padding-top: 8pt; font-size: 9pt; break-inside: avoid; }   /* 제목만 쪽 끝에 남지 않게 */
-  .link-list .ll-title { font-weight: 800; font-size: 11pt; margin-bottom: 4pt; }
+  .link-list { margin-top: 18pt; border-top: 1px solid #ccc; padding-top: 8pt; font-size: 9pt; }
+  .link-list .ll-title { font-weight: 800; font-size: 11pt; margin-bottom: 4pt; break-after: avoid; }   /* 제목만 쪽 끝에 남지 않게(긴 목록은 그대로 나뉨) */
   .link-list ol { padding-left: 18pt; }
   .link-list li { font-size: 9pt; word-break: break-all; }
 }
