@@ -190,6 +190,20 @@
       figs.push(fig);
     });
     try { await Promise.race([Promise.all([document.fonts.load('16px Pretendard'), document.fonts.load('700 16px Pretendard')]), sleep(4000)]); } catch { /* 글꼴 없이 진행 */ }
+
+    // ⑥-2 인쇄(A4 글줄 680px)에서 낱말 단위 줄바꿈으로는 들어가지 않는 표에만 .print-wide → 인쇄 CSS가 그 표에서만 낱말 중간 줄바꿈을 허용
+    //   (모든 표에 허용하면 짧은 칸의 한글 낱말이 '방|식'처럼 끊김). 인쇄와 같은 표 규칙(doc.css .md.print-probe)으로, 이미지는 빼고(불러오지 않게) 잼
+    const probe = document.createElement('div');
+    probe.className = 'md print-probe'; probe.setAttribute('aria-hidden', 'true');
+    probe.innerHTML = '<div class="table-wrap" style="width:680px;min-width:0;max-width:none;margin:0;overflow:visible"></div>';
+    document.body.appendChild(probe);
+    doc.querySelectorAll('.table-wrap > table').forEach((tb) => {
+      const t = document.createElement('template'); t.innerHTML = tb.outerHTML;
+      t.content.querySelectorAll('img, video, picture, source').forEach((e) => e.remove());
+      probe.firstChild.replaceChildren(t.content);
+      tb.parentElement.classList.toggle('print-wide', probe.firstChild.firstElementChild.offsetWidth > 681);
+    });
+    probe.remove();
     if (window.mermaid && figs.length) {
       mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose', fontFamily: 'Pretendard, sans-serif' });
       try { await mermaid.run({ nodes: doc.querySelectorAll('.mermaid') }); }

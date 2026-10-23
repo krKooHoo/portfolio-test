@@ -37,7 +37,7 @@ code { font-family: var(--mono); font-size: .88em; background: var(--accent-soft
 .print-only { display: none; }
 .loading { color: var(--faint); padding: 40px 0; }
 .error { color: #C0392B; overflow-wrap: anywhere; }
-.notice { max-width: 640px; margin: 96px auto; padding: 32px 36px; border: 1px solid var(--line); border-radius: var(--radius); }
+.notice { max-width: 640px; margin: 96px auto; padding: 32px 36px; border: 1px solid var(--line); border-radius: var(--radius); overflow-wrap: anywhere; }
 .notice h1 { font-size: 22px; margin-bottom: 12px; }
 .notice p + p, .notice ol { margin-top: 10px; }
 .notice ol { padding-left: 22px; }
@@ -279,15 +279,26 @@ dialog.lightbox::backdrop { background: rgba(10, 11, 14, .82); }
   /* .fade-r(화면용 흐림 mask)이 인쇄에 남으면 코드가 그림으로 바뀌고 글자가 두 번 들어감(시안 검증에서 발견) → 인쇄에서 mask를 끔 */
   .md pre, .md pre.fade-r { white-space: pre-wrap; overflow: visible; background: #F6F8FA; border: 1px solid #D8DEE4; -webkit-mask-image: none; mask-image: none; }
   .md pre code, .md pre code.hljs { white-space: pre-wrap; word-break: break-all; width: auto; min-width: 0; font-size: 8.5pt; color: #24292E; padding: 8pt 10pt; }
-  .md > :is(pre, .table-wrap) { overflow: visible; }     /* 화면 규칙 .md > :is(pre, .table-wrap)의 overflow-x:auto와 구체성이 같고 뒤에 와서 이김 */
+  /* 화면 규칙(.md > :is(pre, .table-wrap)·.table-wrap의 overflow-x:auto)과 구체성이 같거나 높고 뒤에 와서 이김 — 목록·인용 안의 표도 */
+  .md > :is(pre, .table-wrap), .md .table-wrap { overflow: visible; }
   .md table { font-size: 9pt; }
-  .md th, .md td { padding: 4pt 6pt; white-space: normal; overflow-wrap: anywhere; }   /* 넓은 표도 A4 글줄 안에서 줄바꿈(오른쪽이 잘리지 않게) */
+  /* 칸은 낱말 단위로 줄바꿈(짧은 한글 낱말을 끊지 않음). 낱말 단위로는 A4 글줄에 안 들어가는 표(doc.js ⑥-2가 .print-wide로 표시)만
+     아무 곳에서나 줄바꿈해 오른쪽이 잘리지 않게. 표 규칙을 바꾸면 맨 아래 .md.print-probe도 같이 바꿈 */
+  .md th, .md td { padding: 4pt 6pt; white-space: normal; overflow-wrap: break-word; }
+  .md :is(th, td) a, .md .table-wrap.print-wide :is(th, td) { overflow-wrap: anywhere; }
   thead { display: table-header-group; }
   .mmd .mermaid { border: 0; padding: 0; overflow: visible; }
   .mermaid svg, .md img { max-width: 100% !important; height: auto; max-height: 230mm; }
   .md a { color: inherit; text-decoration: none; }
-  .link-list { margin-top: 18pt; border-top: 1px solid #ccc; padding-top: 8pt; font-size: 9pt; }
+  .link-list { margin-top: 18pt; border-top: 1px solid #ccc; padding-top: 8pt; font-size: 9pt; break-inside: avoid; }   /* 제목만 쪽 끝에 남지 않게 */
   .link-list .ll-title { font-weight: 800; font-size: 11pt; margin-bottom: 4pt; }
   .link-list ol { padding-left: 18pt; }
   .link-list li { font-size: 9pt; word-break: break-all; }
 }
+
+/* 인쇄 폭(A4 글줄 680px)에서 표가 낱말 단위 줄바꿈으로 들어가는지 재는 상자 — doc.js ⑥-2가 잠깐 붙였다 뗌.
+   위 @media print의 표 규칙과 같은 값(바꿀 때 함께) */
+.md.print-probe { position: absolute; left: -10000px; top: 0; visibility: hidden; pointer-events: none; }
+.md.print-probe table { font-size: 9pt; }
+.md.print-probe :is(th, td) { padding: 4pt 6pt; white-space: normal; overflow-wrap: break-word; }
+.md.print-probe :is(th, td) a { overflow-wrap: anywhere; }

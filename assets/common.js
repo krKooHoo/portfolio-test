@@ -9,8 +9,8 @@ const PF = (() => {
   const isUrl = (u) => /^https?:\/\//i.test(u || '');
   const shortUrl = (u) => String(u || '').replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '');
 
-  // 오류 문구의 경로는 사람이 읽게 디코딩(src/%EA%B8%B0… → src/기술…)
-  const shownPath = (path) => { try { return decodeURI(path); } catch { return path; } };
+  // 오류 문구의 경로는 사람이 읽게 디코딩(src/%EA%B8%B0… → src/기술…). 조각마다 encodeURIComponent로 만들었으므로 조각마다 되돌림(#·& 등 포함)
+  const shownPath = (path) => String(path).split('/').map((s) => { try { return decodeURIComponent(s); } catch { return s; } }).join('/');
   async function loadJSON(path) {
     const res = await fetch(path, { cache: 'no-cache' });
     if (!res.ok) throw new Error(`${shownPath(path)} (HTTP ${res.status})`);

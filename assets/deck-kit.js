@@ -412,7 +412,7 @@
       <button type="button" data-a="help" aria-expanded="false" aria-controls="pf-hud-help" aria-label="PDF 저장 안내" title="PDF 저장 안내">?</button>
       <button type="button" data-a="view"><span class="l"></span><span class="s"></span></button>
       <button type="button" data-a="anyway" hidden>그래도 인쇄</button>
-      ${isLocal ? '<span class="pf-hud-badge" hidden title="미리보기에서만 보이는 장면 배치 점검 결과(찾은 항목 수). 배포된 페이지·PDF에는 나오지 않습니다. 슬라이드에 &quot;내용이 잘렸습니다&quot; 띠가 있으면 src/의 그 부분을 줄이고 /portfolio-build를 다시 실행하세요."></span>' : ''}
+      ${isLocal ? '<span class="pf-hud-badge" role="img" hidden title="미리보기에서만 보이는 장면 배치 점검 결과(찾은 항목 수). 배포된 페이지·PDF에는 나오지 않습니다. 슬라이드에 &quot;내용이 잘렸습니다&quot; 띠가 있으면 그 장면의 원문(src/의 기술 문서, 자기소개·연락처는 profile.md)을 줄이고 /portfolio-build를 다시 실행하세요."></span>' : ''}
       <span class="pf-hud-msg" role="status" aria-live="polite"></span>
       <div class="pf-hud-help" id="pf-hud-help" hidden>${HELP}</div>
       <span class="pf-sr" aria-live="polite" aria-atomic="true"></span>`;

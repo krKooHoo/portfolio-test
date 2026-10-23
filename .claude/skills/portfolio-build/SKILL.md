@@ -63,9 +63,12 @@ argument-hint: "[프로젝트 폴더 이름 (생략하면 전체)]"
 - [ ] `tags`의 기술명이 원문에 실제로 등장한다. `skills`는 기술명 또는 그 근거가 된 구체 용어가 등장한다
 - [ ] `code/`가 있으면: 문서 코드 블록에 나온 **주요 클래스·메서드 이름**이 `code/`에 존재하는지 표본 확인
       (불일치는 리포트 **권장** — "문서 코드와 실제 코드가 다릅니다")
-- [ ] `portfolio.json`의 `projects`마다 같은 이름(대소문자까지)의 `src/<id>/` 폴더와 `data/projects/<id>.json`이 있다
-      (Windows는 대소문자를 무시해 미리보기에서는 열리지만, GitHub Pages에서는 그 프로젝트가 덱에서 빠집니다.
-      대소문자만 다른 예전 JSON이 남아 있으면 지운 뒤 새로 씁니다 — Windows는 덮어써도 예전 이름을 유지합니다)
+- [ ] `portfolio.json`의 `projects`마다 같은 이름(대소문자까지)의 `src/<id>/` 폴더와 `data/projects/<id>.json`이 있다.
+      디스크만 보지 말고 `git ls-files src data/projects`에 나오는 이름도 대소문자까지 같은지 봅니다(GitHub Pages는 git에 올라간 이름으로 보여 줍니다).
+      Windows는 대소문자를 무시해 미리보기에서는 열리지만, Pages에서는 JSON 이름이 다르면 그 프로젝트가 덱에서 빠지고,
+      폴더 이름이 다르면 이미지·상세 문서가 404가 됩니다. 대소문자만 다른 예전 JSON은 지운 뒤 새로 씁니다.
+      git에 예전 이름이 남아 있으면(Windows의 git은 대소문자만 바꾼 이름 변경을 알아채지 못함) 직접 고치지 말고 리포트 **필수**에
+      `git rm -r --cached <예전 경로>` → `git add <새 경로>` → commit · push 순서를 적습니다
 - [ ] JSON이 문법적으로 유효하다 (작성 후 다시 읽어 확인. 예: `python -c "import json,sys;json.load(open(sys.argv[1],encoding='utf-8'))" <파일>`
       — Windows에서 한글 출력이 깨지면 `PYTHONIOENCODING=utf-8`)
 
@@ -111,8 +114,11 @@ argument-hint: "[프로젝트 폴더 이름 (생략하면 전체)]"
    이미 떠 있으면 재사용. 브라우저 도구가 있으면 세 페이지를 열어 콘솔 오류·깨진 이미지가 없는지 확인합니다.
    - `http://localhost:4600/`(포트폴리오 덱)과 프로젝트마다 `project.html?p=<id>`(요약 덱):
      `await PFScene.whenReady()` 뒤 `PFScene.report()`의 `audit`을 읽습니다. `clipped`(빨간 "내용이 잘렸습니다" 띠 —
-     배포된 페이지와 PDF에도 나옴)가 있으면 그 장면과 줄여야 할 원문 항목(제목·한 줄 소개·역할·핵심 구현 설명 등)을
-     리포트 **권장**에 적습니다. 다른 항목(`head-overlap`·`outside` 등)도 같은 방식으로 적습니다.
+     배포된 페이지와 PDF에도 나옴)가 있으면 그 장면과 줄여야 할 원문 항목(제목·한 줄 소개·역할·핵심 구현 설명 등,
+     자기소개·연락처는 profile.md)을 리포트 **권장**에 적습니다. `audit`은 요소마다 한 줄이라 넘친 장면 하나가
+     `clipped`·`body-scroll`·`outside` 여러 줄로 나오므로 **장면(`scene` 번호)마다 1건**으로 묶고, `clipped`가 있는 장면의
+     `body-scroll`·`outside`는 같은 문제로 봅니다. `clipped` 없이 `head-overlap`·`outside`만 있는 장면도 같은 방식으로 적습니다.
+     적은 뒤 report.md `## 요약` 표의 **권장** 개수를 고칩니다.
    - 프로젝트마다 `doc.html?p=<id>`(상세 기술문서): 기술 문서 안의 이미지는 이 페이지에서만 불러오므로 깨진 이미지는 여기서 확인합니다.
    - 콘솔 경고 `[portfolio] 상세 문서에서 절 제목을 찾지 못함`·`[doc] 요약 덱 대상 제목을 찾지 못함`이 보이면
      `section` 값이 원문 제목과 다른 것입니다. §4의 `section` 검증을 다시 해서 고쳐 씁니다.
