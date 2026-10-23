@@ -89,7 +89,6 @@ code { font-family: var(--mono); font-size: .88em; background: var(--accent-soft
 .toc-links a.h3 { padding-left: 22px; font-size: 13px; }
 .toc-links a:hover { color: var(--ink); }
 .toc-links a.active { color: var(--accent-ink); border-left-color: var(--accent); font-weight: 700; background: var(--accent-soft); }
-.toc-links .star { color: var(--accent); margin-left: 5px; font-size: 11px; }
 
 /* 레일 (≥1800px) */
 .rail { display: grid; gap: 14px; align-content: start; padding-bottom: 24px; scrollbar-width: thin; }
@@ -103,7 +102,6 @@ code { font-family: var(--mono); font-size: .88em; background: var(--accent-soft
 .now-title { font-size: 14px; font-weight: 800; color: var(--ink); margin-bottom: 8px; line-height: 1.4; }
 .now-none { font-size: 13px; color: var(--muted); }
 .now-parent { font-size: 12.5px; color: var(--faint); margin-top: 4px; }
-.rail-card .chip { display: flex; flex-wrap: wrap; border-radius: 10px; }
 .rail-misc { display: grid; gap: 6px; font-size: 13.5px; font-weight: 700; }
 .rail-misc a { text-decoration: none; color: var(--accent-ink); }
 .rail-misc a:hover { text-decoration: underline; }
@@ -171,16 +169,6 @@ code { font-family: var(--mono); font-size: .88em; background: var(--accent-soft
 .mmd-zoom { font: inherit; font-size: 13px; font-weight: 700; color: var(--accent-ink); background: none; border: 0; cursor: pointer; padding: 0; }
 .pf-mmd-error { font-family: var(--mono); font-size: 13px; white-space: pre-wrap; color: #B42318; }
 
-/* 절 머리 칩 (요약 덱의 이 장면 ↗) */
-.doc-chip { margin: -4px 0 16px; }
-.chip { display: inline-flex; align-items: center; gap: 4px 8px; padding: 4px 12px; border-radius: 999px; text-decoration: none;
-        background: var(--accent-soft); border: 1px solid var(--accent-line); color: var(--accent-ink); font-size: 13px; line-height: 1.45; }
-.chip:hover { border-color: var(--accent); }
-.chip-ic { font-size: 12px; }
-.chip-k { font-weight: 800; }
-.chip-t { font-weight: 600; color: var(--body); }
-.chip-t code { font-size: .9em; padding: 0 4px; }
-.chip-note { display: none; }
 
 /* 도착 강조 (딥링크) */
 .arrive { animation: pf-arrive 2s ease-out; border-radius: 6px; }
@@ -242,9 +230,6 @@ dialog.lightbox::backdrop { background: rgba(10, 11, 14, .82); }
   .md h3 { font-size: 17.5px; }
   .md pre code, .md pre code.hljs { font-size: 12.5px; padding: 14px 16px; }
   .md table { font-size: 14px; }
-  .chip { padding: 3px 10px; font-size: 12.5px; }
-  .chip-t { display: none; }                       /* 휴대폰: 칩을 작게 접고 안내 한 줄 */
-  .chip-note { display: inline; margin-left: 8px; font-size: 12px; color: var(--faint); }
   .doc-foot { padding-bottom: 88px; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -257,7 +242,7 @@ dialog.lightbox::backdrop { background: rgba(10, 11, 14, .82); }
   @page { size: A4; margin: 16mm 15mm 18mm; }
   html { scroll-behavior: auto; }
   body { background: #fff; }
-  .toc, .rail, .doc-chip, .doc-head, .pf-newtab-icon, .pf-newtab-sr, dialog, .skip-link, .doc-fab, .glance, .mmd-bar, .doc-foot { display: none !important; }
+  .toc, .rail, .doc-head, .pf-newtab-icon, .pf-newtab-sr, dialog, .skip-link, .doc-fab, .glance, .mmd-bar, .doc-foot { display: none !important; }
   .print-only { display: block; }
   sup.print-only { display: inline; font-size: 7pt; color: #555; margin-left: 1px; }
   .print-urls { font-size: 8.5pt; color: #555; border-bottom: 1px solid #ccc; padding-bottom: 6px; margin-bottom: 10px; }

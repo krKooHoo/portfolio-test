@@ -3,24 +3,28 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>프로젝트 · 요약 덱</title>
+<title>프로젝트 · 발표 덱</title>
 <link rel="icon" href="data:," /><!-- 아이콘 파일 없음: 브라우저가 /favicon.ico를 요청해 404가 나지 않게 -->
-<!-- 고정 렌더러 — 프로젝트 요약 덱(16:9): project.html?p=<src 폴더 이름>. 내용은 data/projects/<폴더>.json(+ 기술 문서의 제목)에서 읽습니다.
-     장면: 표지(cover) → 목차(toc) → 스크린샷(shots) → 핵심 구현(hl-n) → 이슈 해결(ts-n) → 회고(retro) → 상세 문서로(more). 주소 #s=<장면 id> · #<번호>
-     옛 주소(#pf-doc · #pf-highlights · 옛 기술 문서 제목 앵커 등)는 project-deck.js가 새 주소로 넘깁니다. 상세 기술문서 전문은 doc.html?p=<폴더>
-     CDN은 버전 고정(marked 12.0.2 — 기술 문서의 제목만 읽어 딥링크 slug를 계산, Pretendard v1.3.9, D2Coding 1.3.2) -->
+<!-- 고정 렌더러 — 발표 덱(16:9): project.html?p=<src 폴더 이름>. 장면 목록은 data/projects/<폴더>.json의 deck, 그림·코드·표·이미지는 src/<폴더>/의 기술 문서 원문에서 그대로 그립니다.
+     장면: 표지(cover) → 목차(toc) → [장 표지(ch-<key>) → 장면(d-<key>)] × 장 → 결과와 회고(retro) → 맺음(end). 주소 #s=<장면 id> · #<번호>
+     옛 주소(#s=hl-n · #pf-doc · #pf-highlights · 옛 기술 문서 제목 앵커 등)는 project-deck.js가 새 주소로 넘깁니다. 상세 기술문서 전문은 doc.html?p=<폴더>
+     CDN은 버전 고정(marked 12.0.2, mermaid 11.4.1, highlight.js 11.9.0 — github-dark, Pretendard v1.3.9, D2Coding 1.3.2) -->
 <script src="assets/deck-kit.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/d2coding@1.3.2/d2coding-subset.css" />
 <link rel="stylesheet" href="assets/scene-kit.css" />
 <link rel="stylesheet" href="assets/deck-kit.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/github-dark.min.css" />
 <link rel="stylesheet" href="assets/deck-theme.css" />
 <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
 </head>
 <body>
 <p class="pf-loading pf-screen-only" data-pf-ui="loading" data-pf-loading>불러오는 중…</p>
-<main class="pf-deck" id="deck" aria-label="프로젝트 요약 덱"><noscript><section class="pf-scene pf-bare t-msg"><div class="pf-body"><div class="msg"><h1>JavaScript를 켜 주세요</h1><div class="msg-b"><p>이 요약 덱은 data/의 내용을 읽어 브라우저에서 그립니다. JavaScript를 켠 뒤 다시 열어 주세요.</p></div></div></div></section></noscript></main>
+<main class="pf-deck" id="deck" aria-label="프로젝트 발표 덱"><noscript><section class="pf-scene pf-bare t-msg"><div class="pf-body"><div class="msg"><h1>JavaScript를 켜 주세요</h1><div class="msg-b"><p>이 발표 덱은 data/의 내용을 읽어 브라우저에서 그립니다. JavaScript를 켠 뒤 다시 열어 주세요.</p></div></div></div></section></noscript></main>
 <script src="assets/common.js"></script>
+<script src="assets/md-blocks.js"></script>
 <script src="assets/deck-common.js"></script>
 <script src="assets/project-deck.js"></script>
 </body>

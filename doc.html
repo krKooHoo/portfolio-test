@@ -6,7 +6,7 @@
 <title>상세 기술문서</title>
 <link rel="icon" href="data:," /><!-- 아이콘 파일 없음: 브라우저가 /favicon.ico를 요청해 404가 나지 않게 -->
 <!-- 고정 렌더러 — 상세 기술문서(흐르는 읽기 문서): doc.html?p=<src 폴더 이름>#<제목 slug>. 내용은 data/projects/<폴더>.json + src/<폴더>/<기술 문서>에서 읽습니다.
-     요약 덱은 project.html?p=<폴더>, 포트폴리오 덱은 index.html. 인쇄는 A4(코드·그림이 쪽 사이에서 잘리지 않게만, PDF 보장은 덱만 — 결정 F3).
+     발표 덱은 project.html?p=<폴더>, 포트폴리오 덱은 index.html. md 해석(상대경로·제목 slug)은 assets/md-blocks.js(발표 덱과 공용). 인쇄는 A4(코드·그림이 쪽 사이에서 잘리지 않게만, PDF 보장은 덱만 — 결정 F3).
      CDN은 버전 고정(marked 12.0.2, mermaid 11.4.1, highlight.js 11.9.0 — 화면 github-dark · 인쇄 github, Pretendard v1.3.9). 장면 키트 CSS는 싣지 않습니다. -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
 <link rel="stylesheet" media="screen" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/github-dark.min.css" />
@@ -22,6 +22,7 @@
 <div id="app"><p class="loading">불러오는 중…</p></div>
 <noscript><div class="notice"><h1>JavaScript를 켜 주세요</h1><p>이 문서는 data/와 기술 문서를 읽어 브라우저에서 그립니다. JavaScript를 켠 뒤 다시 열어 주세요.</p></div></noscript>
 <script src="assets/common.js"></script>
+<script src="assets/md-blocks.js"></script>
 <script src="assets/doc.js"></script>
 </body>
 </html>

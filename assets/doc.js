@@ -1,15 +1,15 @@
 // 상세 기술문서 — doc.html?p=<폴더>  (portfolio-structure §4, 링크 §5, 결정 F2·F3·F6·F10)
 //   흐르는 읽기 문서. 레이아웃 ① 가운데 정렬(spikes/doc-layout/doc.html?layout=1). 출처: spikes/doc-layout/doc.js
 //   주석의 설계 근거(docs/design/…의 portfolio-structure·deck-vs-scroll·01 §, R0, 결정 F·Q·# 번호)와 원본 시안(spikes/…)은 템플릿 유지관리용 maintainer 브랜치에 있습니다. 이 레포에 없어도 정상입니다.
-//   문서 처리 순서: marked 12.0.2(gfm) → 상대경로 → GitHub식 slug(PF.slugger)·목차 → 요약 덱 장면 연결 → Mermaid 11.4.1 → highlight.js 11.9.0
-//   주소: #<제목 slug>(요약 덱·옛 project.html 조각이 이 형식으로 옴) · #sec=<절 제목>(제목을 찾아 #<slug>로 바꿈)
-//   요약 덱으로 되돌아가기: 머리 [요약 덱으로 ↗], 절 머리 칩 → project.html?p=<폴더>#s=hl-<n> / #s=ts-<n>(새 탭)
+//   문서 처리 순서: marked 12.0.2(gfm) → 상대경로 → GitHub식 slug(PF.slugger) — 여기까지 md-blocks.js(PF.md.parse, 발표 덱과 같은 규칙) → 목차 → Mermaid 11.4.1 → highlight.js 11.9.0
+//   주소: #<제목 slug>(발표 덱·옛 project.html 조각이 이 형식으로 옴) · #sec=<절 제목>(제목을 찾아 #<slug>로 바꿈)
+//   발표 덱으로: 머리 [발표 덱 ↗](새 탭). 예전의 절 머리 칩·목차 ★(덱 장면 연결)는 없앴습니다(결정 G1)
 //   내용은 data/projects/<폴더>.json + src/<폴더>/<기술 문서>만 씁니다. 여기 있는 글자는 UI 문구뿐입니다.
 (async () => {
   const root = document.getElementById('app');
   if (PF.guardFileProtocol(root)) return;
 
-  const { esc, inline, link, markNewTab, NEWTAB } = PF;
+  const { esc, inline, link, markNewTab } = PF;
   const html = document.documentElement;
   const Q = new URLSearchParams(location.search);
   const id = Q.get('p');
@@ -33,12 +33,6 @@
   const name = pf.profile?.name || '';
   document.title = `${p.title} — 상세 기술문서${name ? ' · ' + name : ''}`;
 
-  // ── 요약 덱 장면 대응: highlights → #s=hl-<n>, troubleshooting → #s=ts-<n>. 회고는 data에 section이 없어 칩 없음(§3-3 대체 동작) ──
-  const targets = [
-    ...(p.highlights || []).map((h, i, a) => ({ section: h.section, scene: `hl-${i + 1}`, kind: '핵심 구현', n: `${i + 1}/${a.length}`, title: h.title })),
-    ...(p.troubleshooting || []).map((t, i, a) => ({ section: t.section, scene: `ts-${i + 1}`, kind: '이슈 해결', n: `${i + 1}/${a.length}`, title: t.title })),
-  ].filter((t) => t.section);
-
   // ── 뼈대 ──
   const metaRows = (p.meta || []).map((m) => `<div><dt>${esc(m.label)}</dt><dd>${inline(m.value)}</dd></div>`).join('') +
     (p.team?.role ? `<div class="role"><dt>내 역할</dt><dd>${inline(p.team.role)}</dd></div>` : '');
@@ -47,7 +41,7 @@
     PF.isUrl(p.links?.video) && link({ href: p.links.video, label: '시연 영상', kind: 'external', cls: 'btn' }),
     ...(p.links?.extra || []).filter((l) => PF.isUrl(l.url)).map((l) => link({ href: l.url, label: esc(l.label), kind: 'external', cls: 'btn' })),
   ].filter(Boolean);
-  const deckBtn = link({ href: deckUrl(), label: '요약 덱으로', kind: 'page', cls: 'btn primary' });
+  const deckBtn = link({ href: deckUrl(), label: '발표 덱', kind: 'page', cls: 'btn primary' });
   const tags = (p.tags || []).length ? `<ul class="tags">${p.tags.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '';
 
   root.innerHTML = `
@@ -72,12 +66,12 @@
           ${tags}
           <details class="glance" id="glance"><summary>한눈에 · 링크</summary>
             <div class="glance-body"><div class="actions">${deckBtn}${ext.join('')}</div>
-            <p class="newtab-note">링크는 새 탭에서 열립니다. 요약 덱은 PC에서 보기 좋습니다.</p></div>
+            <p class="newtab-note">링크는 새 탭에서 열립니다. 발표 덱은 PC에서 보기 좋습니다.</p></div>
           </details>
         </div>
         <article class="md" id="doc"><p class="loading">기술 문서를 불러오는 중…</p></article>
       </main>
-      <aside class="rail" aria-label="요약 덱 연결">
+      <aside class="rail" aria-label="프로젝트 정보">
         <section class="rail-card"><p class="rail-title">이 프로젝트</p><dl class="rail-meta">${metaRows}</dl>
           <div class="actions">${deckBtn}${ext.join('')}</div></section>
         <section class="rail-card" id="rail-now" aria-live="polite"><p class="rail-title">지금 읽는 절</p><p class="now-title">—</p><div class="now-body"></div></section>
@@ -106,55 +100,24 @@
     let md;
     try { md = await PF.loadText(srcPath(p.doc)); }
     catch (err) { doc.innerHTML = `<p class="error">기술 문서를 불러오지 못했습니다 (${esc(err.message)}).</p>`; return; }
-    // md HTML은 먼저 비활성 <template>에 넣고(그 안의 그림은 받지 않음) 상대경로·제목 id·링크를 다 고친 뒤에 문서에 붙임.
-    //   → 고치기 전 주소(images/…)로 그림을 요청할 여지가 없음(PF.headingsOf와 같은 방식)
-    const tpl = document.createElement('template');
-    tpl.innerHTML = marked.parse(md, { gfm: true });
-    const frag = tpl.content;
-
-    // ① 상대경로(그림·영상)
-    const isRelative = (u) => u && !/^([a-z][a-z0-9+.-]*:|#|\/)/i.test(u);
-    const decode = (u) => { try { return decodeURI(u); } catch (_) { return u; } };
-    frag.querySelectorAll('img[src], video[src], source[src]').forEach((el) => {
-      const s = el.getAttribute('src');
-      if (isRelative(s)) el.setAttribute('src', srcPath(decode(s)));
-    });
-    frag.querySelectorAll('video[poster]').forEach((el) => { const s = el.getAttribute('poster'); if (isRelative(s)) el.setAttribute('poster', srcPath(decode(s))); });
-
-    // ② 제목 앵커(GitHub 규칙, PF.slugger) — 옛 project.html의 기술 문서 전문·요약 덱(PF.headingsOf)과 같은 id(첫 H1 포함 같은 순서).
-    //    링크 분류(숨김 "(새 탭)")·인쇄 각주([n])가 제목 글자에 섞이기 전의 원문 제목 글자로 계산하고, 그 글자를 목차·레일·장면 대응에도 씀
-    const slug = PF.slugger();
-    const headings = [...frag.querySelectorAll('h1, h2, h3, h4, h5, h6')];
-    headings.forEach((h) => { const t = h.textContent.trim(); headText.set(h, t); h.id = slug(t); });
+    // ①② md HTML은 먼저 비활성 <template>에 넣고(그 안의 그림은 받지 않음) 상대경로·제목 id를 고친 뒤에 문서에 붙임(PF.md.parse, 발표 덱과 같은 규칙).
+    //    제목 id는 GitHub 규칙(PF.slugger), 링크 분류(숨김 "(새 탭)")·인쇄 각주([n])가 섞이기 전의 원문 제목 글자로 계산하고, 그 글자를 목차·레일에도 씀
+    const { frag, headings: hs } = PF.md.parse(md, id);
+    const { isRelative, decode } = PF.md;
+    const headings = hs.map((h) => { headText.set(h.el, h.text); return h.el; });
 
     // ③ 링크 분류(§5-2)
     frag.querySelectorAll('a[href]').forEach((a) => classifyMdLink(a, isRelative, decode));
     doc.replaceChildren(frag);
 
-    // ④ 요약 덱 장면 ↔ 제목 (요약 덱과 같은 규칙 PF.resolveHeading: 정확히 일치 → 앞부분 양방향 일치, 여럿이면 문서 순서상 첫 번째)
+    // ④ 제목 찾기(#sec=<절 제목> 딥링크용, PF.resolveHeading: 정확히 일치 → 앞부분 양방향 일치, 여럿이면 문서 순서상 첫 번째)
     const list = headings.map((h) => ({ text: htext(h), el: h }));
     const resolve = (title) => PF.resolveHeading(list, title)?.el || null;
-    const sceneOf = new Map();
-    targets.forEach((t) => {
-      const h = resolve(t.section);
-      if (!h) { console.warn('[doc] 요약 덱 대상 제목을 찾지 못함:', t.section); return; }
-      if (!sceneOf.has(h)) sceneOf.set(h, t);
-    });
     window.PFDoc = { resolve };
 
-    const tocHtml = headings.filter((h) => h.tagName === 'H2' || h.tagName === 'H3').map((h) => {
-      const star = sceneOf.has(h) ? '<span class="star" aria-hidden="true">★</span><span class="sr-only">(요약 덱에 있음)</span>' : '';
-      return `<a class="${h.tagName.toLowerCase()}" href="#${esc(h.id)}">${esc(htext(h))}${star}</a>`;
-    }).join('');
+    const tocHtml = headings.filter((h) => h.tagName === 'H2' || h.tagName === 'H3')
+      .map((h) => `<a class="${h.tagName.toLowerCase()}" href="#${esc(h.id)}">${esc(htext(h))}</a>`).join('');
     document.querySelectorAll('.toc-links').forEach((el) => { el.innerHTML = tocHtml; });
-
-    // ⑤ 절 머리 칩: 요약 덱이 가리키는 제목 바로 뒤 → 요약 덱의 그 장면(새 탭)
-    const chip = (t) => `<a class="chip" href="${esc(deckUrl(t.scene))}" target="_blank" rel="noopener">` +
-      `<span class="chip-ic" aria-hidden="true">◧</span><span class="chip-k">요약 덱의 이 장면</span>` +
-      `<span class="chip-t">${esc(t.kind)} ${esc(t.n)} · ${inline(t.title)}</span>${NEWTAB}</a>`;
-    sceneOf.forEach((t, h) => {
-      h.insertAdjacentHTML('afterend', `<p class="doc-chip">${chip(t)}<span class="chip-note">요약 덱은 PC에서 보기 좋습니다</span></p>`);
-    });
 
     // ⑥ 표 → .table-wrap(스크롤 영역), 그림만 있는 문단 → .pf-figure
     let nTable = 0;
@@ -262,10 +225,10 @@
     }
     const here = new URL(location.href); here.hash = '';
     const deckAbs = new URL(deckUrl(), location.href).href;
-    document.querySelector('.print-urls').innerHTML = `<p>웹에서 보기: ${esc(here.href)}</p><p>요약 덱: ${esc(deckAbs)}</p>`;
+    document.querySelector('.print-urls').innerHTML = `<p>웹에서 보기: ${esc(here.href)}</p><p>발표 덱: ${esc(deckAbs)}</p>`;
 
     // ⑩ 목차 현재 위치(스크롤 기준) + 레일 "지금 읽는 절"
-    trackSection(headings.filter((h) => h.tagName === 'H2' || h.tagName === 'H3'), sceneOf, chip);
+    trackSection(headings.filter((h) => h.tagName === 'H2' || h.tagName === 'H3'));
 
     // ⑪ 이미지 크게 보기, 다이어그램 크게 보기(같은 페이지 dialog)
     doc.addEventListener('click', (e) => {
@@ -298,7 +261,7 @@
     markNewTab(a);
   }
 
-  function trackSection(list, sceneOf, chip) {
+  function trackSection(list) {
     const links = new Map([...document.querySelectorAll('#toc-links a')].map((a) => [decodeURIComponent(a.hash.slice(1)), a]));
     const tocBox = document.getElementById('toc');
     const nowTitle = document.querySelector('#rail-now .now-title');
@@ -312,7 +275,7 @@
       if (c === cur && cur !== undefined) return;
       cur = c;
       links.forEach((a) => { a.classList.remove('active'); a.removeAttribute('aria-current'); });
-      if (!c) { nowTitle.textContent = '문서 처음'; nowBody.innerHTML = '<p class="now-none">절 제목을 지나면 그 절이 요약 덱의 어느 장면인지 여기에 보입니다.</p>'; return; }
+      if (!c) { nowTitle.textContent = '문서 처음'; nowBody.innerHTML = '<p class="now-none">절 제목을 지나면 여기에 지금 읽는 절이 보입니다.</p>'; return; }
       const a = links.get(c.id);
       if (a) {
         a.classList.add('active'); a.setAttribute('aria-current', 'location');
@@ -322,10 +285,8 @@
         }
       }
       nowTitle.textContent = htext(c);
-      const tg = sceneOf.get(c);
       const h2 = parentH2(c);
-      nowBody.innerHTML = tg ? chip(tg)
-        : `<p class="now-none">이 절은 요약 덱에 따로 실리지 않았습니다.</p>${h2 && h2 !== c ? `<p class="now-parent">${esc(htext(h2))}</p>` : ''}`;
+      nowBody.innerHTML = h2 && h2 !== c ? `<p class="now-parent">${esc(htext(h2))}</p>` : '';
     };
     addEventListener('scroll', () => { if (!t) t = setTimeout(update, 60); }, { passive: true });   // rAF 대신 setTimeout(가려진 창에서도 동작)
     addEventListener('resize', () => { cur = undefined; update(); });
@@ -356,7 +317,7 @@
     document.querySelector('.fab-toc').addEventListener('click', () => dlg.showModal());
     dlg.addEventListener('click', (e) => { if (e.target === dlg || e.target.closest('.dlg-close') || e.target.closest('a')) dlg.close(); });
 
-    // 딥링크: #sec=<절 제목> → 정규 앵커 #<slug>로 바꾸고 도착 강조, 그냥 #<slug>(요약 덱·옛 주소)도 도착 강조
+    // 딥링크: #sec=<절 제목> → 정규 앵커 #<slug>로 바꾸고 도착 강조, 그냥 #<slug>(발표 덱·옛 주소)도 도착 강조
     const flash = (el) => { el.classList.add('arrive'); setTimeout(() => el.classList.remove('arrive'), 2100); };
     const arrive = (el) => {
       el.scrollIntoView({ block: 'start', behavior: 'instant' });

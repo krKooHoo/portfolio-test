@@ -5,7 +5,7 @@
 //   블록 A: docs/design/01 §8-2 준비 게이트(R0 【시험대 1~5】 포함)
 //   블록 B: 덱 키트 — 덱 보기(기본)·한 번에 보기, 배율 k = min(vw/1280, (vh−HUD)/720), HUD 띠, 키보드·휠·터치·가장자리 클릭,
 //           주소(#s=<장면 id> · #n · #s-n), 개요 격자, 포커스·aria-live, 세로 화면 안내, [PDF로 저장], 감사(audit·outside-deck)
-//   deck-vs-scroll §3 알려진 결함 중 요약 덱에 해당하는 것을 고침:
+//   deck-vs-scroll §3 알려진 결함 중 덱 보기에 해당하는 것을 고침:
 //     휠·트랙패드 넘기기 기본 켬(몸짓 하나 = 한 장) · 데스크톱 장면 클릭 넘기기 없앰(HUD·가장자리·터치만) · 세로 스와이프 + 회전 안내 ·
 //     보기 선택이 페이지를 넘어 유지 · 공유 주소는 장면 id(#s=hl-2) · HUD 번호 "NN / NN" · 한 번에 보기의 링크 첫 클릭 삼켜짐
 // 시험 훅(쿼리): ?pf-timeout=<ms> · ?pf-k=<수> · ?pf-audit=1 · ?view=deck|scroll · ?wheel=0
@@ -612,6 +612,8 @@
         else if (!i.naturalWidth) add('img-broken', i.getAttribute('src'));
       });
       s.querySelectorAll('.pf-clipped').forEach((c) => add('clipped', c.textContent.trim().slice(0, 80)));
+      s.querySelectorAll('[data-pf-visual-err]').forEach((c) => add(c.dataset.pfVisualErr, c.textContent.trim().slice(0, 120)));   // 원문 블록 0곳·여러 곳·바뀜(발표 덱)
+      if (s.dataset.pfErr) add(s.dataset.pfErr.split(':')[0], s.dataset.pfErr);                                                       // key-invalid 등 장면 자체 문제
     }
     return out;
   }
@@ -716,6 +718,8 @@
   }
   function report() {
     const a = audit();
+    const ids = scenes.map((s) => s.id);
+    if (PF.info?.notes) PF.info.notes.forEach((n) => { n.scene = ids.indexOf(n.id) + 1 || null; });   // 참고 지표(audit 아님)에 장면 번호
     return { ready: root.dataset.pfReady, scenes: scenes.length, printScenes: printed().length, scope, view, cur: cur + 1, wheel: WHEEL,
              ids: scenes.map((s) => s.id), audit: a, clipped: a.filter((x) => x.type === 'clipped').length,
              outsideDeck: a.filter((x) => x.type === 'outside-deck').length,

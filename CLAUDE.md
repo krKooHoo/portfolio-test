@@ -19,9 +19,9 @@
 ├── format/                  # 📏 가이드 판정 기준 (읽기 전용)
 ├── data/                    # 🤖 /portfolio-build가 생성 (portfolio.json, projects/*.json)
 ├── index.html               # 🖥 고정 렌더러 — 포트폴리오 덱 (16:9 슬라이드, 제출 PDF)
-├── project.html             # 🖥 고정 렌더러 — 프로젝트 요약 덱 (?p=<폴더 이름>)
+├── project.html             # 🖥 고정 렌더러 — 발표 덱 (?p=<폴더 이름>, data/의 deck이 가리키는 기술 문서 원문 블록을 그대로 그림)
 ├── doc.html                 # 🖥 고정 렌더러 — 상세 기술문서 (?p=<폴더 이름>, src/의 기술 문서 md를 직접 읽음)
-├── assets/                  # 🖥 렌더러 CSS·JS (덱 키트·장면 키트·상세 문서)
+├── assets/                  # 🖥 렌더러 CSS·JS (덱 키트·장면 키트·상세 문서·md-blocks.js = 기술 문서 md 해석과 원문 블록 찾기, 발표 덱·상세 문서 공용)
 ├── custom/                  # 🎨 /portfolio-custom 결과 (직접 생성 모드)
 └── report.md                # 📋 점검 리포트 (git 제외, 로컬 전용)
 ```
@@ -40,8 +40,8 @@ flowchart LR
     F["format/ 판정 기준"] --> B
     B --> D["data/*.json"]
     B --> R["report.md"]
-    D --> I["index.html 포트폴리오 덱 · project.html 요약 덱 · doc.html 상세 문서"]
-    S -.->|"기술 문서 md (doc.html 전문 · project.html 제목)"| I
+    D --> I["index.html 포트폴리오 덱 · project.html 발표 덱 · doc.html 상세 문서"]
+    S -.->|"기술 문서 md (doc.html 전문 · project.html은 deck이 가리키는 원문 블록)"| I
     D -.->|"직접 입력 시만"| C["/portfolio-custom → custom/index.html"]
 ```
 
@@ -91,4 +91,5 @@ flowchart LR
   `await PFScene.whenReady()` 뒤 `PFScene.report().audit`을 읽어 `.claude/skills/portfolio-build/SKILL.md` §7-1처럼 장면마다 1건으로
   묶어 알려 줍니다. 브라우저 도구가 없으면 headless Chrome으로
   `chrome --headless=new --virtual-time-budget=30000 --dump-dom "http://localhost:4600/index.html?pf-audit=1"`
-  (요약 덱은 `project.html?p=<id>&pf-audit=1`)을 실행해 `#pf-audit`의 base64 JSON(= `report()`)을 읽고, `ready`가 `yes`인지 확인합니다.
+  (발표 덱은 `project.html?p=<id>&pf-audit=1`)을 실행해 `#pf-audit`의 base64 JSON(= `report()`)을 읽고, `ready`가 `yes`인지 확인합니다.
+  발표 덱의 빨간 띠(원문 블록을 찾지 못함·여러 곳·바뀜)도 `audit`에 함께 나오고, `info.mode`가 `auto`면 예전 데이터로 자동 구성된 덱이므로 `/portfolio-build`를 다시 실행하도록 안내합니다.
