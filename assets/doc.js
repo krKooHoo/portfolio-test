@@ -198,7 +198,8 @@
     const markPrintWide = () => {
       const probe = document.createElement('div');
       probe.className = 'md print-probe'; probe.setAttribute('aria-hidden', 'true');
-      probe.innerHTML = '<div class="table-wrap" style="min-width:0;max-width:none;margin:0;overflow:visible"></div>';
+      // 인라인 !important: 인쇄 중에 다시 재도 인쇄 규칙 .md > * { width:auto !important … }에 지지 않게
+      probe.innerHTML = '<div class="table-wrap" style="min-width:0 !important;max-width:none !important;margin:0 !important;overflow:visible"></div>';
       document.body.appendChild(probe);
       const box = probe.firstChild;
       doc.querySelectorAll('.table-wrap > table').forEach((tb) => {
@@ -210,9 +211,9 @@
         const t = document.createElement('template'); t.innerHTML = tb.outerHTML;
         t.content.querySelectorAll('img, video, picture, source').forEach((e) => e.remove());
         t.content.querySelectorAll('iframe, object, embed, audio').forEach((e) => ['src', 'srcdoc', 'data'].forEach((a) => e.removeAttribute(a)));
-        box.style.width = `${680 - inset}px`;
+        box.style.setProperty('width', `${680 - inset}px`, 'important');
         box.replaceChildren(t.content);
-        tb.parentElement.classList.toggle('print-wide', box.firstElementChild.offsetWidth > 681 - inset);
+        tb.parentElement.classList.toggle('print-wide', box.firstElementChild.getBoundingClientRect().width > 680 - inset + 0.5);
       });
       probe.remove();
     };

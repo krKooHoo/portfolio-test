@@ -71,6 +71,7 @@
   @media (max-width: 760px) {
     .pf-hud { gap: 6px; padding: 0 8px; }
     .pf-hud .pf-hud-sec { display: none; }
+    .pf-hud .pf-hud-prog { min-width: 0; }   /* 쪽 수·점검 숫자가 들어갈 자리(진행 막대가 먼저 줄어듦) */
     .pf-hud .l { display: none; } .pf-hud .s { display: inline; }
     .pf-hud button { padding: 0 8px; }
   }

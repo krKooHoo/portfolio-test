@@ -115,14 +115,15 @@ argument-hint: "[프로젝트 폴더 이름 (생략하면 전체)]"
    - `http://localhost:4600/`(포트폴리오 덱)과 프로젝트마다 `project.html?p=<id>`(요약 덱):
      `await PFScene.whenReady()` 뒤 `PFScene.report()`의 `audit`을 읽습니다. `clipped`(빨간 "내용이 잘렸습니다" 띠 —
      배포된 페이지와 PDF에도 나옴)가 있으면 그 장면과 줄여야 할 원천 항목(제목·한 줄 소개·역할·핵심 구현 설명 등)을
-     리포트 **권장**에 적습니다. 표지·자기소개는 profile.md, 연락처 장면은 `detail`의 요소가 `div.cl-me`면 profile.md(내 연락처),
-     `div.cl-lk`면 프로젝트 링크입니다. `audit`은 요소마다 한 줄이라 넘친 장면 하나가 `clipped`·`body-scroll`·`outside` 여러 줄로
+     리포트 **권장**에 적습니다. 포트폴리오 덱(index.html)의 표지·자기소개는 profile.md, 연락처 장면은 `detail`의 요소가 `div.cl-me`면 profile.md(내 연락처),
+     `div.cl-lk`면 프로젝트 링크입니다. 요약 덱(project.html)은 표지를 포함해 모든 장면이 그 프로젝트의 src/ 기술 문서에서 옵니다. `audit`은 요소마다 한 줄이라 넘친 장면 하나가 `clipped`·`body-scroll`·`outside` 여러 줄로
      나오므로 **장면(`scene` 번호)마다 1건**으로 묶고, 장면 이름은 `report().ids[scene - 1]`(예: `intro`)로 적습니다.
      `clipped`가 있는 장면의 `body-scroll`·`outside`는 같은 문제로 봅니다. `clipped`가 없는 장면의 다른 항목
      (`head-overlap`·`outside`·`inner-scroll`·`img-broken` 등)도 장면마다 1건으로 적습니다. `scene`이 null인 항목
      (`outside-deck`·`foreign`·`dialog`)은 src/로 고칠 수 없는 렌더러 문제이므로 리포트에 넣지 말고 마무리 보고에서 따로 알립니다.
-     적은 뒤 프로젝트 장면의 항목은 `## 요약` 표에서 그 프로젝트 행의 **권장** 개수에 더하고, 표지·자기소개·기술 스택·한눈에 보기·연락처
-     장면의 항목은 `## 프로필`에 적습니다(요약 표 개수에는 넣지 않음).
+     적은 뒤 프로젝트 장면의 항목(요약 덱의 모든 장면과 포트폴리오 덱의 프로젝트 소개·핵심 요약)은 `## 요약` 표에서 그 프로젝트 행의
+     **권장** 개수에 더하고, 포트폴리오 덱의 표지·자기소개·기술 스택·한눈에 보기·연락처 장면의 항목은 `## 프로필`에 적습니다
+     (요약 표 개수에는 넣지 않음).
    - 프로젝트마다 `doc.html?p=<id>`(상세 기술문서): 기술 문서 안의 이미지는 이 페이지에서만 불러오므로 깨진 이미지는 여기서 확인합니다.
    - 콘솔 경고 `[portfolio] 상세 문서에서 절 제목을 찾지 못함`·`[doc] 요약 덱 대상 제목을 찾지 못함`이 보이면
      `section` 값이 원문 제목과 다른 것입니다. §4의 `section` 검증을 다시 해서 고쳐 씁니다.

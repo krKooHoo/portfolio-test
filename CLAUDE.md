@@ -89,5 +89,6 @@ flowchart LR
 - Claude 데스크톱 앱: `.claude/launch.json`의 `portfolio` 구성으로 미리보기
 - 덱 아래 띠의 빨간 숫자(미리보기 배치 점검)를 물으면 데이터를 다시 만들지 않고, 그 페이지(`index.html`·`project.html?p=<id>`)에서
   `await PFScene.whenReady()` 뒤 `PFScene.report().audit`을 읽어 `.claude/skills/portfolio-build/SKILL.md` §7-1처럼 장면마다 1건으로
-  묶어 알려 줍니다. 브라우저 도구가 없으면 headless Chrome으로 `pf-audit=1` 쿼리를 붙인 주소(`index.html?pf-audit=1`,
-  `project.html?p=<id>&pf-audit=1`)를 `--dump-dom`한 뒤 `#pf-audit`의 base64 JSON(= `report()`)을 읽습니다.
+  묶어 알려 줍니다. 브라우저 도구가 없으면 headless Chrome으로
+  `chrome --headless=new --virtual-time-budget=30000 --dump-dom "http://localhost:4600/index.html?pf-audit=1"`
+  (요약 덱은 `project.html?p=<id>&pf-audit=1`)을 실행해 `#pf-audit`의 base64 JSON(= `report()`)을 읽고, `ready`가 `yes`인지 확인합니다.

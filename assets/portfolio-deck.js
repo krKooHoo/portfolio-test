@@ -79,7 +79,7 @@
     if ((pf.skills || []).length) {
       const V = [{ name: 'c3', min: 1, max: 3 }, { name: 'c2', min: 4, max: 4 }, { name: 'rows', min: 1, max: 8 }];
       const pages = PF.pack(pf.skills, V, buildSkills);
-      pages.forEach((pg, i) => out.push(pg.variant ? buildSkills(pg.chunk, pg.variant, i, pages.length) : PF.shrinkOrClip(buildSkills(pg.chunk, 'rows', i, pages.length), PFScene.refUrl('stack'), ov)));
+      pages.forEach((pg, i) => out.push(pg.variant ? buildSkills(pg.chunk, pg.variant, i, pages.length) : PF.shrinkOrClip(buildSkills(pg.chunk, 'rows', i, pages.length), PFScene.refUrl(i === 0 ? 'stack' : `stack-${i + 1}`), ov)));
     }
 
     // ④ 프로젝트마다 2장(F8): 소개(영상·GitHub·요약 덱·상세 문서 링크) + 핵심 요약(핵심 구현 제목·기능 설명, 이슈 해결 제목)
@@ -122,7 +122,7 @@
     };
     if (projects.length) {
       const pages = PF.pack(projects, [{ name: 'rows', min: 1, max: 99 }], (it, v) => buildSum(it, v, 1, 2));
-      pages.forEach((pg, i) => out.push(pg.variant ? buildSum(pg.chunk, 'rows', i, pages.length) : PF.shrinkOrClip(buildSum(pg.chunk, 'rows', i, pages.length), PFScene.refUrl('glance'), ov)));
+      pages.forEach((pg, i) => out.push(pg.variant ? buildSum(pg.chunk, 'rows', i, pages.length) : PF.shrinkOrClip(buildSum(pg.chunk, 'rows', i, pages.length), PFScene.refUrl(i === 0 ? 'glance' : `glance-${i + 1}`), ov)));
     }
 
     // ⑥ 맺음: 연락처 + 프로젝트별 링크(요약 덱 · 상세 문서 · GitHub · 영상 · 그 밖의 링크는 주소까지)
