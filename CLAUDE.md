@@ -16,6 +16,7 @@
 │   ├── 기술문서.md           #    기술 문서 (폴더 안의 .md 하나. README.md여도 됨)
 │   ├── images/              #    스크린샷·GIF
 │   ├── code/                #    (선택) 핵심 소스코드 .cs
+│   ├── deck-edits.json      #    (/portfolio-edit) 발표 덱 장면 고치기 — 요청을 받아 Claude가 씀, 커밋함, 기술 문서가 아님, build는 읽기만
 │   └── _intake/             #    (/portfolio-intake) 재료집·촬영목록 — 기술 문서가 아님, git 제외, build·check가 읽지 않음
 ├── format/                  # 📏 가이드 판정 기준 (읽기 전용)
 ├── data/                    # 🤖 /portfolio-build가 생성 (portfolio.json, projects/*.json)
@@ -40,6 +41,8 @@ flowchart LR
     P["profile.md"] --> B["/portfolio-build"]
     S["src/*/ 기술문서·이미지·코드"] --> B
     F["format/ 판정 기준"] --> B
+    E["/portfolio-edit"] -->|"장면 고치기"| X["src/*/deck-edits.json"]
+    X -->|"deck-edits.py (build 마지막·edit 직후)"| D
     B --> D["data/*.json"]
     B --> R["report.md"]
     D --> I["index.html 포트폴리오 덱 · project.html 발표 덱 · doc.html 상세 문서"]
@@ -53,6 +56,7 @@ flowchart LR
 |---|---|
 | `/portfolio-build [폴더]` | 소스를 읽어 `data/` 생성 + 점검 리포트 + 미리보기. 폴더를 주면 그 프로젝트만 |
 | `/portfolio-check [폴더]` | 기술 문서를 가이드 기준으로 점검만 (데이터는 안 건드림) |
+| `/portfolio-edit [폴더] [장면] [요청]` | 발표 덱 장면 하나의 배치(틀·원문 블록 고르기·줄 범위·나누기·합치기·숨기기·순서)를 고침. `src/<NN>/deck-edits.json`에 써서 다시 빌드해도 남음. 말로 요청해도 되지만 **장면 카드로 확인받은 뒤에만** 씀. 내용(사실·설명) 문제는 기술 문서로 안내 |
 | `/portfolio-custom [디자인 요청]` | 직접 생성 모드. **사용자가 직접 입력했을 때만** 실행 |
 | `/portfolio-update [되돌리기]` | 템플릿 원본에서 렌더러·스킬·`format/`·`CLAUDE.md`만 받아 반영(`src/`·`profile.md`·`data/`·`custom/`은 안 건드림). **사용자가 직접 입력했을 때만** 실행 |
 | `/portfolio-intake <레포 주소\|폴더>` | GitHub 레포에서 핵심 `.cs`·재료집(사실 + 질문)·촬영 목록을 `src/<NN>/`에 만듦. 기술 문서는 만들지 않음. **사용자가 직접 입력했을 때만** 실행 |
@@ -69,6 +73,8 @@ flowchart LR
 3. **Claude가 요약한 문장은 표시한다.** 원문을 그대로 옮기지 않고 Claude가 압축한 문장(한 줄 소개, 기술 스택 근거 등)은
    리포트의 "확인해 주세요" 목록에 넣어 수강생이 직접 검토하게 합니다.
 4. **고칠 곳은 소스다.** 페이지 내용이 틀리면 `data/`를 손으로 고치기보다 `src/`·`profile.md`를 고치고 다시 빌드하도록 안내합니다.
+   발표 덱의 **장면 배치**(기술 문서를 읽는 사람에게는 달라질 필요가 없는 것: 틀·어떤 원문 블록을 보일지·나누기·합치기·숨기기·순서)는
+   `/portfolio-edit`가 `src/<NN>/deck-edits.json`에 씁니다. 이 파일도 소스이고, 글은 원문 그대로이거나 줄인 것(→ "확인해 주세요")뿐입니다.
 5. **렌더러는 건드리지 않는다.** `index.html`, `project.html`, `doc.html`, `assets/`는 사용자가 요청할 때만 수정합니다.
    디자인 변경 요청은 ① `profile.md`의 강조색 ② `/portfolio-custom` 순으로 안내합니다.
 6. **경로는 상대경로, 대소문자 정확히.** GitHub Pages(리눅스)는 대소문자를 구분합니다.

@@ -116,14 +116,16 @@
   async function resolveVisuals(model, P, p) {
     const mm = [];
     for (const c of model) for (const sl of c.slides) {
-      sl._v = await Promise.all((sl.visuals || []).map(async (ref) => {
+      sl._v = (await Promise.all((sl.visuals || []).map(async (ref) => {
         if (ref.direct) { const d = ref.w && ref.h ? { w: ref.w, h: ref.h } : await PF.imageSize(PF.srcPath(p.id, ref.src)); return { ref, status: 'ok', src: PF.srcPath(p.id, ref.src), d }; }
         const r = ref._el ? { status: 'ok', el: ref._el } : PF.md.pick(P, ref, sl.sectionPath || []);
         if (r.status === 'missing' || r.status === 'ambiguous') { info.unresolved.push(`${sl.key}: ${r.detail}`); return { ref, ...r }; }
         if (ref.kind === 'mermaid') mm.push(r.el);
         if (ref.kind === 'image') { const src = r.el.getAttribute('src'); const d = ref.w && ref.h ? { w: ref.w, h: ref.h } : await PF.imageSize(src); return { ref, ...r, src, d }; }
+        // 표 안 그림: 불러오기 전 높이로 재면 나중에 표가 커져 조용히 잘림 → 크기를 먼저 받아 두고 복제본에 width·height를 적음(vboxHtml)
+        if (ref.kind === 'table' && r.el) return { ref, ...r, imgDims: await Promise.all([...r.el.querySelectorAll('img')].map((i) => PF.imageSize(i.getAttribute('src')))) };
         return { ref, ...r };
-      }));
+      }))).map((v) => (sl.edited ? { ...v, edited: true } : v));             // 장면 고치기로 고친 장면: 원문 문제 띠 문구가 다름
     }
     await renderMermaid(mm);
   }
@@ -140,8 +142,8 @@
     return code.outerHTML;
   }
   function vboxHtml(v, chunk) {
-    if (v.status === 'missing' || v.status === 'ambiguous') return `<figure class="vbox err">${PF.vband(`visual-${v.status}`, v.detail)}</figure>`;
-    const warn = v.status === 'changed' ? PF.vband('visual-changed', v.detail) : '';
+    if (v.status === 'missing' || v.status === 'ambiguous') return `<figure class="vbox err">${PF.vband(`visual-${v.status}`, v.detail, v.edited)}</figure>`;
+    const warn = v.status === 'changed' ? PF.vband('visual-changed', v.detail, v.edited) : '';
     const cap = (t) => (t ? `<figcaption class="cap">${t}</figcaption>` : '');
     const k = v.ref.kind;
     if (k === 'image') {
@@ -162,8 +164,12 @@
     if (k === 'table') {
       const t = v.el.cloneNode(true);
       t.classList.add('md-table');
+      t.querySelectorAll('img').forEach((i, n) => {                       // 행을 나누기 전에(원본과 같은 순서로) 크기를 적음
+        const d = v.imgDims?.[n];
+        if (d) { const h = Math.min(d.h, 120); i.width = Math.round((h * d.w) / d.h); i.height = h; }   // CSS max-height 120px와 같은 크기
+        i.loading = 'lazy'; i.decoding = 'async';
+      });
       if (chunk) { const rows = [...t.querySelectorAll('tbody tr')]; rows.forEach((r, i) => { if (i < chunk[0] || i >= chunk[1]) r.remove(); }); }
-      t.querySelectorAll('img').forEach((i) => { i.loading = 'lazy'; i.decoding = 'async'; });
       return `<figure class="vbox" data-kind="table"><div class="vmedia"><div class="fit-in">${t.outerHTML}</div></div>${cap(v.ref.caption?.text ? inline(v.ref.caption.text) : '')}${warn}</figure>`;
     }
     return '';
@@ -189,10 +195,11 @@
       return `<div class="dk scr-row${tight}" style="--n:${vs.length}">${vs.map((v, i) => `<div class="fe-card">${vis([v])}${points[i] ? `<p class="fe-k">FEATURE ${String(i + 1).padStart(2, '0')}</p>${points[i].label ? `<h3>${esc(points[i].label)}</h3>` : ''}${txt(points[i]) ? `<p>${inline(txt(points[i]))}</p>` : ''}` : ''}</div>`).join('')}</div>`;
     }
     if (sl.layout === 'problem') {
-      if (variant.stack) return `<div class="dk dk-stack${tight}">${vis(vs)}${flowHtml(points, 'row')}</div>`;
+      if (variant.stack || !points.length) return `<div class="dk dk-stack${tight}">${vis(vs)}${points.length ? flowHtml(points, 'row') : ''}</div>`;
       return `<div class="dk dk-side flip${tight}" style="--vw:${variant.vw}fr">${vis(vs)}${flowHtml(points, 'col')}</div>`;
     }
-    if (sl.layout === 'full' || variant.stack) return `<div class="dk dk-stack${tight}">${vis(vs)}${ncards(points, { row: true, num: sl.layout !== 'full' })}</div>`;
+    // 요점이 없으면(나눈 장면 등) 옆 칸이 비지 않게 시각 자료를 가로 전체로
+    if (sl.layout === 'full' || variant.stack || !points.length) return `<div class="dk dk-stack${tight}">${vis(vs)}${ncards(points, { row: true, num: sl.layout !== 'full' })}</div>`;
     return `<div class="dk dk-side${tight}" style="--vw:${variant.vw}fr">${vis(vs)}${ncards(points, { num: true })}</div>`;
   }
 
@@ -228,6 +235,7 @@
       const s = PF.scene({ id: sid, tpl: 'D', eyebrow: meta.chapter, rlabel: meta.rlabel, title: txt(sl.title) || meta.chapter, sub: part, lead: part && part !== `1/${part.split('/')[1]}` ? '' : txt(sl.lead), foot: meta.foot, sec: meta.chapter, group: meta.chapter, stitle: txt(sl.title) });
       s.classList.add(`l-${sl.layout || 'visual'}`);
       if (meta.err) s.dataset.pfErr = meta.err;
+      if (sl.edited) s.dataset.pfEdited = '1';                       // 장면 고치기로 고친 장면(미리보기 개요에 ✎)
       PF.body(s).innerHTML = `<div class="pf-fill">${bodyHtml(sl, vs, v)}</div>`;
       if (meta.auto) s.querySelector('.pf-foot > span').insertAdjacentHTML('beforeend', '<span class="pf-autoband" data-pf-ui="note">예전 데이터로 자동 구성 — /portfolio-build를 다시 실행하면 발표 덱이 됩니다</span>');
       return PF.fitVisuals(s);
@@ -310,7 +318,7 @@
     mark('assembled');
   }
 
-  // 옛 장면 id(#s=hl-n …) → 새 장면 id. 마운트 전에 주소만 바꿈(키트가 그 장면으로 이동)
+  // 옛 장면 id(#s=hl-n …)·없는 장면 id(#s=d-<key>·ch-<key>) → 새 장면 id. 마운트 전에 주소만 바꿈(키트가 그 장면으로 이동)
   function remapHash(p, scenes, model) {
     let raw = location.hash.slice(1); try { raw = decodeURIComponent(raw); } catch { /* */ }
     const m = /^(?:s=)?(.+)$/.exec(raw); if (!m) return;
@@ -329,25 +337,31 @@
     } else if (/^shots/.test(want)) to = scenes.find((s) => s.classList.contains('l-screens'))?.id || '';
     else if (want === 'more') to = 'end';
     else if (/^retro/.test(want)) to = 'retro';
-    if (!to || !scenes.some((s) => s.id === to)) to = /^(hl|ts|shots|more|retro)/.test(want) ? 'toc' : '';
+    else if (/^d-/.test(want)) to = PF.deckSceneNear(p, want, (id) => scenes.some((s) => s.id === id));   // 숨겼거나 다시 빌드로 없어진 장면
+    if (!to || !scenes.some((s) => s.id === to)) to = /^(hl|ts|shots|more|retro|d-|ch-)/.test(want) ? 'toc' : '';
     if (to) try { history.replaceState(null, '', `${location.pathname}${location.search}#s=${encodeURIComponent(to)}`); } catch { /* */ }
   }
 
   // 목록 한 줄(같은 덱 안 이동 = 같은 탭). 쪽 번호(p.N)는 키트가 채움
-  const item = (n, t, d, ref) => `<li><a href="#${esc(ref)}" data-pf-ref="${esc(ref)}"><span class="n">${esc(n)}</span><span class="tx"><span class="t">${inline(t)}</span>${d ? `<span class="d">${esc(d)}</span>` : ''}</span><span class="pg"><span class="pf-n-screen">p.00</span><span class="pf-n-print"></span></span></a></li>`;
+  //   ld = 장 표지 넉넉한 변형에서 그 장면의 도입(lead, 데이터의 글 조각 그대로)
+  const item = (n, t, d, ref, ld = '') => `<li><a href="#${esc(ref)}" data-pf-ref="${esc(ref)}"><span class="n">${esc(n)}</span><span class="tx"><span class="t">${inline(t)}</span>${d ? `<span class="d">${esc(d)}</span>` : ''}${ld ? `<span class="ld">${inline(ld)}</span>` : ''}</span><span class="pg"><span class="pf-n-screen">p.00</span><span class="pf-n-print"></span></span></a></li>`;
   const band = (s, auto) => { if (auto) s.querySelector('.pf-foot > span').insertAdjacentHTML('beforeend', '<span class="pf-autoband" data-pf-ui="note">예전 데이터로 자동 구성</span>'); return s; };
 
+  // 장 표지: 장면이 적으면(4개 이하) 넉넉한 변형 — 목차 크기 목록 + 장면마다 도입(결정 I7). 안 들어가면 보통 → 촘촘
+  const ROOMY_MAX = 4;
   function chapterScene(c, ci, chId, slides, foot, auto, ptitle) {
-    const make = (compact) => {
-      const s = PF.scene({ id: chId, tpl: 'CH', kind: 'bare', cls: compact ? 'compact' : '', foot, sec: c.title, group: c.title, stitle: c.title });
-      const list = slides.map((x, i) => item(String(i + 1), txt(x.sl.title) || c.title, x.sl.tab || '', x.scenes[0].id)).join('');
-      PF.body(s).innerHTML = `<div class="toprow"><span class="pf-eyebrow">${esc(ptitle)}</span><span class="rl">장면 ${slides.length}개</span></div>
+    const make = (mode) => {
+      const s = PF.scene({ id: chId, tpl: 'CH', kind: 'bare', cls: mode === 'compact' ? 'compact' : '', foot, sec: c.title, group: c.title, stitle: c.title });
+      const roomy = mode === 'roomy';
+      const list = slides.map((x, i) => item(String(i + 1), txt(x.sl.title) || c.title, x.sl.tab || '', x.scenes[0].id, roomy ? txt(x.sl.lead) : '')).join('');
+      PF.body(s).innerHTML = `<div class="toprow"><span class="pf-eyebrow long">${esc(ptitle)}</span><span class="rl">장면 ${slides.length}개</span></div>
         <div class="ch-mid"><div><p class="ch-no">CHAPTER ${String(ci + 1).padStart(2, '0')}</p><h2 class="ch-t">${esc(c.title)}</h2>${DOT}</div>
-        <div class="ch-list t-P2${compact ? ' compact' : ''}"><ol class="toc-list sub">${list}</ol></div></div>`;
+        <div class="ch-list t-P2${mode === 'normal' ? '' : ' ' + mode}"><ol class="toc-list${roomy ? '' : ' sub'}">${list}</ol></div></div>`;
       return band(s, auto);
     };
-    for (const compact of [false, true]) { const s = make(compact); if (PF.fitsM(s)) return s; }
-    return PF.shrinkOrClip(make(true), PFScene.refUrl(chId), info.overflow);
+    const modes = slides.length <= ROOMY_MAX ? ['roomy', 'normal', 'compact'] : ['normal', 'compact'];
+    for (const m of modes) { const s = make(m); if (PF.fitsM(s)) return s; }
+    return PF.shrinkOrClip(make('compact'), PFScene.refUrl(chId), info.overflow);
   }
 
   function tocScene(p, foot, items, retro, auto) {

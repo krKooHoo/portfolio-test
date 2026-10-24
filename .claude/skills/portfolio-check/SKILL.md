@@ -32,7 +32,8 @@ argument-hint: "[프로젝트 폴더 이름 (생략하면 전체)]"
    - 문서 속 이미지 경로가 실제 파일과 **대소문자까지** 맞는지, 링크가 `#`·빈 값이 아닌지.
    - `code/`가 있으면 문서 코드의 주요 클래스·메서드 이름이 실제 코드에 있는지 표본 확인.
 4. `report.md`에 씁니다. `/portfolio-build`의 리포트 형식에서 **"확인해 주세요"·"장면 점검" 섹션을 빼고** 같은 형식을 씁니다
-   ([../portfolio-build/SKILL.md](../portfolio-build/SKILL.md) §6 — 요약 표의 **참고** 열 포함). 기존 report.md는 덮어씁니다.
+   ([../portfolio-build/SKILL.md](../portfolio-build/SKILL.md) §6 — 요약 표의 **참고** 열 포함). 기존 report.md는 덮어쓰되,
+   기존 report.md에 `## 확인해 주세요` 절이 있으면 그 절은 **그대로 옮겨 둡니다**(빌드·`/portfolio-edit`가 남긴 Claude 압축 문장 기록, 원칙 3).
 
 ## 피드백 쓰는 법
 

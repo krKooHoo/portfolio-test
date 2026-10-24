@@ -499,6 +499,11 @@
       const cap = document.createElement('span'); cap.className = 'pf-ov-cap'; cap.innerHTML = `<b>${pad2(i + 1)}</b><span></span>`;
       cap.querySelector('span').textContent = t || sec;
       b.append(th, cap);
+      if (isLocal) {                                         // 미리보기에서만: 장면 id(주소 #s=<id>, 장면 고치기에서 씀) + 고친 장면 ✎
+        const id = document.createElement('small'); id.className = 'pf-ov-id';
+        id.textContent = `${s.id}${s.dataset.pfEdited ? ' ✎' : ''}`;
+        b.appendChild(id);
+      }
       frag.appendChild(b);
     });
     grid.replaceChildren(frag);

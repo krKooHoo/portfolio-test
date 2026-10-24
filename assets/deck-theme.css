@@ -33,6 +33,11 @@ body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: anti
 .pf-headrow { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
 .pf-eyebrow { font-size: 15px; font-weight: 800; line-height: 20px; color: var(--accent-ink); letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; }
 .pf-rlabel { font-size: 15px; font-weight: 600; line-height: 20px; color: var(--muted); text-align: right; min-width: 0; }
+/* 윗줄 왼쪽 라벨에 장 제목·프로젝트 제목처럼 긴 글자가 들어가는 곳(장면 머리, 장 표지 .long) → 줄바꿈(자르지 않음),
+   오른쪽 라벨은 제 폭을 지켜 밀려나지 않게. 왼쪽이 고정 글자(PROJECT·MORE·CONTACT 등)인 윗줄은 그대로(오른쪽이 길면 오른쪽이 꺾임) */
+.pf-headrow .pf-eyebrow, .toprow .pf-eyebrow.long { white-space: normal; min-width: 0; overflow-wrap: anywhere; }
+.pf-headrow .pf-rlabel { flex-shrink: 0; max-width: 60%; }
+.t-CH .toprow .rl { flex: none; white-space: nowrap; }
 .pf-titlerow { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
 .pf-title { font-size: 32px; font-weight: 800; letter-spacing: -.02em; line-height: 1.2; color: var(--ink); }
 .pf-title .pf-part { font-size: 16px; font-weight: 700; color: var(--muted); margin-left: 12px; letter-spacing: 0; }
@@ -120,7 +125,7 @@ table.kv td.role { color: var(--accent-ink); font-weight: 800; }
 .skill .dotrule { margin-bottom: 4px; }
 .skill ul { list-style: none; display: grid; gap: 14px; }
 .skill li { font-size: 16px; line-height: 1.55; color: var(--ink); }
-.skill li .chip { display: table; margin-top: 5px; font-size: 13px; }
+.skill li .chip { display: table; margin-top: 5px; font-size: 13px; white-space: normal; overflow-wrap: anywhere; max-width: 100%; }   /* 긴 프로젝트 제목도 카드 안에서 줄바꿈 */
 .skills.rows .skill { display: grid; grid-template-columns: 180px 1fr; align-items: start; gap: 18px; padding: 14px 20px; }
 .skills.rows .skill .dotrule { display: none; }
 .skills.rows .skill ul { gap: 4px; }
@@ -289,7 +294,8 @@ table.md-table th { background: var(--accent-fill); color: #fff; font-weight: 70
 table.md-table td { padding: 7px 11px; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--ink); overflow-wrap: anywhere; }
 table.md-table tbody tr:nth-child(even) td { background: var(--zebra); }
 table.md-table code { font-size: .86em; }
-table.md-table img { max-height: 120px; max-width: 100%; }
+table.md-table img { max-height: 120px; max-width: 100%; height: auto; }   /* width·height 속성(렌더러가 미리 잰 크기)으로 불러오기 전에도 자리를 잡음 */
+.vbox[data-kind] > .pf-vband { min-width: 0; }                         /* 그림 상자 안 띠는 상자 폭에 맞춰 꺾임(높이는 fitVisuals가 다시 잼) */
 .cards { display: grid; gap: 12px; align-content: center; min-width: 0; }
 .cards.row { grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); align-items: stretch; }
 .cards.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -325,6 +331,10 @@ table.md-table img { max-height: 120px; max-width: 100%; }
 .ch-t { margin-top: 10px !important; font-size: 50px; font-weight: 800; line-height: 1.15; letter-spacing: -.03em; color: var(--ink); }
 .t-CH .dotrule { margin-top: 22px; max-width: 360px; }
 .ch-list .toc-list a { cursor: pointer; }
+/* 장면이 적은 장 표지(넉넉한 변형, 결정 I7): 목차 크기 목록 + 장면마다 도입 한두 줄 */
+.ch-list.roomy .toc-list a { align-items: flex-start; padding: 16px 0; }
+.ch-list.roomy .toc-list .pg { padding-top: 8px; }
+.ch-list.roomy .toc-list .ld { display: block; margin-top: 6px; font-size: 15px; line-height: 1.55; color: var(--ink); opacity: .82; }
 
 /* ── 맺음(발표 덱) ── */
 .t-EN .pf-body { display: flex; flex-direction: column; }

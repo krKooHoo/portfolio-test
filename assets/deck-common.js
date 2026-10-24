@@ -126,11 +126,13 @@
     if (!fitsScene(s)) {
       stats?.push({ tpl: s.dataset.pfTpl, action: 'overflow', issues: window.PFScene.sceneIssues(s, { layoutOnly: true }).slice(0, 4) });
       const zmin = Math.min(1, minZoom(b));
-      const w = document.createElement('div'); w.className = 'pf-zoomwrap'; w.append(...b.childNodes); b.appendChild(w);
-      const bw = b.clientWidth, bh = b.clientHeight;
-      while (!fitsScene(s) && z > zmin + 1e-9) {
-        z = Math.max(+(z - 0.01).toFixed(2), zmin);
-        Object.assign(w.style, { zoom: String(z), width: `${bw / z}px`, height: `${bh / z}px` });
+      if (zmin < 1) {                                                    // 이미 하한이면 감싸지 않음(크기 없는 감싸개가 세로 가운데를 깸)
+        const w = document.createElement('div'); w.className = 'pf-zoomwrap'; w.append(...b.childNodes); b.appendChild(w);
+        const bw = b.clientWidth, bh = b.clientHeight;
+        while (!fitsScene(s) && z > zmin + 1e-9) {
+          z = Math.max(+(z - 0.01).toFixed(2), zmin);
+          Object.assign(w.style, { zoom: String(z), width: `${bw / z}px`, height: `${bh / z}px` });
+        }
       }
       stats?.push({ tpl: s.dataset.pfTpl, action: 'shrink', zoom: +z.toFixed(4), floor: +zmin.toFixed(4) });
       if (!fitsScene(s)) note(s.id, 'font-floor', +zmin.toFixed(3), `글자 하한(본문 14·코드 12·라벨 11px)에 닿아 더 줄이지 못함`);
@@ -197,19 +199,29 @@
     return f;
   }
   // 최종 장면들의 참고 지표: 채움률 60% 미만(표지·목차·장 표지 같은 bare 장면은 레이아웃이 정하므로 빼고), 다이어그램 실효 글자 10px 미만
+  //   detail에 원인을 적음(리포트 안내를 원인별로, /portfolio-build SKILL §7-1): 다이어그램은 폭·높이 중 무엇에 막혔는지, 채움률은 장면에 든 것
+  const KIND = { mermaid: '다이어그램', table: '표', code: '코드', image: '그림' };
   function noteFill(scenes, { fill = true } = {}) {
     scenes.forEach((s) => {
-      s.querySelectorAll('.vbox[data-eff]').forEach((b) => { const eff = +b.dataset.eff; if (eff < 10) note(s.id, 'tiny-diagram', +eff.toFixed(1), `다이어그램 글자가 약 ${Math.round(eff)}px로 작음`); });
+      s.querySelectorAll('.vbox[data-eff]').forEach((b) => {
+        const eff = +b.dataset.eff; if (eff >= 10) return;
+        const why = { h: '세로로 긴 그림 — 높이에 막힘', w: '가로로 긴 그림 — 폭에 막힘', multi: '다른 자료와 한 장면 — 나누면 커짐' }[b.dataset.lim] || '';
+        note(s.id, 'tiny-diagram', +eff.toFixed(1), `다이어그램 글자가 약 ${Math.round(eff)}px로 작음${why ? `(${why}, ${b.dataset.vb})` : ''}`);
+      });
       if (!s.classList.contains('pf-sum')) return;
       const f = fillOf(s);
       s.dataset.pfFill = f.toFixed(2);
-      if (fill && f < 0.6) note(s.id, 'low-fill', +f.toFixed(2), `본문 상자의 ${Math.round(f * 100)}%만 채움`);
+      if (fill && f < 0.6 && !s.querySelector('.vbox.err')) {           // 원문을 못 찾은 자리가 있으면 그 문제(감사 visual-*)가 먼저
+        const kinds = [...s.querySelectorAll('.vbox[data-kind]')].map((b) => KIND[b.dataset.kind] || b.dataset.kind);
+        note(s.id, 'low-fill', +f.toFixed(2), `본문 상자의 ${Math.round(f * 100)}%만 채움(${kinds.length ? [...new Set(kinds)].join('·') : '글만'})`);
+      }
     });
   }
 
   // ── 원문 블록 문제 띠(배포·PDF에도 보임 → 조용히 비지 않음). audit type = data-pf-visual-err ──
   const VBAND = { 'visual-missing': '원문에서 찾지 못했습니다', 'visual-ambiguous': '원문 위치가 여러 곳입니다', 'visual-changed': '원문이 바뀌었습니다' };
-  const vband = (type, detail) => `<div class="pf-vband" data-pf-visual-err="${esc(type)}" role="note"><b>${esc(VBAND[type] || type)}</b> → /portfolio-build를 다시 실행하세요<span>${esc(detail || '')}</span></div>`;
+  //   edited = 장면 고치기(src/<폴더>/deck-edits.json)로 고친 장면: 빌드가 아니라 /portfolio-edit로 고쳐야 함
+  const vband = (type, detail, edited) => `<div class="pf-vband" data-pf-visual-err="${esc(type)}" role="note"><b>${esc(VBAND[type] || type)}</b> → ${edited ? '고친 장면입니다. /portfolio-edit로 고치세요' : '/portfolio-build를 다시 실행하세요'}<span>${esc(detail || '')}</span></div>`;
 
   // ── 시각 자료 맞추기: .vis 안의 .vbox(그림·다이어그램·코드·표)를 칸에 맞춰 크기를 정함 ──
   //   1) 장면에 .pf-sizing을 붙여 .vis가 쓸 수 있는 칸 크기(W×H)를 잼  2) 한 개/세로로 쌓기/가로로 늘어놓기 중 가장 크게 보이는 배치
@@ -226,11 +238,14 @@
       return { k, ar: w / h, nw: w, max: 22 / 16 };                       // 다이어그램 글자는 22px까지만 키움
     }
     const fin = media.querySelector(':scope > .fit-in');
-    Object.assign(fin.style, { zoom: '1', width: k === 'code' ? 'max-content' : '' });
+    Object.assign(fin.style, { zoom: '1', width: 'max-content' });
     if (k === 'code') return { k, ar: fin.offsetWidth / Math.max(1, fin.offsetHeight), nw: fin.offsetWidth, nh: fin.offsetHeight, max: 1, min: 12 / 14 };
-    return { k, table: true, min: 14 / 15, max: 1 };
+    // 표: 높이는 놓일 폭에 따라 달라지므로 hAt(w)로 잼(배율 1)
+    const hAt = (w) => { Object.assign(fin.style, { zoom: '1', width: `${Math.max(1, Math.floor(w))}px` }); return fin.offsetHeight; };
+    return { k, table: true, min: 14 / 15, max: 1, hAt };
   }
-  function capOf(box) { const c = box.querySelector(':scope > figcaption'); return c ? c.offsetHeight + 6 : 0; }
+  // 시각 자료 상자 안에서 그림 말고 차지하는 높이: 캡션 + 원문 문제 띠(visual-changed). 상자 안 간격 6px씩
+  const capOf = (box) => [...box.querySelectorAll(':scope > figcaption, :scope > .pf-vband')].reduce((a, c) => a + c.offsetHeight + 6, 0);
   // 표: 폭 bw에서 높이 bh 안에 들어가는 가장 큰 배율(하한까지)
   function fitTable(fin, bw, bh, min) {
     const at = (z) => { Object.assign(fin.style, { zoom: String(z), width: `${bw / z}px` }); return fin.offsetHeight * z <= bh + 0.5 && fin.scrollWidth <= bw / z + 1; };
@@ -241,8 +256,8 @@
     at(lo);
     return lo;
   }
-  function sizeBoxes(boxes, arr, W, H) {
-    const nat = boxes.map(natOf), caps = boxes.map(capOf), n = boxes.length;
+  function sizeBoxes(boxes, arr, W, H, capsIn) {
+    const nat = boxes.map(natOf), caps = capsIn || boxes.map(capOf), n = boxes.length;
     const out = nat.map(() => ({ w: 0, h: 0 }));
     const contain = (i, w, h) => {
       const t = nat[i];
@@ -252,13 +267,15 @@
         return { w: Math.floor(w), h: Math.ceil(t.nh * z) };
       }
       let bw = Math.min(w, h * t.ar);
+      const lim = w <= h * t.ar ? 'w' : 'h';                             // 폭에 막힘(가로로 긴 그림) / 높이에 막힘(세로로 긴 그림)
       if (t.max !== Infinity && t.nw) bw = Math.min(bw, t.nw * t.max);
-      return { w: Math.max(1, Math.floor(bw)), h: Math.max(1, Math.floor(bw / t.ar)) };
+      return { w: Math.max(1, Math.floor(bw)), h: Math.max(1, Math.floor(bw / t.ar)), lim };
     };
     if (arr === 'one' || n === 1) out[0] = contain(0, W, H - caps[0]);
     else if (arr === 'col') {
+      // 세로로 쌓기: 표는 똑같이 나눈 몫까지 받되 칸 폭에서의 실제 높이가 더 작으면 그만큼만(남는 높이는 다이어그램·그림에)
       const avail = H - GAP * (n - 1) - caps.reduce((a, c) => a + c, 0);
-      const need = nat.map((t) => (t.table ? avail / n : t.k === 'code' ? t.nh : W / t.ar));
+      const need = nat.map((t) => (t.table ? Math.min(avail / n, t.hAt(W)) : t.k === 'code' ? t.nh : W / t.ar));
       const f = Math.min(1, avail / Math.max(1, need.reduce((a, x) => a + x, 0)));
       nat.forEach((t, i) => { out[i] = contain(i, W, need[i] * f); });
     } else {
@@ -267,10 +284,17 @@
       const hh = Math.min(avail / ars.reduce((a, x) => a + x, 0), H - Math.max(...caps));
       nat.forEach((t, i) => { out[i] = contain(i, hh * ars[i], t.k === 'code' ? H - caps[i] : hh); });
     }
-    return { out, nat };
+    // 표가 받은 칸에서 실제로 몇 배로 보일지(fitTable로 잼) — 배치 점수용. 하한에서도 안 들어가면 0.01(그 배치를 피함)
+    nat.forEach((t, i) => {
+      if (!t.table) return;
+      const fin = boxes[i].querySelector(':scope > .vmedia > .fit-in'), o = out[i];
+      const z = fitTable(fin, o.w, o.h, t.min);
+      o.z = fin.offsetHeight * z <= o.h + 0.5 && fin.scrollWidth <= o.w / z + 1 ? z : 0.01;
+    });
+    return { out, nat, caps };
   }
   // 시각 자료가 원래 크기의 몇 배로 보이는가(1 이상은 1). 배치 고르기 점수
-  const scaleOf = (t, o) => (t.table ? 0.9 : t.k === 'code' ? Math.min(1, o.w / t.nw, o.h / t.nh) : Math.min(1, o.w / (t.nw || 1600)));
+  const scaleOf = (t, o) => (t.table ? (o.z ?? 0.9) : t.k === 'code' ? Math.min(1, o.w / t.nw, o.h / t.nh) : Math.min(1, o.w / (t.nw || 1600)));
   // 장면 점수 = 시각 자료마다 log(보이는 배율)의 합(PF.fitVisuals 뒤). 클수록 그림·코드가 크게 보임
   const visScore = (s) => [...s.querySelectorAll('.vbox[data-sc]')].reduce((x, b) => x + Math.log(Math.max(0.01, +b.dataset.sc)), 0);
   function fitVisuals(s) {
@@ -278,16 +302,26 @@
     s.classList.add('pf-sizing');
     const plans = [...s.querySelectorAll('.vis')].map((vis) => {
       const boxes = [...vis.children].filter((e) => e.classList.contains('vbox') && e.dataset.kind);
-      return { vis, boxes, W: vis.clientWidth, H: vis.clientHeight };
+      // 원문을 찾지 못한 자리(.vbox.err, 띠만 있음)는 크기를 정하지 않으므로 그 높이를 칸에서 빼고 세로로 쌓음
+      const errs = [...vis.children].filter((e) => e.classList.contains('vbox') && !e.dataset.kind);
+      const errH = errs.reduce((a, e) => a + e.offsetHeight + GAP, 0);
+      return { vis, boxes, W: vis.clientWidth, H: vis.clientHeight - errH, col: errs.length > 0 };
     });
-    for (const { vis, boxes, W, H } of plans) {
-      if (!boxes.length || !W || !H) continue;
-      const arrs = boxes.length === 1 ? ['one'] : (vis.dataset.arr ? [vis.dataset.arr] : ['col', 'row']);
+    for (const { vis, boxes, W, H, col } of plans) {
+      if (!boxes.length || !W || H <= 0) continue;
+      const arrs = boxes.length === 1 ? ['one'] : col ? ['col'] : (vis.dataset.arr ? [vis.dataset.arr] : ['col', 'row']);
       let best = null;
       for (const a of arrs) {
         const r = sizeBoxes(boxes, a, W, H);
         const score = r.out.reduce((x, o, i) => x + Math.log(Math.max(0.01, scaleOf(r.nat[i], o))), 0);   // 모두가 고르게 크게(하나만 크고 하나는 아주 작은 배치를 피함)
         if (!best || score > best.score + 1e-6) best = { ...r, a, score };
+      }
+      // 캡션·원문 문제 띠는 상자 폭이 정해진 뒤 다시 잼: 세로로 긴 그림은 상자가 좁아 띠가 여러 줄로 꺾여 높아짐 → 그 높이로 다시 배분(최대 3번)
+      for (let k = 0; k < 3; k++) {
+        boxes.forEach((box, i) => { box.style.width = `${best.out[i].w}px`; });
+        const caps = boxes.map(capOf);
+        if (!caps.some((c, i) => c > best.caps[i] + 1)) break;
+        best = { ...best, ...sizeBoxes(boxes, best.a, W, H, caps.map((c, i) => Math.max(c, best.caps[i]))) };
       }
       vis.dataset.arr = best.a;
       boxes.forEach((box, i) => {
@@ -299,6 +333,8 @@
           if (t.k === 'mermaid') {
             const eff = 16 * o.w / t.nw;
             box.dataset.eff = eff.toFixed(1);                                // 참고 지표는 최종 장면에서만(noteFill)
+            box.dataset.lim = best.a === 'one' ? o.lim : 'multi';             // 다른 자료와 함께면 막힌 쪽이 아니라 '함께 있어서'가 원인
+            box.dataset.vb = `${Math.round(t.nw)}×${Math.round(t.nw / t.ar)}`;
           }
         } else {
           const fin = media.querySelector(':scope > .fit-in');
@@ -348,10 +384,29 @@
     const want = PF.normTitle(section);
     if (!want || !p.deck?.slides?.length) return '';
     const last = (x) => PF.normTitle((x.sectionPath || []).slice(-1)[0]);
-    const sl = p.deck.slides.find((x) => last(x) === want) || p.deck.slides.find((x) => (x.sectionPath || []).some((t) => PF.normTitle(t) === want));
-    return sl && keyOk(sl.key) ? `d-${sl.key}` : '';
+    const find = (list) => list.find((x) => last(x) === want) || list.find((x) => (x.sectionPath || []).some((t) => PF.normTitle(t) === want));
+    const sl = find(p.deck.slides);
+    if (sl) return keyOk(sl.key) ? `d-${sl.key}` : '';
+    // 장면 고치기로 숨긴 장면(빌드 결과 deck.base에만 있음) → 같은 장에 장면이 남아 있으면 그 장 표지
+    const hid = find(p.deck.base || []);
+    return hid && keyOk(hid.chapter) && p.deck.slides.some((x) => x.chapter === hid.chapter) ? `ch-${hid.chapter}` : '';
+  }
+  // 덱에 없는 장면 주소(#s=d-<key>·d-<key>-2·ch-<key>: 숨겼거나 다시 빌드로 없어짐) → 가장 가까운 장면(결정 G3 정신):
+  //   나뉜 장면의 앞 장면 → 같은 절의 남은 장면 → 그 장 표지 → ''(목차는 부르는 쪽이 정함). has(id) = 그 장면이 덱에 있는가
+  function deckSceneNear(p, want, has) {
+    const m = /^d-(.+)$/.exec(want);
+    if (!m) return '';
+    const k = m[1], stem = k.replace(/-(\d+|t\d+)$/, '');
+    if (stem !== k && has(`d-${stem}`)) return `d-${stem}`;
+    const all = [...(p.deck?.base || []), ...(p.deck?.slides || [])];
+    const sl = all.find((x) => x.key === k) || all.find((x) => x.key === stem);
+    if (!sl) return '';
+    const path = (x) => (x.sectionPath || []).map(PF.normTitle).join(' › ');   // 절 경로 전체(하위 제목 '개요'처럼 여러 절에 같은 이름이 있음)
+    const same = (p.deck?.slides || []).find((x) => path(x) === path(sl) && has(`d-${x.key}`));
+    if (same) return `d-${same.key}`;
+    return sl.chapter && has(`ch-${sl.chapter}`) ? `ch-${sl.chapter}` : '';
   }
 
   Object.assign(PF, { sleep, loadFonts, imageSize, measureRoot, dropMeasure, scene, body, fitsScene, fitsM, pack, shrinkOrClip, guard, msgScene, DOT, imgTag, extLinks, refitOnLateFont,
-                      projectIntro, note, fillOf, noteFill, vband, fitVisuals, visScore, minFonts, deckSceneFor, keyOk, FLOOR });
+                      projectIntro, note, fillOf, noteFill, vband, fitVisuals, visScore, minFonts, deckSceneFor, deckSceneNear, keyOk, FLOOR });
 })();

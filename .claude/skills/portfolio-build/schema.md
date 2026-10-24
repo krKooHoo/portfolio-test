@@ -213,6 +213,9 @@
 
 - 영문 소문자·숫자·하이픈만, 2~32자, 영문 소문자로 시작(`^[a-z][a-z0-9-]{1,31}$`). `s-숫자`·숫자만은 금지.
 - 다시 빌드할 때 **같은 `sectionPath`의 장·장면은 예전 `key`를 그대로** 씁니다(공유한 `#s=` 주소가 유지되게). 예전 data가 없으면 절 내용을 나타내는 짧은 영어 낱말로 만듭니다(예: `spawn-weight`). 덱 안에서 겹치면 안 됩니다.
+  - 한 절에 장면이 여럿이면(구조·흐름·구현으로 나눈 경우) 예전 장면 중 **시각 자료(kind·n·fp 또는 src)가 가장 많이 겹치는** 장면의 key를 이어 받습니다. 겹치는 예전 장면이 없으면 새 key.
+  - 예전 data에 `deck.base`가 있으면 그것이 **빌드가 만든 예전 장면 목록**입니다(`deck.slides`는 장면 고치기가 반영된 것). key를 이어 받을 때는 `deck.base`를 보고, `edited: true` 장면은 옮겨 적지 않습니다.
+  - 장면 고치기 파일(아래)의 `pin[].key`와 `hide`의 key는 **다른 절의 장면에 쓰지 않습니다.**
 - 렌더러는 장면 id를 `d-<key>`(코드가 나뉘면 `d-<key>-2`…, 표가 하한에서도 안 들어가 행을 나누면 `d-<key>-t1`…)로 씁니다. 규칙에 맞지 않는 key는 렌더러가 순번 id로 바꾸고 감사에 남깁니다.
 
 ### 분량
@@ -224,3 +227,57 @@
 
 `schemaVersion`이 없거나 `deck`이 없으면 렌더러가 `highlights`·`troubleshooting`·`screenshots`·`retro`로 덱을 만들고, 각 항목의 `section`이 **정확히 1곳**으로 풀릴 때만 그 절의 첫 그림(이미지·mermaid·코드 순)을 붙입니다.
 장면마다 작은 띠("예전 데이터로 자동 구성 — /portfolio-build를 다시 실행하면 발표 덱이 됩니다")가 보입니다.
+
+---
+
+## 장면 고치기 파일 `src/<폴더>/deck-edits.json`
+
+발표 덱 장면을 수강생 요청으로 고친 결과입니다(`/portfolio-edit`가 씀). **수강생 소유 소스**라 커밋하고, `/portfolio-build`는 읽기만 하고 쓰지 않습니다.
+기술 문서가 아니므로(`.md` 아님) 빌드·점검이 문서로 읽지 않습니다. 다시 빌드해도 고친 내용이 남는 이유는 이 파일이 `data/`가 아니라 `src/`에 있기 때문입니다.
+
+```json
+{
+  "schemaVersion": 1,
+  "pin": [
+    { "key": "spawn-weight", "chapter": "spawn", "layout": "full", "tab": "구현",
+      "title": { "text": "4.3 핵심 기능 ①: 레벨별 지수 가중치", "verbatim": true }, "lead": null,
+      "sectionPath": ["4. 시스템 ② 스폰·난이도 곡선 ★", "4.3 핵심 기능 ①: 레벨별 지수 가중치"],
+      "points": [], "visuals": [{ "kind": "table", "n": 1, "fp": "레벨|지수" }],
+      "from": { "key": "spawn-weight", "sectionPath": ["…"], "sig": ["…"] } },
+    { "key": "spawn-weight-code", "after": "spawn-weight", "chapter": "spawn", "layout": "code", "…": "…" }
+  ],
+  "hide": [{ "key": "spawn-chart", "from": { "…": "…" } }],
+  "portfolio": null
+}
+```
+
+| 필드 | 규칙 |
+|---|---|
+| `pin[]` | **장면 통째**(위 「장면」 규칙 그대로: `key`·`chapter`·`layout`·`tab`·`title`·`lead`·`sectionPath`·`points`·`visuals`) + 선택 `after`·`from`. 배열 순서 = 적용 순서. 빌드 장면과 key가 같으면 그 장면을 바꾸고, 없으면 새 장면 |
+| `pin[].after` | 같은 장 안에서 이 장면 바로 뒤에 놓을 장면 key. 없거나 숨긴 장면이면 옮기지 않음(새 장면은 그 장 끝) |
+| `pin[].from`·`hide[].from` | 닻: 원래 빌드 장면의 `key`·`sectionPath`·시각 자료 서명. `deck-edits.py pin`·`hide`가 채우며 **손대지 않습니다**. 다시 빌드로 key가 바뀌어도 같은 절(제목 그대로)·같은 그림의 장면을 찾아 다시 붙이는 데 씀. 절 제목이 바뀌면 다시 붙지 않습니다(고아) |
+| `pin[].group`·`hide[].group` | 묶음: 나누기(`pin --as`)·합치기(`hide --into`)로 함께 생긴 항목. `undo`는 같은 묶음을 함께 지움. 스크립트가 채우며 손대지 않습니다 |
+| `hide[]` | 숨길 장면. `{ "key", "from" }` 또는 key 글자 |
+| `portfolio` | 포트폴리오 덱 고치기 자리(2차, 지금은 `null`). 식별자는 `highlights[].section` |
+
+- **글 조각**은 둘뿐입니다: `verbatim: true`(그 절 원문 또는 절 경로의 제목에 같은 글자가 있음 — 스크립트가 검사) · `verbatim: false`(Claude가 줄임 → 리포트 "확인해 주세요").
+  원문에 없는 새 문장·수치는 넣지 않습니다(수강생이 직접 쓰고 싶은 문장은 기술 문서에 먼저 쓰고 다시 빌드).
+- **다른 절의 원문 블록**도 가리킬 수 있습니다(수강생이 요청할 때). 참조마다 자기 `sectionPath`를 적고, "확인해 주세요"에 기록됩니다.
+- 장 제목(원문 H2)과 렌더러 장면(표지·목차·장 표지·회고·맺음)은 고치지 않습니다.
+
+**반영**: `python .claude/skills/portfolio-build/deck-edits.py apply <폴더>|--all` (결정적·멱등, Python 3.8 이상·표준 라이브러리만). `data/projects/<폴더>.json`의 `deck`에 다음을 씁니다
+(deck 값만 바꿔 끼우므로 나머지 글자는 그대로지만, deck 블록은 스크립트의 줄 모양으로 바뀌고 되돌린 뒤에도 그 모양이 남습니다 — 내용은 같음).
+스크립트는 원문 블록 지문(코드·mermaid·표·그림 경로)도 미리 대조해 다르면 `[권장]`으로 알립니다(최종 판정은 미리보기 감사).
+명령은 `apply`·`check`·`show`·`pin [--as]`·`add --after`·`hide [--into]`·`undo [--all]`(스크립트 머리말).
+
+| data 필드 | 뜻 |
+|---|---|
+| `deck.slides` | 고치기를 반영한 장면 목록(렌더러가 그리는 것) |
+| `deck.base` | 빌드가 만든 장면 목록(되돌리기용). 고친 것이 없으면 없음 |
+| `deck.applied` | 반영 결과 지문. `slides`가 스크립트 결과인지(그러면 `base`가 원본) 빌드가 새로 쓴 것인지(그러면 그것이 새 원본) 가림 |
+| `deck.slides[].edited` | `true` = 고친 장면(빨간 띠 문구가 "/portfolio-edit로 고치세요", 미리보기 개요에 ✎) |
+
+`/portfolio-build`는 `base`·`applied`·`edited`를 직접 쓰지 않습니다(스크립트 몫). 스크립트 출력의 `[필수]`·`[권장]`·`[참고]`는 리포트의 같은 등급으로, "확인해 주세요" 줄은 리포트 "확인해 주세요"로 옮깁니다.
+고아(다시 빌드로 원래 장면을 잃은 고친 장면)는 반영하지 않고 **권장**으로 알리며, 깨진 원문 참조는 지금처럼 빨간 띠(`visual-*`)로 보입니다.
+**숨긴** 장면의 주소(`#s=d-<key>`, `deck.base`에 남아 있음)는 렌더러가 같은 절(절 경로 전체가 같은)의 남은 장면 → 그 장 표지 → 목차 순으로 넘기고,
+다시 빌드로 **없어진** 장면·장의 주소는 목차로 넘깁니다. 나뉜 장면 주소 `d-<key>-2`·`d-<key>-t1`이 없으면 `d-<key>`로 갑니다.
