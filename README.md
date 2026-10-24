@@ -38,10 +38,10 @@ flowchart LR
 2. 레포 이름은 바꿔도 됩니다(예: `portfolio`). 영문 소문자·숫자·하이픈을 권합니다.
 3. 내 레포 화면의 **Code → HTTPS 주소**로 내 PC에 clone합니다.
 
-나중에 템플릿이 업데이트되면, 내 레포 화면의 **Sync fork** 버튼으로 받아올 수 있습니다.
-내가 고친 파일과 겹치면 충돌이 날 수 있으니, 받기 전에 커밋해 두세요.
+나중에 템플릿이 업데이트되면 아래 「템플릿 업데이트 받기」의 `/portfolio-update`로 받는 것을 추천합니다(방법 B로 만든 레포도 같습니다).
+**Sync fork** 버튼으로도 받을 수 있지만, 내가 고친 파일과 겹치면 충돌이 날 수 있으니 받기 전에 커밋해 두세요.
 
-**`data/`에서 충돌이 났다면** — 템플릿에 들어 있던 샘플 빌드 결과와 내 빌드 결과가 같은 파일이라서 생기는 충돌입니다. `data/`는 어차피 `/portfolio-build`가 다시 만드니 **내 것을 유지**하면 됩니다.
+**Sync fork에서 `data/` 충돌이 났다면** — 템플릿에 들어 있던 샘플 빌드 결과와 내 빌드 결과가 같은 파일이라서 생기는 충돌입니다. `data/`는 어차피 `/portfolio-build`가 다시 만드니 **내 것을 유지**하면 됩니다.
 
 1. Sync fork 화면에 충돌이 보이면 **Discard commits는 누르지 마세요**(내 커밋이 사라집니다). 대신 내 PC에서 받습니다.
 
@@ -66,6 +66,23 @@ flowchart LR
 
    `data/` 밖의 파일(예: `profile.md`)이 충돌했다면 그 파일을 열어 `<<<<<<<` 표시 부분에서 남길 쪽을 직접 고르세요. Claude에게 "충돌 해결 도와줘"라고 해도 됩니다.
 3. 그다음 `/portfolio-build`를 다시 실행하세요. 새 렌더러는 발표 덱용 데이터가 있어야 제대로 그리므로, **다시 빌드하기 전에는** 발표 덱이 노란 **예전 데이터로 자동 구성** 띠와 함께 임시 모양으로 보입니다(아래 「미리보기」).
+
+**템플릿 업데이트 받기 (추천: `/portfolio-update`)**
+
+`/portfolio-update`는 템플릿의 새 렌더러·Claude 명령·판정 기준(`index.html`·`project.html`·`doc.html`·`assets/`·`.claude/skills/`·`format/`·`CLAUDE.md` 등)만 받아 바꾸고, **내 것(`src/`·`profile.md`·`data/`·`custom/`)은 건드리지 않습니다.** 무엇이 바뀌는지 먼저 보여 주고 동의를 받으며, 업데이트를 커밋 1개로 남겨 `/portfolio-update 되돌리기`로 되돌릴 수 있습니다. 직접 고친 렌더러 파일이나 README가 있으면 따로 물어봅니다.
+
+- 내 레포에 이 명령이 아직 없다면(옛 템플릿으로 만든 레포), 레포 폴더의 터미널에서 아래 두 줄을 **한 번만** 실행해 명령부터 받습니다.
+
+  ```bash
+  git fetch https://github.com/krKooHoo/portfolio-test main
+  ```
+
+  ```bash
+  git checkout FETCH_HEAD -- .claude/skills/portfolio-update
+  ```
+
+- 그다음 Claude Code에서 `/portfolio-update`를 입력합니다(명령 목록에 안 보이면 Claude Code를 새로 시작하세요).
+- 끝나면 `/portfolio-build`를 다시 실행하고, 미리보기로 확인한 뒤 push하세요. 다시 빌드하기 전에는 발표 덱이 노란 **예전 데이터로 자동 구성** 띠와 함께 보입니다.
 
 **방법 B. 새 레포를 만들고 파일 복사**
 
@@ -136,6 +153,7 @@ Claude가 하는 일:
 | `/portfolio-check` | 기술 문서를 **쓰는 중에** 가이드 기준 피드백만 받고 싶을 때 |
 | `/portfolio-custom 다크 톤으로…` | 고정 디자인 대신 **나만의 디자인**을 원할 때 (아래 참고) |
 | `/portfolio-intake https://github.com/내아이디/내레포` | 기술 문서를 쓰기 **전에**, 내 GitHub 레포에서 재료를 뽑을 때 (2단계 참고) |
+| `/portfolio-update` | 템플릿이 업데이트됐을 때 새 렌더러·명령만 받을 때 (1단계 「템플릿 업데이트 받기」) |
 
 ### 5. 배포
 

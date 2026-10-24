@@ -54,6 +54,7 @@ flowchart LR
 | `/portfolio-build [폴더]` | 소스를 읽어 `data/` 생성 + 점검 리포트 + 미리보기. 폴더를 주면 그 프로젝트만 |
 | `/portfolio-check [폴더]` | 기술 문서를 가이드 기준으로 점검만 (데이터는 안 건드림) |
 | `/portfolio-custom [디자인 요청]` | 직접 생성 모드. **사용자가 직접 입력했을 때만** 실행 |
+| `/portfolio-update [되돌리기]` | 템플릿 원본에서 렌더러·스킬·`format/`·`CLAUDE.md`만 받아 반영(`src/`·`profile.md`·`data/`·`custom/`은 안 건드림). **사용자가 직접 입력했을 때만** 실행 |
 | `/portfolio-intake <레포 주소\|폴더>` | GitHub 레포에서 핵심 `.cs`·재료집(사실 + 질문)·촬영 목록을 `src/<NN>/`에 만듦. 기술 문서는 만들지 않음. **사용자가 직접 입력했을 때만** 실행 |
 
 ---
