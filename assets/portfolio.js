@@ -11,6 +11,12 @@
   const pad2 = (n) => String(n).padStart(2, '0');
   const info = { errors: [], sections: [], projects: 0 };
   html.dataset.pfReady = 'no';
+  // 처음 주소로 도착한 절, 또는 새로고침 전 스크롤 위치. 글꼴·그림이 늦게 와 위치가 밀리면 settle()에서 한 번 더 맞춤(그사이 사용자가 움직이지 않았을 때만)
+  let arrived = '', restoreY = null, userMoved = false;
+  ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach((t) => addEventListener(t, () => { userMoved = true; }, { once: true, passive: true }));
+  const POS = `pf-portfolio-y:${location.pathname}`;                 // 새로고침해도 읽던 곳으로(내용을 늦게 그려 브라우저가 스스로 되돌리지 못함)
+  try { history.scrollRestoration = 'manual'; } catch { /* 그대로 */ }
+  addEventListener('pagehide', () => { try { sessionStorage.setItem(POS, String(Math.round(scrollY))); } catch { /* 저장소 막힘 */ } });
   let resolveReady;
   const ready = new Promise((r) => { resolveReady = r; });
   window.PFPage = { whenReady: () => ready, report };
@@ -21,36 +27,44 @@
   }).finally(settle);
 
   async function start() {
-    if (PF.guardFileProtocol(root)) return;
+    if (PF.guardFileProtocol(root)) { info.errors.push('file:// — 로컬 서버로 열어야 합니다'); return; }
     let pf;
     try { pf = await PF.loadJSON('data/portfolio.json'); }
-    catch (err) { PF.noData(root, err); return; }
+    catch (err) { info.errors.push(`data/portfolio.json: ${err && err.message || err}`); PF.noData(root, err); return; }
     PF.applyTheme(pf.settings?.accent);
     const projects = (await Promise.all((pf.projects || []).map((id) => PF.loadJSON(`data/projects/${encodeURIComponent(id)}.json`)
       .catch((err) => { console.warn('[portfolio] 프로젝트 데이터 없음:', err.message); return null; })))).filter(Boolean);
     render(pf, projects);
     bind();
-    go(projects);                                                      // 내용을 그린 뒤라 브라우저가 처음 주소의 절로 스스로 가지 못함
+    arrived = go(projects);                                            // 내용을 그린 뒤라 브라우저가 처음 주소의 절로 스스로 가지 못함
+    if (!arrived && performance.getEntriesByType?.('navigation')[0]?.type === 'reload') {
+      try { restoreY = +sessionStorage.getItem(POS) || null; } catch { /* 저장소 막힘 */ }
+      if (restoreY) scrollTo({ top: restoreY, behavior: 'instant' });
+    }
     addEventListener('hashchange', () => go(projects));                // 같은 페이지에서 예전 주소(#s=…)를 붙여 넣은 경우
   }
 
   function go(projects) {
     const want = legacyTarget(projects);
     const el = want && document.getElementById(want);
-    if (!el) return;
+    if (!el) return '';
     if (location.hash !== `#${encodeURIComponent(want)}`) try { history.replaceState(null, '', `${location.pathname}${location.search}#${encodeURIComponent(want)}`); } catch { /* 그대로 */ }
     el.scrollIntoView({ behavior: 'instant', block: 'start' });        // 부드러운 스크롤은 가려진 창에서 멈춤 → 바로 이동
+    return want;
   }
 
-  // 예전 포트폴리오 덱의 주소(#s=<장면 id> · #<번호> · 옛 랜딩 #skills 등) → 이 페이지의 절 id. 지금 주소가 절 id 그대로여도 돌려줌(그리고 나서 그 절로 스크롤)
+  // 예전 포트폴리오 덱의 주소(#s=<장면 id> · #<번호> · #s-<번호> · 옛 랜딩 #skills 등) → 이 페이지의 절 id. 지금 주소가 절 id 그대로여도 돌려줌(그리고 나서 그 절로 스크롤)
+  //   번호는 실제로 그린 절의 차례(예전 덱도 그린 장면만 셈. 나뉜 장면 stack-2·glance-2는 이제 한 절). #0·#-3 → 첫 절, #99 → 마지막 절(덱 키트와 같은 규칙)
   function legacyTarget(projects) {
     let h = location.hash.slice(1);
     try { h = decodeURIComponent(h); } catch { /* 그대로 */ }
     if (!h) return '';
-    const order = ['cover', 'intro', 'stack', ...projects.flatMap((p) => [`p-${p.id}`, `p-${p.id}-core`]), 'glance', 'contact'];
-    if (/^\d+$/.test(h)) return order[Math.min(order.length, Math.max(1, +h)) - 1];
+    const nth = (n) => info.sections[Math.max(1, Math.min(info.sections.length, n)) - 1] || '';
+    if (/^-?\d+$/.test(h)) return nth(+h);
     const m = /^s=(.+)$/.exec(h);
     if (m) h = m[1].replace(/^(stack|glance)-\d+$/, '$1');
+    const sn = /^s-(\d+)$/.exec(h);
+    if (sn) return nth(+sn[1]);
     return { skills: 'stack', projects: projects[0] ? `p-${projects[0].id}` : '', summary: 'glance' }[h] ?? h;
   }
 
@@ -62,8 +76,9 @@
     const total = pad2(projects.length);
     const btn = (href, label, kind, cls = 'btn') => link({ href, label, kind, cls });
     const profLinks = (prof.links || []).filter((l) => isUrl(l.url));
-    // 인쇄(PDF)에서는 버튼 대신 칠 수 있는 주소를 보여 줌
-    const printUrls = (rows) => rows.length ? `<dl class="print-only purls">${rows.map(([k, u]) => `<div><dt>${esc(k)}</dt><dd class="url">${esc(u)}</dd></div>`).join('')}</dl>` : '';
+    // 인쇄(PDF)에서는 버튼 대신 칠 수 있는 주소를 보여 줌. rows: [이름, 보이는 주소, 링크, 종류] — PDF에서는 눌러도 열림(링크 규칙은 PF.link 그대로, ↗는 인쇄에서 숨김)
+    const printUrls = (rows) => rows.length ? `<dl class="print-only purls">${rows.map(([k, u, href, kind]) => `<div><dt>${esc(k)}</dt><dd class="url">${href
+      ? link({ href, label: esc(u), kind }) : esc(u)}</dd></div>`).join('')}</dl>` : '';
     const sec = (id, eyebrow, title, right, body, cls = '') => `<section id="${esc(id)}" class="sec${cls ? ' ' + cls : ''}"><div class="wrap">
       <div class="sec-head"><div><p class="eyebrow">${esc(eyebrow)}</p><h2>${esc(title)}</h2></div>${right ? `<p class="sec-r">${esc(right)}</p>` : ''}</div>${body}</div></section>`;
     const out = [];
@@ -75,8 +90,8 @@
       ${prof.headline ? `<p class="headline">${inline(prof.headline)}</p>` : ''}
       <div class="btns no-print">${[prof.email && link({ href: `mailto:${prof.email}`, label: esc(prof.email), kind: 'mail', cls: 'btn' }),
         isUrl(prof.github) && btn(prof.github, 'GitHub', 'external'), ...profLinks.map((l) => btn(l.url, esc(l.label), 'external'))].filter(Boolean).join('')}</div>
-      ${printUrls([prof.email && ['이메일', prof.email], isUrl(prof.github) && ['GitHub', shortUrl(prof.github)], ...profLinks.map((l) => [l.label, shortUrl(l.url)]),
-        ['웹 포트폴리오', PF.visibleUrl('')]].filter(Boolean))}
+      ${printUrls([prof.email && ['이메일', prof.email, `mailto:${prof.email}`, 'mail'], isUrl(prof.github) && ['GitHub', shortUrl(prof.github), prof.github, 'external'],
+        ...profLinks.map((l) => [l.label, shortUrl(l.url), l.url, 'external']), ['웹 포트폴리오', PF.visibleUrl('')]].filter(Boolean))}
     </div></section>`);
 
     // ② 자기소개: profile.intro를 줄바꿈까지 그대로(고쳐 쓰지 않음)
@@ -134,9 +149,9 @@
     const btns = [btn(PF.projectUrl(p.id), '발표 덱', 'page', 'btn primary'), btn(PF.docUrl(p.id), '상세 기술문서', 'page'),
       isUrl(p.links?.github) && btn(p.links.github, 'GitHub', 'external'), isUrl(p.links?.video) && btn(p.links.video, '시연 영상', 'external'),
       ...extra.map((l) => btn(l.url, esc(l.label), 'external'))].filter(Boolean);
-    const urls = [['발표 덱', PF.visibleUrl(PF.projectUrl(p.id))], ['상세 기술문서', PF.visibleUrl(PF.docUrl(p.id))],
-      isUrl(p.links?.github) && ['GitHub', shortUrl(p.links.github)], isUrl(p.links?.video) && ['시연 영상', shortUrl(p.links.video)],
-      ...extra.map((l) => [l.label, shortUrl(l.url)])].filter(Boolean);
+    const urls = [['발표 덱', PF.visibleUrl(PF.projectUrl(p.id)), PF.projectUrl(p.id), 'page'], ['상세 기술문서', PF.visibleUrl(PF.docUrl(p.id)), PF.docUrl(p.id), 'page'],
+      isUrl(p.links?.github) && ['GitHub', shortUrl(p.links.github), p.links.github, 'external'], isUrl(p.links?.video) && ['시연 영상', shortUrl(p.links.video), p.links.video, 'external'],
+      ...extra.map((l) => [l.label, shortUrl(l.url), l.url, 'external'])].filter(Boolean);
     const cover = p.cover ? `<figure class="cover"><img src="${esc(PF.srcPath(p.id, p.cover))}" alt="${esc(p.title)} 대표 화면"></figure>` : '';
     const body = `${p.tagline ? `<p class="tagline">${inline(p.tagline)}</p>` : ''}
       <div class="pi${cover ? '' : ' nocover'}">${cover}<div class="pi-r">
@@ -208,6 +223,11 @@
     if (desk) eager();
     await Promise.race([Promise.all([...document.querySelectorAll('img:not([loading="lazy"])')].map(loaded)), new Promise((r) => setTimeout(r, 20000))]);
     if (document.fonts) await Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 3000))]);
+    if (!userMoved) {                                                  // 글꼴이 바뀌며 절 높이가 달라져 도착 위치가 밀린 만큼 다시 맞춤
+      const el = arrived && document.getElementById(arrived);
+      if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' });
+      else if (restoreY) scrollTo({ top: restoreY, behavior: 'instant' });
+    }
     html.dataset.pfReady = 'yes';
     resolveReady(report());
     if (new URLSearchParams(location.search).get('pf-audit') === '1') writeAudit();
