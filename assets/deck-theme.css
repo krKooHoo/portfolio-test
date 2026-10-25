@@ -228,7 +228,7 @@ table.md-table { border-collapse: collapse; width: 100%; font-size: 15px; line-h
 table.md-table th { background: var(--accent-fill); color: #fff; font-weight: 700; text-align: left; padding: 7px 11px; font-size: 13px; vertical-align: bottom; }
 table.md-table td { padding: 7px 11px; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--ink); overflow-wrap: anywhere; }
 table.md-table tbody tr:nth-child(even) td { background: var(--zebra); }
-table.md-table code { font-size: .86em; }
+table.md-table code { font-size: max(.86em, 12px); }   /* 머리 칸(13px) 안 코드도 코드 하한 12px 아래로 내려가지 않게 */
 table.md-table img { max-height: 120px; max-width: 100%; height: auto; }   /* width·height 속성(렌더러가 미리 잰 크기)으로 불러오기 전에도 자리를 잡음 */
 .vbox[data-kind] > .pf-vband { min-width: 0; }                         /* 그림 상자 안 띠는 상자 폭에 맞춰 꺾임(높이는 fitVisuals가 다시 잼) */
 .cards { display: grid; gap: 12px; align-content: center; min-width: 0; }
