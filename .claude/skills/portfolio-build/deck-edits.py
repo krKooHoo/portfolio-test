@@ -671,7 +671,7 @@ def apply_edits(data, edits, doc, rep):
         if all(last_title(s) in shown.get(vsig(v, s.get('sectionPath')), ()) for v in s['visuals']):
             S.remove(s)
             rep.add('참고', '빌드 장면 "%s"의 그림이 모두 고친 장면에 이미 있어 뺐습니다(겹침 방지)' % s.get('key'))
-    # 장이 빈 경우 · 포트폴리오 덱 기능 카드의 [발표 덱에서 보기] 연결
+    # 장이 빈 경우 · 포트폴리오 문서 기능 소개의 [발표 덱에서 보기] 연결
     left = {s.get('chapter') for s in S}
     gone = [c for c in chapters if c in {s.get('chapter') for s in base} and c not in left]
     for c in gone:
@@ -681,7 +681,7 @@ def apply_edits(data, edits, doc, rep):
         b = deck_scene_for(base, sec) if sec else None
         if b and not deck_scene_for(S, sec):
             where = '그 장의 장 표지로' if b.get('chapter') in left else '장 표지도 사라져 발표 덱 표지로'
-            rep.add('권장', '포트폴리오 덱 기능 카드 "%s"의 [발표 덱에서 보기]가 연결된 장면이 빠졌습니다 → %s 이어집니다' % (hl.get('title', sec), where))
+            rep.add('권장', '포트폴리오 문서 기능 "%s"의 [발표 덱에서 보기]가 연결된 장면이 빠졌습니다 → %s 이어집니다' % (hl.get('title', sec), where))
     if applied or removed:
         rep.add('참고', '고친 장면 %d개 · 숨긴 장면 %d개를 반영했습니다' % (len(applied), len(removed)))
     n0, n1 = scene_count(chapters, base, data), scene_count(chapters, S, data)
@@ -718,7 +718,7 @@ def load_edits(pid, rep):
         rep.add('필수', 'src/%s/%s의 schemaVersion이 %s가 아닙니다(%r) → 반영하지 않았습니다' % (pid, EDITS, VERSION, e.get('schemaVersion') if isinstance(e, dict) else e))
         return None, True
     if e.get('portfolio') not in (None, {}, []):
-        rep.add('참고', 'portfolio(포트폴리오 덱 고치기)는 아직 지원하지 않아 무시했습니다')
+        rep.add('참고', 'portfolio(포트폴리오 문서 고치기)는 아직 지원하지 않아 무시했습니다')
     return e, False
 
 

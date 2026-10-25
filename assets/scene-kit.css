@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════════════
-   장면 키트 CSS (assets/scene-kit.css) — 렌더러 소유. 덱 페이지(index.html·project.html)만 싣습니다. doc.html은 싣지 않습니다
+   장면 키트 CSS (assets/scene-kit.css) — 렌더러 소유. 덱 페이지(project.html — 발표 덱)만 싣습니다. index.html(포트폴리오 문서)·doc.html은 싣지 않습니다
    (결정 #14의 인쇄 규칙이 덱 밖 요소를 숨기므로, 흐르는 문서에 실으면 A4 인쇄가 빈 쪽이 됨 — portfolio-structure §4-8).
    출처: spikes/deck/kit/scene-kit.css(= spikes/r0/kit/scene-kit.css)
    주석의 설계 근거(docs/design/…의 portfolio-structure·deck-vs-scroll·01 §, R0, 결정 F·Q·# 번호)와 원본 시안(spikes/…)은 템플릿 유지관리용 maintainer 브랜치에 있습니다. 이 레포에 없어도 정상입니다.

@@ -1,4 +1,4 @@
-// 덱 장면 공통 — index.html(포트폴리오 덱)·project.html(발표 덱)이 common.js 다음에 싣습니다. 출처: spikes/deck/pages/pf-common.js
+// 덱 장면 공통 — project.html(발표 덱)이 common.js 다음에 싣습니다. 출처: spikes/deck/pages/pf-common.js
 //   장면 틀 scene()(제목 + 도입 1~2줄, 결정 G7), 측정 후 고르기 pack(), 넘침 처리 shrinkOrClip()(§4-3 원칙 5: 변형 → 축소 → 보이는 잘림 띠),
 //   글자 하한(결정 G5: 본문 14 · 코드 12 · 라벨 11px), 세로 가운데(.pf-fill, G8)·채움률, 시각 자료 맞추기(fitVisuals), 프로젝트 소개 장면, 글꼴·이미지 크기 대기
 //   주석의 설계 근거(docs/design/…의 portfolio-structure·deck-vs-scroll·01 §, R0, 결정 F·Q·# 번호)와 원본 시안(spikes/…)은 템플릿 유지관리용 maintainer 브랜치에 있습니다. 이 레포에 없어도 정상입니다.
@@ -351,7 +351,7 @@
     return s;
   }
 
-  // ── 프로젝트 소개 장면(포트폴리오 덱의 프로젝트 소개 = 발표 덱 표지, 결정 G4): 큰 대표 이미지 · 메타 격자 · 개발 의도 · 링크 카드 · 태그 ──
+  // ── 프로젝트 소개 장면(발표 덱 표지, 결정 G4): 큰 대표 이미지 · 메타 격자 · 개발 의도 · 링크 카드 · 태그 ──
   //   글: title · tagline · meta · team.role · intent · tags(data 그대로). 링크: [{ k, label, href, kind, visible }]
   const META_EN = { '장르': 'GENRE', '기간': 'DURATION', '개발 기간': 'DURATION', '인원': 'TEAM', '팀': 'TEAM', '팀 구성': 'TEAM', '환경': 'ENVIRONMENT', '개발 환경': 'ENVIRONMENT', '엔진': 'ENGINE', '플랫폼': 'PLATFORM' };
   const metaEn = (label) => META_EN[String(label || '').replace(/\s+/g, ' ').trim()] || '';
@@ -377,20 +377,7 @@
     return shrinkOrClip(make(true, true), window.PFScene.refUrl(id), stats);
   }
 
-  // 발표 덱에서 원문 절(section 글자)에 해당하는 장면 id(포트폴리오 덱의 기능 카드 링크·옛 주소 hl-n 넘기기)
-  const KEY_RE = /^[a-z][a-z0-9-]{1,31}$/;
-  const keyOk = (k) => KEY_RE.test(k || '') && !/^s-\d+$/.test(k);
-  function deckSceneFor(p, section) {
-    const want = PF.normTitle(section);
-    if (!want || !p.deck?.slides?.length) return '';
-    const last = (x) => PF.normTitle((x.sectionPath || []).slice(-1)[0]);
-    const find = (list) => list.find((x) => last(x) === want) || list.find((x) => (x.sectionPath || []).some((t) => PF.normTitle(t) === want));
-    const sl = find(p.deck.slides);
-    if (sl) return keyOk(sl.key) ? `d-${sl.key}` : '';
-    // 장면 고치기로 숨긴 장면(빌드 결과 deck.base에만 있음) → 같은 장에 장면이 남아 있으면 그 장 표지
-    const hid = find(p.deck.base || []);
-    return hid && keyOk(hid.chapter) && p.deck.slides.some((x) => x.chapter === hid.chapter) ? `ch-${hid.chapter}` : '';
-  }
+  // 원문 절(section 글자) → 발표 덱 장면 id는 PF.deckSceneFor(common.js — 포트폴리오 문서의 기능 링크도 씀)
   // 덱에 없는 장면 주소(#s=d-<key>·d-<key>-2·ch-<key>: 숨겼거나 다시 빌드로 없어짐) → 가장 가까운 장면(결정 G3 정신):
   //   나뉜 장면의 앞 장면 → 같은 절의 남은 장면 → 그 장 표지 → ''(목차는 부르는 쪽이 정함). has(id) = 그 장면이 덱에 있는가
   function deckSceneNear(p, want, has) {
@@ -408,5 +395,5 @@
   }
 
   Object.assign(PF, { sleep, loadFonts, imageSize, measureRoot, dropMeasure, scene, body, fitsScene, fitsM, pack, shrinkOrClip, guard, msgScene, DOT, imgTag, extLinks, refitOnLateFont,
-                      projectIntro, note, fillOf, noteFill, vband, fitVisuals, visScore, minFonts, deckSceneFor, deckSceneNear, keyOk, FLOOR });
+                      projectIntro, note, fillOf, noteFill, vband, fitVisuals, visScore, minFonts, deckSceneNear, FLOOR });
 })();

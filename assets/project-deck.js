@@ -272,7 +272,7 @@
     const ext = PF.extLinks(p);
     const used = new Set(['cover', 'toc', 'retro', 'end']);
 
-    // 표지 = 포트폴리오 덱의 프로젝트 소개와 같은 템플릿(결정 G4). 상세 문서 링크는 표지·맺음에만(G1)
+    // 표지 = 프로젝트 소개 템플릿(PF.projectIntro, 결정 G4). 상세 문서 링크는 표지·맺음에만(G1)
     const K = { 'GitHub': 'REPOSITORY', '시연 영상': 'GAMEPLAY' };
     const cards = [
       ...ext.map((l) => ({ k: K[l.label] || 'LINK', label: l.label, href: l.url, kind: 'external', visible: shortUrl(l.url) })),
@@ -407,7 +407,7 @@
         <div class="en-mid"><div><h2 class="en-t">${esc(p.title)}</h2>${p.tagline ? `<p class="tagline">${inline(p.tagline)}</p>` : ''}${DOT}</div>
         <div class="en-links">${card('TECH DOC', '상세 기술문서 — 코드·다이어그램·설계 과정 전문', PF.docUrl(p.id), 'page', PF.visibleUrl(PF.docUrl(p.id)), true)}
           ${ext.map((l) => card(K[l.label] || 'LINK', l.label, l.url, 'external', shortUrl(l.url))).join('')}
-          ${card('PORTFOLIO', '← 포트폴리오 덱', 'index.html', 'page', PF.visibleUrl(''))}</div></div>`;
+          ${card('PORTFOLIO', '← 포트폴리오', 'index.html', 'page', PF.visibleUrl(''))}</div></div>`;
       return band(s, auto);
     };
     return PF.guard(make(), PFScene.refUrl('end'), info.overflow);

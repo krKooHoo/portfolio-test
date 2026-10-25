@@ -1,4 +1,4 @@
-// 포트폴리오 렌더러 공통 유틸 — index.html(포트폴리오 덱) · project.html(발표 덱) · doc.html(상세 문서)가 함께 씁니다.
+// 포트폴리오 렌더러 공통 유틸 — index.html(포트폴리오 문서) · project.html(발표 덱) · doc.html(상세 문서)가 함께 씁니다.
 // 데이터: data/portfolio.json, data/projects/<폴더 이름>.json(/portfolio-build가 생성), src/<폴더>/<기술 문서>.md
 // 이 파일은 글을 만들지 않습니다. 화면에 나오는 내용은 모두 위 데이터에서 오고, 여기 있는 글자는 UI 문구뿐입니다.
 // 주석의 설계 근거(docs/design/…의 portfolio-structure·deck-vs-scroll·01 §, R0, 결정 F·Q·# 번호)와 원본 시안(spikes/…)은 템플릿 유지관리용 maintainer 브랜치에 있습니다. 이 레포에 없어도 정상입니다.
@@ -55,6 +55,20 @@ const PF = (() => {
     if (!want) return null;
     const norm = list.map((h) => [normTitle(h.text), h]);
     return (norm.find(([t]) => t === want) || norm.find(([t]) => t && (t.startsWith(want) || want.startsWith(t))))?.[1] || null;
+  }
+  // 발표 덱에서 원문 절(section 글자)에 해당하는 장면 id(포트폴리오 문서의 [발표 덱에서 보기]·발표 덱 옛 주소 hl-n 넘기기)
+  const KEY_RE = /^[a-z][a-z0-9-]{1,31}$/;
+  const keyOk = (k) => KEY_RE.test(k || '') && !/^s-\d+$/.test(k);
+  function deckSceneFor(p, section) {
+    const want = normTitle(section);
+    if (!want || !p.deck?.slides?.length) return '';
+    const last = (x) => normTitle((x.sectionPath || []).slice(-1)[0]);
+    const find = (list) => list.find((x) => last(x) === want) || list.find((x) => (x.sectionPath || []).some((t) => normTitle(t) === want));
+    const sl = find(p.deck.slides);
+    if (sl) return keyOk(sl.key) ? `d-${sl.key}` : '';
+    // 장면 고치기로 숨긴 장면(빌드 결과 deck.base에만 있음) → 같은 장에 장면이 남아 있으면 그 장 표지
+    const hid = find(p.deck.base || []);
+    return hid && keyOk(hid.chapter) && p.deck.slides.some((x) => x.chapter === hid.chapter) ? `ch-${hid.chapter}` : '';
   }
   // md → 제목 목록(상세 문서와 같은 파이프라인: marked gfm → 제목 textContent → slugger). 제목 목록이 필요한 곳용(원문 블록까지 필요하면 md-blocks.js의 PF.md.parse)
   //   <template>에 넣는 이유: 그 안의 내용은 비활성이라 문서 속 이미지(GIF 수십 MB)를 받지 않음. div에 넣으면 DOM에 붙이지 않아도 이미지를 받기 시작함
@@ -125,6 +139,6 @@ const PF = (() => {
   function noData(root, err) { notice(root, '아직 포트폴리오 데이터가 없습니다', noDataHtml(err)); }
 
   return { esc, inline, isUrl, shortUrl, loadJSON, loadText, encodePath, srcPath, projectUrl, docUrl, siteBase, visibleUrl, metaValue, teamLabel,
-           slugger, normTitle, resolveHeading, headingsOf, ICON, NEWTAB, link, markNewTab, themeTokens, applyTheme, contrast, hexRgb,
+           slugger, normTitle, resolveHeading, keyOk, deckSceneFor, headingsOf, ICON, NEWTAB, link, markNewTab, themeTokens, applyTheme, contrast, hexRgb,
            FILE_HELP, noDataHtml, isFile, notice, guardFileProtocol, noData };
 })();

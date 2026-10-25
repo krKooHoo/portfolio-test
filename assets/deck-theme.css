@@ -1,5 +1,6 @@
 /* ════════════════════════════════════════════════════════════════════════════
-   덱 장면 테마 (assets/deck-theme.css) — 포트폴리오 덱·발표 덱의 장면 모양. 인쇄 규칙 없음(인쇄는 scene-kit.css만).
+   덱 장면 테마 (assets/deck-theme.css) — 발표 덱(project.html)의 장면 모양. 인쇄 규칙 없음(인쇄는 scene-kit.css만).
+   포트폴리오 문서(index.html)는 덱이 아니라 흐르는 페이지라 이 파일을 싣지 않습니다(assets/portfolio.css).
    출처: spikes/deck/pages/deck-theme.css(가이드 발표 덱의 글자 단계·모티프). 바꾼 곳: 인디고 고정색 → profile.md 강조색에서 파생한 토큰
    주석의 설계 근거(docs/design/…의 portfolio-structure·deck-vs-scroll·01 §, R0, 결정 F·Q·# 번호)와 원본 시안(spikes/…)은 템플릿 유지관리용 maintainer 브랜치에 있습니다. 이 레포에 없어도 정상입니다.
    (common.js PF.applyTheme: 글자용 진한 강조색은 흰 바탕 6.5:1 이상, 흰 글자를 올리는 칠은 4.5:1 이상). 아래 값은 기본 강조색 #2F6FEB의 계산값.
@@ -96,64 +97,6 @@ table.kv td.role { color: var(--accent-ink); font-weight: 800; }
 .toprow { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; border-bottom: 1px solid var(--line); padding-bottom: 14px; }
 .toprow .rl { font-size: 15px; font-weight: 700; color: var(--muted); }
 
-/* ── 표지(포트폴리오 덱) ── */
-.t-L1 .pf-body { display: flex; flex-direction: column; }
-.cv-mid { flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
-.cv-lb { font-size: 14px; font-weight: 800; letter-spacing: .12em; color: var(--muted); }
-.cv-name { font-size: 76px; font-weight: 800; line-height: 1.1; letter-spacing: -.035em; color: var(--ink); margin-top: 10px !important; }
-.cv-name span { display: inline-block; margin-left: 18px; font-size: 30px; font-weight: 700; letter-spacing: 0; color: var(--accent-ink); vertical-align: .32em; }
-.t-L1 .dotrule { width: 420px; margin: 26px 0 22px; }
-.cv-h { font-size: 32px; font-weight: 700; line-height: 1.4; letter-spacing: -.02em; color: var(--ink); max-width: 1000px; }
-.cv-bot { display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; }
-.cv-web { text-align: right; }
-.cv-web .url { display: block; margin-top: 4px; color: var(--ink); font-size: 15px; }
-
-/* ── 자기소개 ── */
-.t-ME .pf-body { display: flex; align-items: center; }
-.me { position: relative; max-width: 1000px; padding: 6px 0 6px 40px; border-left: 4px solid var(--accent); }
-.me p { font-size: 27px; font-weight: 600; line-height: 1.62; letter-spacing: -.01em; color: var(--ink); }
-.me p + p { margin-top: 18px !important; }
-.me.s p { font-size: 22px; }
-
-/* ── 기술 스택(카드 격자) ── */
-.skills { display: grid; gap: 20px; }
-.skills.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.skills.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.skills.rows { grid-template-columns: 1fr; gap: 10px; align-content: start; }
-.skill { padding: 22px 24px; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
-.skill h3 { font-size: 24px; font-weight: 800; letter-spacing: -.01em; color: var(--ink); }
-.skill .dotrule { margin-bottom: 4px; }
-.skill ul { list-style: none; display: grid; gap: 14px; }
-.skill li { font-size: 16px; line-height: 1.55; color: var(--ink); }
-.skill li .chip { display: table; margin-top: 5px; font-size: 13px; white-space: normal; overflow-wrap: anywhere; max-width: 100%; }   /* 긴 프로젝트 제목도 카드 안에서 줄바꿈 */
-.skills.rows .skill { display: grid; grid-template-columns: 180px 1fr; align-items: start; gap: 18px; padding: 14px 20px; }
-.skills.rows .skill .dotrule { display: none; }
-.skills.rows .skill ul { gap: 4px; }
-.skills.rows .skill li { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; font-size: 15px; }
-.skills.rows .skill li .chip { display: inline-block; margin: 0; }
-
-/* ── 한눈에 보기 표 ── */
-.t-L4 table.mini td:first-child { font-weight: 800; }
-.t-L4 table.mini td:first-child a { color: var(--ink); text-decoration: none; }
-.t-L4 .lk { display: flex; flex-direction: column; gap: 2px; }
-.t-L4 .lk a { text-decoration: none; white-space: nowrap; font-weight: 700; font-size: 14px; }
-
-/* ── 맺음 ── */
-.t-L5 .pf-body { display: flex; flex-direction: column; }
-.cl-mid { flex: 1; display: grid; grid-template-columns: 4fr 7fr; gap: 48px; align-items: center; min-height: 0; }
-.cl-name { font-size: 48px; font-weight: 800; letter-spacing: -.03em; line-height: 1.15; }
-.cl-me .dotrule { margin: 22px 0 18px; max-width: 360px; }
-.cl-me p + p { margin-top: 8px !important; }
-.cl-me .em { font-size: 19px; font-weight: 700; }
-.cl-me a { text-decoration: none; }
-.cl-lk { display: grid; gap: 12px; }
-.cl-lk > div { border-bottom: 1px solid var(--line); padding-bottom: 10px; font-size: 15px; line-height: 1.6; }
-.cl-lk b { display: block; font-size: 18px; font-weight: 800; margin-bottom: 2px; }
-.cl-lk .row { display: flex; flex-wrap: wrap; gap: 2px 14px; }
-.cl-lk .row a { font-weight: 700; text-decoration: none; white-space: nowrap; }
-.cl-lk .ex { display: block; margin-top: 2px; }
-.cl-lk .ex a { text-decoration: none; }
-
 /* ── 목차(발표 덱 P2) ── */
 .t-P2 .pf-body { display: flex; flex-direction: column; }
 .toc-top { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; }
@@ -214,7 +157,7 @@ table.kv td.role { color: var(--accent-ink); font-weight: 800; }
 .pf-sizing .pf-fill { flex: 1 1 auto; min-height: 0; margin-block: 0; display: flex; flex-direction: column; }
 .pf-sizing .pf-fill > * { flex: 1 1 auto; min-height: 0; }
 
-/* ── 프로젝트 소개(포트폴리오 덱 프로젝트 소개 = 발표 덱 표지, 결정 G4) ── */
+/* ── 프로젝트 소개(발표 덱 표지, 결정 G4) ── */
 .t-P1 .pf-body { display: flex; flex-direction: column; }
 .pi-main { flex: 1; display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); grid-template-rows: minmax(0, 100%); gap: 40px; margin-top: 22px; min-height: 0; }
 .t-P1.portrait .pi-main { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
@@ -251,21 +194,13 @@ table.kv td.role { color: var(--accent-ink); font-weight: 800; }
 .pi-tight .lcard a { padding: 6px 28px 7px 12px; }
 .pi-tight .pi-left, .pi-tight .pi-right { gap: 12px; }
 
-/* ── 기능 소개(포트폴리오 덱 프로젝트 2장째, 결정 G4): 화면 + FEATURE 0n + 제목 + 설명 ── */
-.fe { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 22px; align-items: start; }
+/* ── 화면 카드(발표 덱 screens 장면의 열 하나): 화면 + FEATURE 0n + 제목 + 설명 ── */
 .fe-card { display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 0; }
-.pf-sizing .fe { align-items: stretch; }
 .pf-sizing .fe-card .vis { flex: 1 1 auto; }
 .fe-card .vis { min-height: 0; }
 .fe-k { font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: .1em; color: var(--accent-ink); }
 .fe-card h3 { font-size: 19px; font-weight: 800; line-height: 1.35; letter-spacing: -.01em; color: var(--ink); }
 .fe-card p { font-size: 15px; line-height: 1.6; color: var(--ink); }
-.fe-a { font-size: 13px; font-weight: 700; text-decoration: none; }
-.fe.text .fe-card { padding: 18px 20px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
-.fe-act { display: flex; gap: 10px; align-items: center; margin-top: 16px; }
-.t-F2.tight .fe { gap: 16px; }
-.t-F2.tight .fe-card h3 { font-size: 17px; }
-.t-F2.tight .fe-card p { font-size: 14px; line-height: 1.55; }
 
 /* ── 발표 덱 장면(deck.slides[].layout) ── */
 .dk { display: grid; gap: 28px; min-width: 0; }

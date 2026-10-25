@@ -9,7 +9,7 @@ disable-model-invocation: true
 
 디자인 요청: `$ARGUMENTS` (비어 있으면 "취업용답게 깔끔하고 절제된, 템플릿 같지 않은 디자인")
 
-고정 렌더러(포트폴리오 덱 `index.html`)와 **같은 데이터**로, 겉모습만 새로 그린 페이지를 `custom/index.html`에 만듭니다.
+고정 렌더러(포트폴리오 문서 `index.html`)와 **같은 데이터**로, 겉모습만 새로 그린 페이지를 `custom/index.html`에 만듭니다.
 고정 렌더러 파일(`index.html`·`project.html`·`doc.html`·`assets/`)은 **수정하지 않습니다.**
 
 ## 0. 준비

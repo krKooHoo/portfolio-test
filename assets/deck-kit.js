@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// 덱 키트 JS (assets/deck-kit.js) — 덱 페이지(index.html·project.html)의 <head>에서 동기 로드, 가장 먼저
+// 덱 키트 JS (assets/deck-kit.js) — 덱 페이지(project.html — 발표 덱)의 <head>에서 동기 로드, 가장 먼저
 //   출처: spikes/deck/kit/deck-kit.js(블록 A는 spikes/r0/kit/scene-kit.js 그대로)
 //   주석의 설계 근거(docs/design/…의 portfolio-structure·deck-vs-scroll·01 §, R0, 결정 F·Q·# 번호)와 원본 시안(spikes/…)은 템플릿 유지관리용 maintainer 브랜치에 있습니다. 이 레포에 없어도 정상입니다.
 //   블록 A: docs/design/01 §8-2 준비 게이트(R0 【시험대 1~5】 포함)
@@ -412,7 +412,7 @@
       <button type="button" data-a="help" aria-expanded="false" aria-controls="pf-hud-help" aria-label="PDF 저장 안내" title="PDF 저장 안내">?</button>
       <button type="button" data-a="view"><span class="l"></span><span class="s"></span></button>
       <button type="button" data-a="anyway" hidden>그래도 인쇄</button>
-      ${isLocal ? '<span class="pf-hud-badge" role="img" hidden title="미리보기에서만 보이는 장면 배치 점검 결과(찾은 항목 수). 배포된 페이지·PDF에는 나오지 않습니다. 슬라이드에 &quot;내용이 잘렸습니다&quot; 띠가 있으면 그 장면의 글이 나온 파일(포트폴리오 덱의 표지·자기소개·내 연락처는 profile.md, 그 밖의 장면은 src/의 기술 문서)을 줄이고 /portfolio-build를 다시 실행하세요."></span>' : ''}
+      ${isLocal ? '<span class="pf-hud-badge" role="img" hidden title="미리보기에서만 보이는 장면 배치 점검 결과(찾은 항목 수). 배포된 페이지·PDF에는 나오지 않습니다. 슬라이드에 &quot;내용이 잘렸습니다&quot; 띠가 있으면 그 장면의 글이 나온 파일(src/의 기술 문서)을 줄이거나 /portfolio-edit로 장면을 나누고 /portfolio-build를 다시 실행하세요."></span>' : ''}
       <span class="pf-hud-msg" role="status" aria-live="polite"></span>
       <div class="pf-hud-help" id="pf-hud-help" hidden>${HELP}</div>
       <span class="pf-sr" aria-live="polite" aria-atomic="true"></span>`;

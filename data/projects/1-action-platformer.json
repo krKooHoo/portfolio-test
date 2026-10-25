@@ -5,7 +5,7 @@
   "title": "Switch Strike",
   "tagline": "교대 한 번으로 위기를 반격 기회로 바꾸는 2D 사이드뷰 액션 플랫포머",
   "cover": "images/cover.png",
-  "intent": {"text": "개발 기간은 2주로 짧았습니다. 그래서 콘텐츠의 양을 늘리기보다, 액션 플랫포머라는 장르가 반드시 갖춰야 할 핵심 조작감을 직접 구현하고 검증하는 것에 집중했습니다.", "verbatim": true},
+  "intent": { "text": "개발 기간은 2주로 짧았습니다. 그래서 콘텐츠의 양을 늘리기보다, 액션 플랫포머라는 장르가 반드시 갖춰야 할 핵심 조작감을 직접 구현하고 검증하는 것에 집중했습니다.", "verbatim": true },
   "team": { "type": "solo", "size": "1인", "role": "" },
   "meta": [
     { "label": "장르", "value": "2D 사이드뷰 액션 플랫포머" },
@@ -13,7 +13,7 @@
     { "label": "인원", "value": "1인 개발 (개인 평가 프로젝트)" },
     { "label": "환경", "value": "Unity 6.3 (6000.3.15f1), C#, Rider" }
   ],
-  "tags": ["Unity 6.3", "C#", "Kinematic 이동 컨트롤러", "Animator 기반 FSM", "캐릭터 교대 & QTE", "중재자 기반 전투 처리", "ScriptableObject"],
+  "tags": ["Unity 6.3", "C#", "Kinematic 이동", "Animator 기반 FSM", "캐릭터 교대 & QTE", "중재자 기반 전투 처리", "ScriptableObject"],
   "links": {
     "github": "https://github.com/chesherneko/2D-Action-Platformer",
     "video": "https://www.youtube.com/watch?v=qtJYxDbJ-fQ",
@@ -25,29 +25,39 @@
       "what": "Rigidbody의 velocity에 맡기지 않고 이동량을 매 프레임 직접 계산하고 충돌도 직접 해결해, 정점 체공·고정 거리 대시·벽 매달리기 같은 움직임을 수치 단위로 설계합니다.",
       "how": "캐릭터 콜라이더 크기의 박스를 이동 방향으로 쏘는 BoxCast로 X축을 먼저 검사해 이동량을 확정하고, 그 위치로 박스를 옮긴 뒤 Y축을 검사합니다. 시간 누적은 `Update`, 이동 계산과 충돌 해결은 `FixedUpdate`에서 처리하고, 조작 수치는 `PlayerMoveSettings`(ScriptableObject)로 분리했습니다.",
       "why": "Rigidbody 물리 이동은 충돌 처리를 엔진이 해 주지만, 마찰·관성 등 물리 연산이 끼어들어 점프 곡선 같은 세밀한 움직임을 원하는 대로 만들기 어렵습니다. 목표가 콘텐츠 볼륨보다 조작감이었기 때문에, 충돌 해결을 직접 책임지는 대가를 감수하고 Kinematic 직접 구현을 선택했습니다.",
-      "section": "3.4 핵심 동작: 축 분리 충돌 해결",
-      "image": null
+      "section": "3. 이동 컨트롤러",
+      "image": {
+        "src": "images/jump_compare.gif",
+        "w": 800,
+        "h": 450,
+        "caption": { "text": "점프 비교", "verbatim": true }
+      }
     },
     {
       "title": "Animator 기반 FSM",
-      "what": "플레이어와 몬스터가 공유하는 FSM 베이스(`AnimationStateController`)로, 매 프레임 Animator의 현재 상태 Tag를 읽어 Dictionary에 매핑된 코드 State를 실행합니다.",
-      "how": "`tagHash`로 State를 찾고 상태가 바뀐 프레임에만 `OnExit` → `OnEnter`를 호출합니다. State는 `normalizedTime`을 받아 애니메이션 30% 이전의 공격 입력은 초기화하고 90% 이후 입력은 무시하는 콤보 입력 창을 처리하며, 파라미터는 `Animator.StringToHash()` 결과를 `static readonly`로 캐싱합니다.",
+      "what": "플레이어와 몬스터가 공유하는 FSM 베이스(`AnimationStateController`)가 매 프레임 Animator의 현재 상태 Tag를 읽어, Dictionary에 매핑된 코드 State를 실행합니다.",
+      "how": "`tagHash`로 State를 찾아 상태가 바뀐 프레임에만 `OnExit` → `OnEnter`를 호출합니다. State에는 `normalizedTime`을 넘겨, 애니메이션 30% 이전의 공격 입력은 초기화하고 90% 이후 입력은 무시하는 콤보 입력 창을 만듭니다.",
       "why": "코드 주도 FSM은 상태 전이 흐름을 추적하기 쉽지만 코드 상태와 애니메이션 상태라는 두 상태 머신을 따로 맞춰야 합니다. 애니메이션이 스프라이트 시트라 사실상 캐릭터의 모션 = 상태였기 때문에, Animator 하나를 기준으로 삼는 Animator 주도 FSM을 선택했습니다.",
       "section": "2.4 Animator 기반 FSM의 동작",
       "image": null
     },
     {
       "title": "캐릭터 교대 & QTE",
-      "what": "두 캐릭터를 한 명씩 번갈아 꺼내 쓰며, 교대 무적은 위험한 공격을 피하는 방어 수단, 게이지가 가득 찬 상태의 QTE 등장 공격은 위기를 반격으로 바꾸는 공격 수단이 되도록 했습니다.",
-      "how": "퇴장 코루틴과 등장 코루틴을 동시에 시작해 둘 다 끝날 때까지 기다리고, 조작 대상인 `Player.Local`을 교체하면서 HP·수평 이동 속도·바라보는 방향을 다음 캐릭터에 넘깁니다.",
-      "why": "대상 주입 구조는 결합도가 낮지만 교대마다 구독자에게 변경을 전파하는 코드가 필요합니다. 조작 중인 캐릭터는 항상 한 명이고 HP도 공유하므로, 2주라는 기간과 프로젝트 규모를 고려해 교대 시 `Local`만 바꾸면 되는 `Player.Local` 정적 참조를 선택했습니다.",
-      "section": "4.3 핵심 동작",
-      "image": null
+      "what": "두 캐릭터를 한 명씩 번갈아 꺼내 쓰며, 교대 무적은 위험한 공격을 교대로 피하는 방어 수단, 게이지가 가득 찬 상태의 QTE 등장 공격은 위기를 반격으로 바꾸는 공격 수단이 됩니다.",
+      "how": "퇴장 코루틴과 등장 코루틴을 동시에 시작해 둘 다 끝날 때까지 기다리고, 조작 대상인 `Player.Local`을 다음 캐릭터로 바꾸면서 HP·수평 이동 속도·바라보는 방향을 넘깁니다.",
+      "why": "대상 주입 구조는 결합도가 낮지만 교대마다 구독자에게 변경을 전파하는 코드가 필요합니다. 조작 중인 캐릭터는 항상 한 명이고 HP도 공유하므로, 2주라는 기간과 프로젝트 규모를 고려해 교대 시 `Local`만 바꾸면 몬스터·보스·UI가 새 캐릭터를 바라보는 `Player.Local` 정적 참조를 선택했습니다.",
+      "section": "4. 캐릭터 교대 & QTE",
+      "image": {
+        "src": "images/switch_qte.gif",
+        "w": 800,
+        "h": 450,
+        "caption": { "text": "교대와 QTE", "verbatim": true }
+      }
     },
     {
       "title": "중재자 기반 전투 처리",
       "what": "플레이어·일반 몬스터·보스·투사체가 모두 같은 전투 흐름을 쓰며, 공격 판정(HitBox)과 피격 판정(HurtBox)을 분리하고 그 사이를 `CombatManager`가 중재합니다.",
-      "how": "HitBox는 레이어·중복 타격을 검사한 뒤 `CombatEvent`를 만들어 전달하고, `CombatManager`가 `CanTakeDamage` 확인 → 히트스탑 → `TakeDamage` 순으로 처리합니다. Collider → HurtBox는 Dictionary로 캐싱해 피격마다 `GetComponent`를 호출하지 않습니다.",
+      "how": "HitBox는 레이어·중복 타격을 검사한 뒤 `CombatEvent`를 만들어 전달하고, `CombatManager`가 피해 수용 여부(`CanTakeDamage`) 확인 → 히트스탑 → `TakeDamage` 순으로 처리합니다. Collider → HurtBox는 Dictionary로 캐싱해 피격마다 `GetComponent`를 호출하지 않습니다.",
       "why": "HitBox가 직접 판정하면 구조는 단순하지만 히트스탑·무적 판정 같은 공통 규칙이 공격 종류마다 흩어집니다. 중재자를 두면 문제가 생겼을 때 볼 곳이 하나이고, 실제로 완벽 회피도 `CanTakeDamage`에 조건 하나를 넣는 것만으로 구현할 수 있었습니다.",
       "section": "5.3 핵심 동작",
       "image": null
@@ -66,7 +76,7 @@
     {
       "title": "소비되지 않은 Trigger가 남아 생긴 문제 2건",
       "problem": "낙하 중 QTE 교대를 하면 QTE 공격이 끝난 뒤 땅에 서 있는데도 Fall 모션이 재생되고, 몬스터가 부활 직후 플레이어가 사거리에 없는데도 허공에 공격했습니다.",
-      "cause": "낙하 중 들어온 FALL 트리거, 그리고 공격 트리거와 공격 요청 플래그가 QTE 모션·사망으로 상태가 끊기면서 소비되지 않은 채 남아 있었고, 남은 트리거가 QTE 종료·부활 후에야 소비됐습니다.",
+      "cause": "낙하 중 들어온 FALL 트리거, 그리고 공격 트리거와 공격 요청 플래그가 QTE 모션·사망으로 상태가 끊기면서 소비되지 않은 채 남아 있다가, QTE 종료·부활 뒤에야 소비됐습니다.",
       "solution": "QTE 상태를 나갈 때 접지 상태라면 FALL 트리거를 `ResetTrigger`로 정리하고, 사망 상태에 들어갈 때 공격 요청 플래그와 공격 트리거를 초기화했습니다.",
       "result": "",
       "lesson": "Animator의 Trigger는 소비될 때까지 남아 있는 예약이며, 상태가 강제로 끊기는 지점에서는 남아 있을 수 있는 Trigger를 반드시 정리해야 합니다.",
@@ -78,7 +88,7 @@
       "cause": "`PlayerController`가 매 프레임 접지 여부와 Y 속도를 보고 공중 상태가 바뀔 때 바깥에서 트리거를 쏘는 구조라, 공격 도중에도 Y 속도가 바뀌면 Jump/Fall 트리거가 그대로 들어가 공격 모션을 끊었습니다.",
       "solution": "Animator의 트랜지션 조건과 Has Exit Time 조정으로는 해결되지 않아, `CAN_JUMP_OR_FALL` 가드 Bool을 두고 공격·스킬·QTE·사망 상태에 들어갈 때 끄고 나올 때 켜서, 꺼져 있으면 Jump/Fall 트리거를 쏘지 않도록 했습니다.",
       "result": "",
-      "lesson": "Animator 트랜지션의 Interruption Source 설정은 검토하지 않았으며, 가드 파라미터를 추가하기 전에 이 설정부터 확인해 봤어야 했다고 회고합니다.",
+      "lesson": "Animator 트랜지션의 Interruption Source 설정은 검토하지 않았으며, 가드 파라미터를 추가하기 전에 이 설정부터 확인해 봤어야 했다고 돌아봅니다.",
       "section": "7.1 공중 공격·스킬 모션이 Jump/Fall 모션에 덮이는 문제"
     }
   ],
@@ -113,55 +123,13 @@
   },
   "deck": {
     "chapters": [
-      {
-        "key": "overview",
-        "title": "프로젝트 개요",
-        "sectionPath": [
-          "1. 프로젝트 개요"
-        ]
-      },
-      {
-        "key": "arch",
-        "title": "전체 시스템 구조",
-        "sectionPath": [
-          "2. 전체 시스템 구조"
-        ]
-      },
-      {
-        "key": "move",
-        "title": "이동 컨트롤러",
-        "sectionPath": [
-          "3. 이동 컨트롤러"
-        ]
-      },
-      {
-        "key": "switch",
-        "title": "캐릭터 교대 & QTE",
-        "sectionPath": [
-          "4. 캐릭터 교대 & QTE"
-        ]
-      },
-      {
-        "key": "combat",
-        "title": "전투 처리 흐름",
-        "sectionPath": [
-          "5. 전투 처리 흐름"
-        ]
-      },
-      {
-        "key": "enemy",
-        "title": "적 AI와 보스 패턴",
-        "sectionPath": [
-          "6. 적 AI와 보스 패턴"
-        ]
-      },
-      {
-        "key": "trouble",
-        "title": "트러블슈팅",
-        "sectionPath": [
-          "7. 트러블슈팅"
-        ]
-      }
+      { "key": "overview", "title": "프로젝트 개요", "sectionPath": ["1. 프로젝트 개요"] },
+      { "key": "arch", "title": "전체 시스템 구조", "sectionPath": ["2. 전체 시스템 구조"] },
+      { "key": "move", "title": "이동 컨트롤러", "sectionPath": ["3. 이동 컨트롤러"] },
+      { "key": "switch", "title": "캐릭터 교대 & QTE", "sectionPath": ["4. 캐릭터 교대 & QTE"] },
+      { "key": "combat", "title": "전투 처리 흐름", "sectionPath": ["5. 전투 처리 흐름"] },
+      { "key": "enemy", "title": "적 AI와 보스 패턴", "sectionPath": ["6. 적 AI와 보스 패턴"] },
+      { "key": "trouble", "title": "트러블슈팅", "sectionPath": ["7. 트러블슈팅"] }
     ],
     "slides": [
       {
@@ -169,45 +137,16 @@
         "chapter": "overview",
         "layout": "visual",
         "tab": "개요",
-        "title": {
-          "text": "1.1 무엇을, 왜 만들었나 · 1.2 핵심 플레이 루프",
-          "verbatim": false
-        },
-        "lead": {
-          "text": "본 프로젝트는 플레이어가 두 명의 근접 캐릭터를 교대하며 싸우는 2D 사이드뷰 액션 플랫포머입니다.",
-          "verbatim": true
-        },
-        "sectionPath": [
-          "1. 프로젝트 개요",
-          "1.1 무엇을, 왜 만들었나"
-        ],
+        "title": { "text": "1.1 무엇을, 왜 만들었나 · 1.2 핵심 플레이 루프", "verbatim": false },
+        "lead": { "text": "본 프로젝트는 플레이어가 두 명의 근접 캐릭터를 교대하며 싸우는 2D 사이드뷰 액션 플랫포머입니다.", "verbatim": true },
+        "sectionPath": ["1. 프로젝트 개요", "1.1 무엇을, 왜 만들었나"],
         "points": [
-          {
-            "label": "Why",
-            "text": "콘텐츠의 양을 늘리기보다, 액션 플랫포머라는 장르가 반드시 갖춰야 할 핵심 조작감을 직접 구현하고 검증하는 것에 집중했습니다.",
-            "verbatim": true
-          },
-          {
-            "label": "조작감",
-            "text": "Unity 물리(Rigidbody의 velocity)에 맡기지 않고 이동을 직접 계산하는 Kinematic 방식을 택했습니다.",
-            "verbatim": true
-          },
-          {
-            "label": "판단의 재미",
-            "text": "\"상황에 맞는 캐릭터를 언제 꺼낼 것인가\"라는 순간의 판단이 전투 흐름을 바꾸도록 교대 시스템을 설계했습니다.",
-            "verbatim": true
-          }
+          { "label": "Why", "text": "콘텐츠의 양을 늘리기보다, 액션 플랫포머라는 장르가 반드시 갖춰야 할 핵심 조작감을 직접 구현하고 검증하는 것에 집중했습니다.", "verbatim": true },
+          { "label": "조작감", "text": "Unity 물리(Rigidbody의 velocity)에 맡기지 않고 이동을 직접 계산하는 Kinematic 방식을 택했습니다.", "verbatim": true },
+          { "label": "판단의 재미", "text": "\"상황에 맞는 캐릭터를 언제 꺼낼 것인가\"라는 순간의 판단이 전투 흐름을 바꾸도록 교대 시스템을 설계했습니다.", "verbatim": true }
         ],
         "visuals": [
-          {
-            "kind": "mermaid",
-            "n": 1,
-            "fp": "flowchart LR",
-            "sectionPath": [
-              "1. 프로젝트 개요",
-              "1.2 핵심 플레이 루프"
-            ]
-          }
+          { "kind": "mermaid", "n": 1, "fp": "flowchart LR", "sectionPath": ["1. 프로젝트 개요", "1.2 핵심 플레이 루프"] }
         ]
       },
       {
@@ -215,36 +154,15 @@
         "chapter": "arch",
         "layout": "visual",
         "tab": "구조",
-        "title": {
-          "text": "2.1 아키텍처 개관",
-          "verbatim": true
-        },
-        "lead": {
-          "text": "입력은 PlayerController로만 들어오고, 실제 이동은 PlayerMove, 피격은 PlayerCombat이 처리합니다.",
-          "verbatim": true
-        },
-        "sectionPath": [
-          "2. 전체 시스템 구조",
-          "2.1 아키텍처 개관"
-        ],
+        "title": { "text": "2.1 아키텍처 개관", "verbatim": true },
+        "lead": { "text": "입력은 PlayerController로만 들어오고, 실제 이동은 PlayerMove, 피격은 PlayerCombat이 처리합니다.", "verbatim": true },
+        "sectionPath": ["2. 전체 시스템 구조", "2.1 아키텍처 개관"],
         "points": [
-          {
-            "label": "",
-            "text": "캐릭터 바깥에서는 PlayerSwitchManager가 교대를, CombatManager가 모든 피격을 중재합니다.",
-            "verbatim": true
-          },
-          {
-            "label": "",
-            "text": "이 구조의 핵심은 \"지금 어떤 상태인가\"를 Animator가 결정하고, 코드는 \"그 상태에서 무엇을 할 것인가\"만 담당한다는 점입니다(2.4 참고).",
-            "verbatim": true
-          }
+          { "label": "", "text": "캐릭터 바깥에서는 PlayerSwitchManager가 교대를, CombatManager가 모든 피격을 중재합니다.", "verbatim": true },
+          { "label": "", "text": "이 구조의 핵심은 \"지금 어떤 상태인가\"를 Animator가 결정하고, 코드는 \"그 상태에서 무엇을 할 것인가\"만 담당한다는 점입니다(2.4 참고).", "verbatim": true }
         ],
         "visuals": [
-          {
-            "kind": "mermaid",
-            "n": 1,
-            "fp": "flowchart TB"
-          }
+          { "kind": "mermaid", "n": 1, "fp": "flowchart TB" }
         ]
       },
       {
@@ -252,40 +170,15 @@
         "chapter": "arch",
         "layout": "code",
         "tab": "구현",
-        "title": {
-          "text": "2.4 Animator 기반 FSM의 동작",
-          "verbatim": true
-        },
-        "lead": {
-          "text": "공통 부모 AnimationStateController는 매 프레임 Animator의 현재 상태 Tag를 읽고, Dictionary에 매핑된 코드 State를 찾아 실행합니다.",
-          "verbatim": true
-        },
-        "sectionPath": [
-          "2. 전체 시스템 구조",
-          "2.4 Animator 기반 FSM의 동작"
-        ],
+        "title": { "text": "2.4 Animator 기반 FSM의 동작", "verbatim": true },
+        "lead": { "text": "공통 부모 AnimationStateController는 매 프레임 Animator의 현재 상태 Tag를 읽고, Dictionary에 매핑된 코드 State를 찾아 실행합니다.", "verbatim": true },
+        "sectionPath": ["2. 전체 시스템 구조", "2.4 Animator 기반 FSM의 동작"],
         "points": [
-          {
-            "label": "상태 식별",
-            "text": "Animator 각 상태에 Tag를 지정하고 AnimationTag 상수로 관리합니다.",
-            "verbatim": true
-          },
-          {
-            "label": "진행도 기반 로직",
-            "text": "State가 normalizedTime을 받기 때문에 \"애니메이션 30% 이전의 공격 입력은 초기화, 90% 이후 입력은 무시\" 같은 규칙을 쓸 수 있습니다.",
-            "verbatim": true
-          }
+          { "label": "상태 식별", "text": "Animator 각 상태에 Tag를 지정하고 AnimationTag 상수로 관리합니다.", "verbatim": true },
+          { "label": "진행도 기반 로직", "text": "State가 normalizedTime을 받기 때문에 \"애니메이션 30% 이전의 공격 입력은 초기화, 90% 이후 입력은 무시\" 같은 규칙을 쓸 수 있습니다.", "verbatim": true }
         ],
         "visuals": [
-          {
-            "kind": "code",
-            "n": 1,
-            "lines": [
-              2,
-              21
-            ],
-            "fp": "// AnimationStateController.cs — 플레이어와 몬스터가 공유하는 FSM 베이스"
-          }
+          { "kind": "code", "n": 1, "lines": [2, 21], "fp": "// AnimationStateController.cs — 플레이어와 몬스터가 공유하는 FSM 베이스" }
         ]
       },
       {
@@ -293,36 +186,15 @@
         "chapter": "arch",
         "layout": "full",
         "tab": "선택",
-        "title": {
-          "text": "2.5 고민과 선택 ① 코드 주도 FSM vs Animator 주도 FSM",
-          "verbatim": true
-        },
-        "lead": {
-          "text": "결정 대상: 캐릭터의 \"현재 상태\"를 누가 결정할 것인가?",
-          "verbatim": true
-        },
-        "sectionPath": [
-          "2. 전체 시스템 구조",
-          "2.5 고민과 선택 ① 코드 주도 FSM vs Animator 주도 FSM"
-        ],
+        "title": { "text": "2.5 고민과 선택 ① 코드 주도 FSM vs Animator 주도 FSM", "verbatim": true },
+        "lead": { "text": "결정 대상: 캐릭터의 \"현재 상태\"를 누가 결정할 것인가?", "verbatim": true },
+        "sectionPath": ["2. 전체 시스템 구조", "2.5 고민과 선택 ① 코드 주도 FSM vs Animator 주도 FSM"],
         "points": [
-          {
-            "label": "최종 결정",
-            "text": "캐릭터 애니메이션이 Spine 같은 본 애니메이션이 아니라 스프라이트 시트였기 때문에, 이 프로젝트에서는 사실상 캐릭터의 모션 = 상태였습니다.",
-            "verbatim": true
-          },
-          {
-            "label": "감수한 대가",
-            "text": "Animator 그래프가 복잡해지는 문제는 실제로 겪었습니다.",
-            "verbatim": true
-          }
+          { "label": "최종 결정", "text": "캐릭터 애니메이션이 Spine 같은 본 애니메이션이 아니라 스프라이트 시트였기 때문에, 이 프로젝트에서는 사실상 캐릭터의 모션 = 상태였습니다.", "verbatim": true },
+          { "label": "감수한 대가", "text": "Animator 그래프가 복잡해지는 문제는 실제로 겪었습니다.", "verbatim": true }
         ],
         "visuals": [
-          {
-            "kind": "table",
-            "n": 1,
-            "fp": "|[A] 코드 주도 FSM|[B] Animator 주도 FSM ✓"
-          }
+          { "kind": "table", "n": 1, "fp": "|[A] 코드 주도 FSM|[B] Animator 주도 FSM ✓" }
         ]
       },
       {
@@ -330,40 +202,15 @@
         "chapter": "move",
         "layout": "code",
         "tab": "구현",
-        "title": {
-          "text": "3.4 핵심 동작: 축 분리 충돌 해결",
-          "verbatim": true
-        },
-        "lead": {
-          "text": "Rigidbody가 충돌을 대신 처리해 주지 않으므로, 이동하기 전에 \"이만큼 움직여도 되는가?\"를 직접 검사합니다.",
-          "verbatim": true
-        },
-        "sectionPath": [
-          "3. 이동 컨트롤러",
-          "3.4 핵심 동작: 축 분리 충돌 해결"
-        ],
+        "title": { "text": "3.4 핵심 동작: 축 분리 충돌 해결", "verbatim": true },
+        "lead": { "text": "Rigidbody가 충돌을 대신 처리해 주지 않으므로, 이동하기 전에 \"이만큼 움직여도 되는가?\"를 직접 검사합니다.", "verbatim": true },
+        "sectionPath": ["3. 이동 컨트롤러", "3.4 핵심 동작: 축 분리 충돌 해결"],
         "points": [
-          {
-            "label": "",
-            "text": "캐릭터 콜라이더 크기의 박스를 이동 방향으로 쏘아(BoxCast) 막히면 막힌 지점 직전까지만 이동합니다.",
-            "verbatim": true
-          },
-          {
-            "label": "",
-            "text": "이 함수 하나가 지형 충돌, 천장 충돌, 벽 매달리기 진입 판정의 기반이 됩니다.",
-            "verbatim": true
-          }
+          { "label": "", "text": "캐릭터 콜라이더 크기의 박스를 이동 방향으로 쏘아(BoxCast) 막히면 막힌 지점 직전까지만 이동합니다.", "verbatim": true },
+          { "label": "", "text": "이 함수 하나가 지형 충돌, 천장 충돌, 벽 매달리기 진입 판정의 기반이 됩니다.", "verbatim": true }
         ],
         "visuals": [
-          {
-            "kind": "code",
-            "n": 1,
-            "lines": [
-              1,
-              20
-            ],
-            "fp": "// PlayerMove.cs"
-          }
+          { "kind": "code", "n": 1, "lines": [1, 20], "fp": "// PlayerMove.cs" }
         ]
       },
       {
@@ -371,36 +218,15 @@
         "chapter": "move",
         "layout": "full",
         "tab": "구현",
-        "title": {
-          "text": "3.5 조작감 보정 기법",
-          "verbatim": true
-        },
-        "lead": {
-          "text": "이 보정들은 모두 중력 배율 하나로 합쳐집니다.",
-          "verbatim": true
-        },
-        "sectionPath": [
-          "3. 이동 컨트롤러",
-          "3.5 조작감 보정 기법"
-        ],
+        "title": { "text": "3.5 조작감 보정 기법", "verbatim": true },
+        "lead": { "text": "이 보정들은 모두 중력 배율 하나로 합쳐집니다.", "verbatim": true },
+        "sectionPath": ["3. 이동 컨트롤러", "3.5 조작감 보정 기법"],
         "points": [
-          {
-            "label": "정점 체공을 넣은 이유",
-            "text": "정점 체공이 없을 때는 점프 정점에 닿자마자 바로 떨어져, 공중에서 방향을 바꾸거나 다음 행동을 고를 시간이 부족했습니다.",
-            "verbatim": true
-          },
-          {
-            "label": "",
-            "text": "정점 부근에서만 중력을 줄이고 수평 이동을 조금 더 허용했습니다.",
-            "verbatim": true
-          }
+          { "label": "정점 체공을 넣은 이유", "text": "정점 체공이 없을 때는 점프 정점에 닿자마자 바로 떨어져, 공중에서 방향을 바꾸거나 다음 행동을 고를 시간이 부족했습니다.", "verbatim": true },
+          { "label": "", "text": "정점 부근에서만 중력을 줄이고 수평 이동을 조금 더 허용했습니다.", "verbatim": true }
         ],
         "visuals": [
-          {
-            "kind": "table",
-            "n": 1,
-            "fp": "기법|설정값|동작|효과"
-          }
+          { "kind": "table", "n": 1, "fp": "기법|설정값|동작|효과" }
         ]
       },
       {
@@ -408,41 +234,16 @@
         "chapter": "move",
         "layout": "full",
         "tab": "선택",
-        "title": {
-          "text": "3.7 고민과 선택 ③ Rigidbody 물리 이동 vs Kinematic 직접 구현",
-          "verbatim": true
-        },
-        "lead": {
-          "text": "결정 대상: 플레이어 이동을 Unity 물리 엔진에 맡길 것인가, 직접 계산할 것인가?",
-          "verbatim": true
-        },
-        "sectionPath": [
-          "3. 이동 컨트롤러",
-          "3.7 고민과 선택 ③ Rigidbody 물리 이동 vs Kinematic 직접 구현"
-        ],
+        "title": { "text": "3.7 고민과 선택 ③ Rigidbody 물리 이동 vs Kinematic 직접 구현", "verbatim": true },
+        "lead": { "text": "결정 대상: 플레이어 이동을 Unity 물리 엔진에 맡길 것인가, 직접 계산할 것인가?", "verbatim": true },
+        "sectionPath": ["3. 이동 컨트롤러", "3.7 고민과 선택 ③ Rigidbody 물리 이동 vs Kinematic 직접 구현"],
         "points": [
-          {
-            "label": "최종 결정",
-            "text": "이 프로젝트의 목표가 \"콘텐츠 볼륨보다 조작감\"이었기 때문에, 조작감의 핵심인 점프를 세밀하게 제어하기 어려운 A는 맞지 않는다고 판단했습니다.",
-            "verbatim": true
-          },
-          {
-            "label": "얻은 것",
-            "text": "이동에 관여하는 모든 수치를 직접 통제할 수 있게 되었습니다.",
-            "verbatim": true
-          },
-          {
-            "label": "감수한 대가",
-            "text": "엔진이 해 주던 충돌 처리를 직접 맡아야 했고, 실제로 충돌 버그를 겪었습니다.",
-            "verbatim": true
-          }
+          { "label": "최종 결정", "text": "이 프로젝트의 목표가 \"콘텐츠 볼륨보다 조작감\"이었기 때문에, 조작감의 핵심인 점프를 세밀하게 제어하기 어려운 A는 맞지 않는다고 판단했습니다.", "verbatim": true },
+          { "label": "얻은 것", "text": "이동에 관여하는 모든 수치를 직접 통제할 수 있게 되었습니다.", "verbatim": true },
+          { "label": "감수한 대가", "text": "엔진이 해 주던 충돌 처리를 직접 맡아야 했고, 실제로 충돌 버그를 겪었습니다.", "verbatim": true }
         ],
         "visuals": [
-          {
-            "kind": "table",
-            "n": 1,
-            "fp": "|[A] Rigidbody 물리 이동 (velocity / AddForce)|[B] Kinematic 직접 구현 ✓"
-          }
+          { "kind": "table", "n": 1, "fp": "|[A] Rigidbody 물리 이동 (velocity / AddForce)|[B] Kinematic 직접 구현 ✓" }
         ]
       },
       {
@@ -450,77 +251,46 @@
         "chapter": "move",
         "layout": "problem",
         "tab": "문제 해결",
-        "title": {
-          "text": "3.8 트러블슈팅: 점프 이동 중 타일 모서리에 끼는 문제",
-          "verbatim": true
-        },
+        "title": { "text": "3.8 트러블슈팅: 점프 이동 중 타일 모서리에 끼는 문제", "verbatim": true },
         "lead": null,
-        "sectionPath": [
-          "3. 이동 컨트롤러",
-          "3.8 트러블슈팅: 점프 이동 중 타일 모서리에 끼는 문제"
-        ],
+        "sectionPath": ["3. 이동 컨트롤러", "3.8 트러블슈팅: 점프 이동 중 타일 모서리에 끼는 문제"],
         "points": [
-          {
-            "label": "문제",
-            "text": "점프하며 대각선으로 이동하다가 타일 모서리 부근에 착지하면, 캐릭터가 모서리에 끼어 움직이지 않는 문제가 발생했습니다.",
-            "verbatim": true
-          },
-          {
-            "label": "원인",
-            "text": "X축과 Y축의 이동 가능 여부를 둘 다 이동 전의 같은 위치에서 검사했기 때문입니다.",
-            "verbatim": true
-          },
-          {
-            "label": "해결",
-            "text": "X축을 먼저 검사해 실제로 이동할 양을 확정하고, 검사용 박스를 그 위치로 옮긴 다음 Y축을 검사하도록 바꿨습니다(3.4 코드의 `box.center += Vector3.right * moveX`).",
-            "verbatim": true
-          },
-          {
-            "label": "배운 점",
-            "text": "충돌 검사는 \"각 축이 따로 가능한가\"가 아니라 \"실제로 이동할 경로가 가능한가\"를 확인해야 합니다.",
-            "verbatim": true
-          }
+          { "label": "문제", "text": "점프하며 대각선으로 이동하다가 타일 모서리 부근에 착지하면, 캐릭터가 모서리에 끼어 움직이지 않는 문제가 발생했습니다.", "verbatim": true },
+          { "label": "원인", "text": "X축과 Y축의 이동 가능 여부를 둘 다 이동 전의 같은 위치에서 검사했기 때문입니다.", "verbatim": true },
+          { "label": "해결", "text": "X축을 먼저 검사해 실제로 이동할 양을 확정하고, 검사용 박스를 그 위치로 옮긴 다음 Y축을 검사하도록 바꿨습니다(3.4 코드의 `box.center += Vector3.right * moveX`).", "verbatim": true },
+          { "label": "배운 점", "text": "충돌 검사는 \"각 축이 따로 가능한가\"가 아니라 \"실제로 이동할 경로가 가능한가\"를 확인해야 합니다.", "verbatim": true }
         ],
         "visuals": [
-          {
-            "kind": "code",
-            "n": 1,
-            "fp": "[수정 전] 두 축을 같은 시작 위치에서 검사"
-          }
+          { "kind": "code", "n": 1, "fp": "[수정 전] 두 축을 같은 시작 위치에서 검사" }
+        ]
+      },
+      {
+        "key": "switch-intro",
+        "chapter": "switch",
+        "layout": "visual",
+        "tab": "개요",
+        "title": { "text": "4.1 개요: 교대가 곧 전투 수단이 되도록", "verbatim": true },
+        "lead": { "text": "이 게임의 차별점은 캐릭터 교대입니다. 플레이어는 두 캐릭터를 동시에 조작하는 것이 아니라, 한 명씩 번갈아 꺼내 씁니다.", "verbatim": true },
+        "sectionPath": ["4. 캐릭터 교대 & QTE", "4.1 개요: 교대가 곧 전투 수단이 되도록"],
+        "points": [
+          { "label": "교대 무적", "text": "교대 연출 동안 나가는 캐릭터와 들어오는 캐릭터 모두 피격 판정(HurtBox) 비활성화 → 위험한 공격을 교대로 피하는 방어 수단", "verbatim": false },
+          { "label": "QTE 등장 공격", "text": "게이지가 가득 찬 상태로 교대하면, 들어온 캐릭터가 등장과 동시에 강력한 공격 → 위기를 반격으로 바꾸는 공격 수단", "verbatim": false }
+        ],
+        "visuals": [
+          { "kind": "image", "src": "images/switch_qte.gif", "w": 800, "h": 450, "caption": { "text": "교대와 QTE", "verbatim": true }, "sectionPath": ["4. 캐릭터 교대 & QTE"] }
         ]
       },
       {
         "key": "switch-flow",
         "chapter": "switch",
-        "layout": "visual",
+        "layout": "full",
         "tab": "흐름",
-        "title": {
-          "text": "4.2 교대 흐름",
-          "verbatim": true
-        },
+        "title": { "text": "4.2 교대 흐름", "verbatim": true },
         "lead": null,
-        "sectionPath": [
-          "4. 캐릭터 교대 & QTE",
-          "4.2 교대 흐름"
-        ],
-        "points": [
-          {
-            "label": "교대 무적",
-            "text": "교대 연출 동안 나가는 캐릭터와 들어오는 캐릭터 모두 피격 판정(HurtBox) 비활성화 → 위험한 공격을 교대로 피하는 방어 수단",
-            "verbatim": false
-          },
-          {
-            "label": "QTE 등장 공격",
-            "text": "게이지가 가득 찬 상태로 교대하면, 들어온 캐릭터가 등장과 동시에 강력한 공격 → 위기를 반격으로 바꾸는 공격 수단",
-            "verbatim": false
-          }
-        ],
+        "sectionPath": ["4. 캐릭터 교대 & QTE", "4.2 교대 흐름"],
+        "points": [],
         "visuals": [
-          {
-            "kind": "mermaid",
-            "n": 1,
-            "fp": "sequenceDiagram"
-          }
+          { "kind": "mermaid", "n": 1, "fp": "sequenceDiagram" }
         ]
       },
       {
@@ -528,40 +298,15 @@
         "chapter": "switch",
         "layout": "code",
         "tab": "구현",
-        "title": {
-          "text": "4.3 핵심 동작",
-          "verbatim": true
-        },
-        "lead": {
-          "text": "퇴장과 등장을 동시에 진행합니다. 퇴장 코루틴과 등장 코루틴을 동시에 시작하고, 둘 다 끝날 때까지 기다립니다.",
-          "verbatim": true
-        },
-        "sectionPath": [
-          "4. 캐릭터 교대 & QTE",
-          "4.3 핵심 동작"
-        ],
+        "title": { "text": "4.3 핵심 동작", "verbatim": true },
+        "lead": { "text": "퇴장과 등장을 동시에 진행합니다. 퇴장 코루틴과 등장 코루틴을 동시에 시작하고, 둘 다 끝날 때까지 기다립니다.", "verbatim": true },
+        "sectionPath": ["4. 캐릭터 교대 & QTE", "4.3 핵심 동작"],
         "points": [
-          {
-            "label": "",
-            "text": "공격 도중에 교대해도 모션을 자르지 않습니다. 나가는 캐릭터는 공격·스킬 모션이 끝날 때까지 기다렸다가 퇴장합니다.",
-            "verbatim": true
-          },
-          {
-            "label": "",
-            "text": "상태를 이어받습니다. 교대 시 HP, 수평 이동 속도, 바라보는 방향을 전용 구조체로 넘겨, 달리던 중에 교대하면 새 캐릭터도 그 속도와 방향 그대로 이어서 움직입니다.",
-            "verbatim": true
-          }
+          { "label": "", "text": "공격 도중에 교대해도 모션을 자르지 않습니다. 나가는 캐릭터는 공격·스킬 모션이 끝날 때까지 기다렸다가 퇴장합니다.", "verbatim": true },
+          { "label": "", "text": "상태를 이어받습니다. 교대 시 HP, 수평 이동 속도, 바라보는 방향을 전용 구조체로 넘겨, 달리던 중에 교대하면 새 캐릭터도 그 속도와 방향 그대로 이어서 움직입니다.", "verbatim": true }
         ],
         "visuals": [
-          {
-            "kind": "code",
-            "n": 1,
-            "lines": [
-              15,
-              33
-            ],
-            "fp": "// PlayerSwitchManager.cs — 교대 코루틴 (요약)"
-          }
+          { "kind": "code", "n": 1, "lines": [15, 33], "fp": "// PlayerSwitchManager.cs — 교대 코루틴 (요약)" }
         ]
       },
       {
@@ -569,65 +314,26 @@
         "chapter": "switch",
         "layout": "full",
         "tab": "구현",
-        "title": {
-          "text": "4.4 QTE 게이지와 완벽 회피",
-          "verbatim": true
-        },
-        "lead": {
-          "text": "게이지가 가득 차면 교대 쿨타임이 풀리는 규칙에 맞춰, 교대 시에는 게이지를 초기화하도록 설계했습니다.",
-          "verbatim": true
-        },
-        "sectionPath": [
-          "4. 캐릭터 교대 & QTE",
-          "4.4 QTE 게이지와 완벽 회피"
-        ],
-        "points": [
-          {
-            "label": "완벽 회피",
-            "text": "완벽 회피는 별도의 판정 시스템 없이, 전투 흐름(5장)의 피해 수용 여부 확인 단계(CanTakeDamage)에 끼워 넣어 구현했습니다.",
-            "verbatim": true
-          }
-        ],
+        "title": { "text": "4.4 QTE 게이지와 완벽 회피", "verbatim": true },
+        "lead": { "text": "완벽 회피는 별도의 판정 시스템 없이, 전투 흐름(5장)의 피해 수용 여부 확인 단계(CanTakeDamage)에 끼워 넣어 구현했습니다.", "verbatim": true },
+        "sectionPath": ["4. 캐릭터 교대 & QTE", "4.4 QTE 게이지와 완벽 회피"],
+        "points": [],
         "visuals": [
-          {
-            "kind": "table",
-            "n": 1,
-            "fp": "항목|값|설명"
-          }
+          { "kind": "table", "n": 1, "fp": "항목|값|설명" },
+          { "kind": "image", "src": "images/perfect_dodge.gif", "w": 800, "h": 450, "caption": { "text": "완벽 회피", "verbatim": true } }
         ]
       },
       {
         "key": "combat-flow",
         "chapter": "combat",
-        "layout": "visual",
+        "layout": "full",
         "tab": "흐름",
-        "title": {
-          "text": "5.2 흐름",
-          "verbatim": true
-        },
+        "title": { "text": "5.2 흐름", "verbatim": true },
         "lead": null,
-        "sectionPath": [
-          "5. 전투 처리 흐름",
-          "5.2 흐름"
-        ],
-        "points": [
-          {
-            "label": "HitBox",
-            "text": "공격 판정. 애니메이션 클립에 연동되어 공격 모션의 특정 프레임에만 켜짐",
-            "verbatim": false
-          },
-          {
-            "label": "CombatManager",
-            "text": "모든 피격 이벤트의 중재자. 피해 수용 여부 확인 → 히트스탑 → 피해 적용",
-            "verbatim": false
-          }
-        ],
+        "sectionPath": ["5. 전투 처리 흐름", "5.2 흐름"],
+        "points": [],
         "visuals": [
-          {
-            "kind": "mermaid",
-            "n": 1,
-            "fp": "sequenceDiagram"
-          }
+          { "kind": "mermaid", "n": 1, "fp": "sequenceDiagram" }
         ]
       },
       {
@@ -635,40 +341,15 @@
         "chapter": "combat",
         "layout": "code",
         "tab": "구현",
-        "title": {
-          "text": "5.3 핵심 동작",
-          "verbatim": true
-        },
-        "lead": {
-          "text": "같은 흐름을 상속으로 확장해 재사용합니다.",
-          "verbatim": true
-        },
-        "sectionPath": [
-          "5. 전투 처리 흐름",
-          "5.3 핵심 동작"
-        ],
+        "title": { "text": "5.3 핵심 동작", "verbatim": true },
+        "lead": { "text": "같은 흐름을 상속으로 확장해 재사용합니다.", "verbatim": true },
+        "sectionPath": ["5. 전투 처리 흐름", "5.3 핵심 동작"],
         "points": [
-          {
-            "label": "PlayerHitBox",
-            "text": "타격에 성공하면 QTE 게이지 획득 (base.TryHit()이 true일 때만)",
-            "verbatim": true
-          },
-          {
-            "label": "Projectile (궁수 화살)",
-            "text": "트리거 대신 매 물리 프레임 CircleCast로 대상을 찾은 뒤, 같은 TryHit()으로 처리",
-            "verbatim": true
-          }
+          { "label": "PlayerHitBox", "text": "타격에 성공하면 QTE 게이지 획득 (base.TryHit()이 true일 때만)", "verbatim": true },
+          { "label": "Projectile (궁수 화살)", "text": "트리거 대신 매 물리 프레임 CircleCast로 대상을 찾은 뒤, 같은 TryHit()으로 처리", "verbatim": true }
         ],
         "visuals": [
-          {
-            "kind": "code",
-            "n": 1,
-            "lines": [
-              2,
-              21
-            ],
-            "fp": "// HitBox.cs — 공격 판정"
-          }
+          { "kind": "code", "n": 1, "lines": [2, 21], "fp": "// HitBox.cs — 공격 판정" }
         ]
       },
       {
@@ -676,36 +357,15 @@
         "chapter": "combat",
         "layout": "full",
         "tab": "선택",
-        "title": {
-          "text": "5.5 고민과 선택 ⑦ 직접 판정 vs 중재자(CombatManager)",
-          "verbatim": true
-        },
-        "lead": {
-          "text": "결정 대상: HitBox가 피격 대상에게 직접 피해를 줄 것인가, 중간에 중재자를 둘 것인가?",
-          "verbatim": true
-        },
-        "sectionPath": [
-          "5. 전투 처리 흐름",
-          "5.5 고민과 선택 ⑦ 직접 판정 vs 중재자(CombatManager)"
-        ],
+        "title": { "text": "5.5 고민과 선택 ⑦ 직접 판정 vs 중재자(CombatManager)", "verbatim": true },
+        "lead": { "text": "결정 대상: HitBox가 피격 대상에게 직접 피해를 줄 것인가, 중간에 중재자를 둘 것인가?", "verbatim": true },
+        "sectionPath": ["5. 전투 처리 흐름", "5.5 고민과 선택 ⑦ 직접 판정 vs 중재자(CombatManager)"],
         "points": [
-          {
-            "label": "최종 결정",
-            "text": "중재자를 두면 문제가 생겼을 때 볼 곳이 하나라는 명확한 이점이 있습니다.",
-            "verbatim": true
-          },
-          {
-            "label": "",
-            "text": "실제로 완벽 회피(4.4)는 이 관문(CanTakeDamage)에 조건 하나를 넣는 것만으로 구현할 수 있었습니다.",
-            "verbatim": true
-          }
+          { "label": "최종 결정", "text": "중재자를 두면 문제가 생겼을 때 볼 곳이 하나라는 명확한 이점이 있습니다.", "verbatim": true },
+          { "label": "", "text": "실제로 완벽 회피(4.4)는 이 관문(CanTakeDamage)에 조건 하나를 넣는 것만으로 구현할 수 있었습니다.", "verbatim": true }
         ],
         "visuals": [
-          {
-            "kind": "table",
-            "n": 1,
-            "fp": "|[A] HitBox가 직접 판정|[B] CombatManager 중재 ✓"
-          }
+          { "kind": "table", "n": 1, "fp": "|[A] HitBox가 직접 판정|[B] CombatManager 중재 ✓" }
         ]
       },
       {
@@ -713,73 +373,34 @@
         "chapter": "enemy",
         "layout": "visual",
         "tab": "흐름",
-        "title": {
-          "text": "6.1 일반 몬스터의 행동",
-          "verbatim": true
-        },
-        "lead": {
-          "text": "일반 몬스터는 플레이어와 같은 Animator 기반 FSM 베이스(2.4)를 상속해 만들었습니다.",
-          "verbatim": true
-        },
-        "sectionPath": [
-          "6. 적 AI와 보스 패턴",
-          "6.1 일반 몬스터의 행동"
-        ],
+        "title": { "text": "6.1 일반 몬스터의 행동", "verbatim": true },
+        "lead": { "text": "일반 몬스터는 플레이어와 같은 Animator 기반 FSM 베이스(2.4)를 상속해 만들었습니다.", "verbatim": true },
+        "sectionPath": ["6. 적 AI와 보스 패턴", "6.1 일반 몬스터의 행동"],
         "points": [
-          {
-            "label": "추적 조건",
-            "text": "① 플레이어가 순찰 범위 안에 있고 ② 일정 거리 이내이며 ③ 사이에 장애물이 없을 때(Linecast 시야 판정)",
-            "verbatim": true
-          },
-          {
-            "label": "추적 범위 제한",
-            "text": "추적 목표 지점을 순찰 범위 안으로 제한 → 순찰 범위 밖까지는 따라오지 않음",
-            "verbatim": true
-          },
-          {
-            "label": "리스폰",
-            "text": "사망 후 일정 시간(기본 30초)이 지나면 처음 위치와 방향으로 부활. 몬스터마다 리스폰 여부 설정 가능",
-            "verbatim": true
-          }
+          { "label": "추적 조건", "text": "① 플레이어가 순찰 범위 안에 있고 ② 일정 거리 이내이며 ③ 사이에 장애물이 없을 때(Linecast 시야 판정)", "verbatim": true },
+          { "label": "추적 범위 제한", "text": "추적 목표 지점을 순찰 범위 안으로 제한 → 순찰 범위 밖까지는 따라오지 않음", "verbatim": true },
+          { "label": "리스폰", "text": "사망 후 일정 시간(기본 30초)이 지나면 처음 위치와 방향으로 부활. 몬스터마다 리스폰 여부 설정 가능", "verbatim": true }
         ],
         "visuals": [
-          {
-            "kind": "mermaid",
-            "n": 1,
-            "fp": "flowchart LR"
-          }
+          { "kind": "mermaid", "n": 1, "fp": "flowchart LR" }
         ]
       },
       {
         "key": "boss-patterns",
         "chapter": "enemy",
-        "layout": "full",
+        "layout": "visual",
         "tab": "구현",
-        "title": {
-          "text": "6.4 패턴 5종",
-          "verbatim": true
-        },
-        "lead": {
-          "text": "특수 패턴 두 종은 모두 잘 대응하면 오히려 보스에게 큰 피해를 줄 수 있는 기회가 되도록 설계했습니다.",
-          "verbatim": true
-        },
-        "sectionPath": [
-          "6. 적 AI와 보스 패턴",
-          "6.4 패턴 5종"
-        ],
+        "title": { "text": "6.4 패턴 5종", "verbatim": true },
+        "lead": { "text": "특수 패턴 두 종은 모두 잘 대응하면 오히려 보스에게 큰 피해를 줄 수 있는 기회가 되도록 설계했습니다.", "verbatim": true },
+        "sectionPath": ["6. 적 AI와 보스 패턴", "6.4 패턴 5종"],
         "points": [
-          {
-            "label": "",
-            "text": "패턴에 쓰이는 오브젝트(칼날, 장판, 스파크, 눈)는 처음에 필요한 개수만큼 미리 만들어 두고, 패턴마다 SetActive로 재사용합니다.",
-            "verbatim": true
-          }
+          { "label": "추적 칼날", "text": "칼날이 일정 시간 플레이어를 따라다니다가 멈춘 뒤 공격", "verbatim": true },
+          { "label": "장판 폭발", "text": "바닥의 일정 간격 지점 중 랜덤 10곳에 장판 생성 → 동시 폭발", "verbatim": true },
+          { "label": "순차 스파크", "text": "스파크를 랜덤 순서로 하나씩 터뜨림", "verbatim": true },
+          { "label": "눈과 빔", "text": "빔을 보스의 특정 부위로 유도해 맞히면 보스가 큰 피해를 입음", "verbatim": true }
         ],
         "visuals": [
-          {
-            "kind": "table",
-            "n": 1,
-            "fp": "구분|패턴|동작"
-          }
+          { "kind": "table", "n": 2, "fp": "일반 1 · 추적 칼날|일반 2 · 장판 폭발" }
         ]
       },
       {
@@ -787,43 +408,17 @@
         "chapter": "trouble",
         "layout": "problem",
         "tab": "문제 해결",
-        "title": {
-          "text": "7.1 공중 공격·스킬 모션이 Jump/Fall 모션에 덮이는 문제",
-          "verbatim": true
-        },
+        "title": { "text": "7.1 공중 공격·스킬 모션이 Jump/Fall 모션에 덮이는 문제", "verbatim": true },
         "lead": null,
-        "sectionPath": [
-          "7. 트러블슈팅",
-          "7.1 공중 공격·스킬 모션이 Jump/Fall 모션에 덮이는 문제"
-        ],
+        "sectionPath": ["7. 트러블슈팅", "7.1 공중 공격·스킬 모션이 Jump/Fall 모션에 덮이는 문제"],
         "points": [
-          {
-            "label": "문제",
-            "text": "공중에서 공격이나 스킬을 쓰면, 모션 도중에 Jump/Fall 모션으로 넘어가 공격 모션이 덮어씌워졌습니다.",
-            "verbatim": true
-          },
-          {
-            "label": "원인",
-            "text": "공격 도중에도 Y 속도가 바뀌면 Jump/Fall 트리거가 그대로 들어가 공격 모션을 끊었습니다.",
-            "verbatim": true
-          },
-          {
-            "label": "해결",
-            "text": "CAN_JUMP_OR_FALL이라는 가드 Bool을 두고, 공격·스킬·QTE·사망 상태에 들어갈 때 끄고 나올 때 켜도록 했습니다.",
-            "verbatim": true
-          },
-          {
-            "label": "회고",
-            "text": "Animator 트랜지션의 Interruption Source 설정은 검토해 보지 않았습니다.",
-            "verbatim": true
-          }
+          { "label": "문제", "text": "공중에서 공격이나 스킬을 쓰면, 모션 도중에 Jump/Fall 모션으로 넘어가 공격 모션이 덮어씌워졌습니다.", "verbatim": true },
+          { "label": "원인", "text": "공격 도중에도 Y 속도가 바뀌면 Jump/Fall 트리거가 그대로 들어가 공격 모션을 끊었습니다.", "verbatim": true },
+          { "label": "해결", "text": "CAN_JUMP_OR_FALL이라는 가드 Bool을 두고, 공격·스킬·QTE·사망 상태에 들어갈 때 끄고 나올 때 켜도록 했습니다.", "verbatim": true },
+          { "label": "회고", "text": "Animator 트랜지션의 Interruption Source 설정은 검토해 보지 않았습니다.", "verbatim": true }
         ],
         "visuals": [
-          {
-            "kind": "code",
-            "n": 1,
-            "fp": "// PlayerAttackState.cs — 공격 중에는 Jump/Fall 전이를 막음"
-          }
+          { "kind": "code", "n": 1, "fp": "// PlayerAttackState.cs — 공격 중에는 Jump/Fall 전이를 막음" }
         ]
       },
       {
@@ -831,46 +426,17 @@
         "chapter": "trouble",
         "layout": "problem",
         "tab": "문제 해결",
-        "title": {
-          "text": "7.2 소비되지 않은 Trigger가 남아 생긴 문제 2건",
-          "verbatim": true
-        },
-        "lead": {
-          "text": "두 문제는 증상은 달랐지만 원인이 같았습니다.",
-          "verbatim": true
-        },
-        "sectionPath": [
-          "7. 트러블슈팅",
-          "7.2 소비되지 않은 Trigger가 남아 생긴 문제 2건"
-        ],
+        "title": { "text": "7.2 소비되지 않은 Trigger가 남아 생긴 문제 2건", "verbatim": true },
+        "lead": { "text": "두 문제는 증상은 달랐지만 원인이 같았습니다.", "verbatim": true },
+        "sectionPath": ["7. 트러블슈팅", "7.2 소비되지 않은 Trigger가 남아 생긴 문제 2건"],
         "points": [
-          {
-            "label": "문제",
-            "text": "낙하 중에 QTE 교대를 하면, QTE 공격이 끝난 뒤 땅에 서 있는데도 Fall 모션이 재생됨",
-            "verbatim": true
-          },
-          {
-            "label": "원인",
-            "text": "낙하 중 들어온 FALL 트리거가 QTE 모션에 밀려 소비되지 않은 채 남아 있었음",
-            "verbatim": true
-          },
-          {
-            "label": "해결",
-            "text": "QTE 상태를 나갈 때 접지 상태라면 FALL 트리거를 ResetTrigger로 정리",
-            "verbatim": true
-          },
-          {
-            "label": "배운 점",
-            "text": "Animator의 Trigger는 쏘는 순간 끝나는 신호가 아니라, 소비될 때까지 남아 있는 \"예약\"입니다.",
-            "verbatim": true
-          }
+          { "label": "문제", "text": "낙하 중에 QTE 교대를 하면, QTE 공격이 끝난 뒤 땅에 서 있는데도 Fall 모션이 재생됨", "verbatim": true },
+          { "label": "원인", "text": "낙하 중 들어온 FALL 트리거가 QTE 모션에 밀려 소비되지 않은 채 남아 있었음", "verbatim": true },
+          { "label": "해결", "text": "QTE 상태를 나갈 때 접지 상태라면 FALL 트리거를 ResetTrigger로 정리", "verbatim": true },
+          { "label": "배운 점", "text": "Animator의 Trigger는 쏘는 순간 끝나는 신호가 아니라, 소비될 때까지 남아 있는 \"예약\"입니다.", "verbatim": true }
         ],
         "visuals": [
-          {
-            "kind": "code",
-            "n": 1,
-            "fp": "// PlayerQTEState.cs"
-          }
+          { "kind": "code", "n": 1, "fp": "// PlayerQTEState.cs" }
         ]
       }
     ]
