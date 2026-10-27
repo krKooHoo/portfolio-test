@@ -5,7 +5,7 @@
    - html[data-view="deck"]   : 한 번에 한 장. .pf-deck을 화면에 고정하고 장면을 같은 자리에 겹쳐 둔 뒤 지금 장면(.pf-cur)만 보임
    - html[data-view="scroll"] : 한 번에 보기(모든 장면을 세로로 쌓음, scene-kit.css의 형제 + 여백 보정 transform)
    - HUD 띠(아래 44px), 개요 격자(dialog), 세로 화면 안내 띠, 화면 낭독기 전용 글자
-   - 색: 어두운 테마(deck-theme.css와 같은 검은 바탕 · 반투명 띠 · 강조색은 --accent 토큰)
+   - 색: deck-theme.css의 토큰(--bg·--card·--th·--ink·--muted·--line…, 테마 손잡이 --t-*를 따름) · 반투명 띠 · 강조색은 --accent 토큰
    ════════════════════════════════════════════════════════════════════════════ */
 :root { --pf-hud-h: 44px; }
 
@@ -17,7 +17,7 @@
   html[data-view="deck"] .pf-deck > .pf-scene {
     position: absolute; left: 0; top: 0; margin: 0;
     transform: translate(var(--pf-x, 0px), var(--pf-y, 0px)) scale(var(--pf-k, 1)); transform-origin: 0 0;
-    visibility: hidden; box-shadow: 0 0 0 1px #1C1C24, 0 24px 60px -24px rgba(0, 0, 0, .9); }
+    visibility: hidden; box-shadow: 0 0 0 1px var(--th, #1C1C24), 0 24px 60px -24px var(--shadow, rgba(0, 0, 0, .9)); }
   html[data-view="deck"] .pf-deck > .pf-scene.pf-cur { visibility: visible; }
   html[data-view="deck"] .pf-deck > .pf-scene:focus,
   html[data-view="deck"] .pf-deck > .pf-scene:focus-visible { outline: none; }
@@ -27,46 +27,46 @@
   /* ── 한 번에 보기 ── */
   html[data-view="scroll"] { scroll-padding-bottom: var(--pf-hud-h); }
   html[data-view="scroll"] .pf-deck { padding-bottom: calc(var(--pf-gap) + var(--pf-hud-h)); }
-  html[data-view="scroll"] .pf-deck > .pf-scene { box-shadow: 0 0 0 1px #1C1C24, 0 10px 30px -16px rgba(0, 0, 0, .9); }
+  html[data-view="scroll"] .pf-deck > .pf-scene { box-shadow: 0 0 0 1px var(--th, #1C1C24), 0 10px 30px -16px var(--shadow, rgba(0, 0, 0, .9)); }
 
   /* 불러오는 동안 보이는 글자(mount 때 지움) */
-  .pf-loading { position: fixed; left: 0; right: 0; top: 40%; margin: 0; text-align: center; font: 600 15px/1.5 'Pretendard', system-ui, sans-serif; color: #9A9AA6; }
+  .pf-loading { position: fixed; left: 0; right: 0; top: 40%; margin: 0; text-align: center; font: 600 15px/1.5 'Pretendard', system-ui, sans-serif; color: var(--muted, #9A9AA6); }
 
   /* ── HUD 띠(아래 고정 44px) ── */
   .pf-hud { position: fixed; left: 0; right: 0; bottom: 0; top: auto; transform: none; height: var(--pf-hud-h); max-width: none; z-index: 1000;
     display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 10px; padding: 0 16px; box-sizing: border-box;
-    background: rgba(10, 10, 13, .86); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-    border-top: 1px solid #24242C; border-radius: 0; box-shadow: none;
-    font: 600 13px/1.2 'Pretendard', system-ui, sans-serif; color: #F4F4F6; }
+    background: color-mix(in srgb, var(--bg, #0A0A0D) 86%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line, #24242C); border-radius: 0; box-shadow: none;
+    font: 600 13px/1.2 'Pretendard', system-ui, sans-serif; color: var(--ink, #F4F4F6); }
   .pf-hud button { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 4px;
-    height: 30px; min-width: 32px; padding: 0 12px; border: 1px solid #2E2E38; border-radius: 999px; background: #15151B;
-    font: 600 13px/1 'Pretendard', system-ui, sans-serif; color: #E8E8EE; cursor: pointer; white-space: nowrap; flex: none; }
+    height: 30px; min-width: 32px; padding: 0 12px; border: 1px solid var(--line-2, #2E2E38); border-radius: var(--pill, 999px); background: var(--card, #15151B);
+    font: 600 13px/1 'Pretendard', system-ui, sans-serif; color: var(--ink, #E8E8EE); cursor: pointer; white-space: nowrap; flex: none; }
   .pf-hud button[data-a="prev"], .pf-hud button[data-a="next"] { padding: 0; width: 32px; font-size: 18px; }
   .pf-hud button[data-a="help"] { padding: 0; width: 30px; }
-  .pf-hud button:hover { border-color: var(--accent-ink, #6D9AF1); color: var(--accent-ink, #6D9AF1); background: #15151B; }
+  .pf-hud button:hover { border-color: var(--accent-ink, #6D9AF1); color: var(--accent-ink, #6D9AF1); background: var(--card, #15151B); }
   .pf-hud button:focus-visible { outline: 2px solid var(--accent-ink, #6D9AF1); outline-offset: 2px; }
-  .pf-hud button[aria-disabled="true"] { opacity: .4; cursor: default; border-color: #2E2E38; color: #E8E8EE; }
+  .pf-hud button[aria-disabled="true"] { opacity: .4; cursor: default; border-color: var(--line-2, #2E2E38); color: var(--ink, #E8E8EE); }
   .pf-hud button[aria-pressed="true"], .pf-hud button[aria-expanded="true"] { background: var(--accent-soft, #101A31); border-color: var(--accent-ink, #6D9AF1); color: var(--accent-ink, #6D9AF1); }
-  .pf-hud .pf-hud-count { flex: none; min-width: 66px; padding: 0; font-weight: 800; font-size: 14px; color: #F4F4F6; font-variant-numeric: tabular-nums; text-align: left; }
-  .pf-hud .pf-hud-sec { flex: 0 1 auto; min-width: 0; max-width: 30vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #9A9AA6; }
-  .pf-hud .pf-hud-prog { flex: 1 1 80px; min-width: 40px; height: 5px; border-radius: 3px; background: #24242C; overflow: hidden; }
+  .pf-hud .pf-hud-count { flex: none; min-width: 66px; padding: 0; font-weight: 800; font-size: 14px; color: var(--ink, #F4F4F6); font-variant-numeric: tabular-nums; text-align: left; }
+  .pf-hud .pf-hud-sec { flex: 0 1 auto; min-width: 0; max-width: 30vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted, #9A9AA6); }
+  .pf-hud .pf-hud-prog { flex: 1 1 80px; min-width: 40px; height: 5px; border-radius: 3px; background: var(--line, #24242C); overflow: hidden; }
   .pf-hud .pf-hud-prog > span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent, #2F6FEB), var(--accent-2, #8C2FEB)); transition: width .2s; }
-  .pf-hud .pf-hud-note { flex: none; font-size: 12px; font-weight: 500; color: #9A9AA6; white-space: nowrap; }
-  .pf-hud .pf-print small { display: inline; font-size: 12px; font-weight: 600; color: #9A9AA6; opacity: 1; }
+  .pf-hud .pf-hud-note { flex: none; font-size: 12px; font-weight: 500; color: var(--muted, #9A9AA6); white-space: nowrap; }
+  .pf-hud .pf-print small { display: inline; font-size: 12px; font-weight: 600; color: var(--muted, #9A9AA6); opacity: 1; }
   .pf-hud .s { display: none; }
   .pf-hud .pf-hud-msg { position: absolute; right: 16px; bottom: calc(100% + 8px); max-width: 22em; padding: 6px 10px; border-radius: 8px;
-    background: #1C1C24; border: 1px solid #2E2E38; color: #fff; font-size: 12px; font-weight: 600; text-align: left; }
+    background: var(--th, #1C1C24); border: 1px solid var(--line-2, #2E2E38); color: var(--ink, #fff); font-size: 12px; font-weight: 600; text-align: left; }
   .pf-hud .pf-hud-msg:empty { display: none; }
-  .pf-hud .pf-hud-badge { flex: none; min-width: 1.6em; padding: 2px 6px; border-radius: 999px; background: #B42318; color: #fff; text-align: center; font-variant-numeric: tabular-nums; }
+  .pf-hud .pf-hud-badge { flex: none; min-width: 1.6em; padding: 2px 6px; border-radius: var(--pill, 999px); background: #B42318; color: #fff; text-align: center; font-variant-numeric: tabular-nums; }
   .pf-hud [hidden] { display: none !important; }
   /* PDF 저장 안내(? 단추) — docs/design/01 §8-8 문구 */
   .pf-hud .pf-hud-help { position: absolute; right: 12px; bottom: calc(100% + 8px); width: min(460px, calc(100vw - 24px)); max-height: calc(100vh - 80px); overflow: auto;
-    box-sizing: border-box; padding: 14px 16px; border-radius: 14px; background: #131318; border: 1px solid #2E2E38; box-shadow: 0 18px 50px -18px rgba(0, 0, 0, .9);
-    font: 500 13px/1.6 'Pretendard', system-ui, sans-serif; color: #E8E8EE; white-space: normal; }
+    box-sizing: border-box; padding: 14px 16px; border-radius: calc(var(--radius, 20px) * .7); background: var(--card, #131318); border: 1px solid var(--line-2, #2E2E38); box-shadow: 0 18px 50px -18px var(--shadow, rgba(0, 0, 0, .9));
+    font: 500 13px/1.6 'Pretendard', system-ui, sans-serif; color: var(--ink, #E8E8EE); white-space: normal; }
   .pf-hud .pf-hud-help b { font-weight: 800; }
   .pf-hud .pf-hud-help p { margin: 0 0 6px; }
   .pf-hud .pf-hud-help ol { margin: 4px 0 8px; padding-left: 20px; }
-  .pf-hud .pf-hud-help .warn { color: #FDB022; }
+  .pf-hud .pf-hud-help .warn { color: color-mix(in srgb, #F79009 70%, var(--ink, #fff)); }
   .pf-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
   @media (max-width: 1100px) { .pf-hud .pf-hud-note { display: none; } }
   @media (max-width: 760px) {
@@ -87,38 +87,38 @@
 
   /* ── 세로 화면 안내 띠(돌리면 장면이 커질 때만, 덱 보기). 덱 밖 화면 전용 UI ── */
   .pf-rotate { position: fixed; left: 8px; right: 8px; top: max(8px, env(safe-area-inset-top)); z-index: 999; display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; border-radius: 12px; background: #1C1C24; border: 1px solid #2E2E38; color: #fff; font: 600 13px/1.45 'Pretendard', system-ui, sans-serif; box-shadow: 0 10px 30px -12px rgba(0, 0, 0, .45); }
+    padding: 10px 12px; border-radius: calc(var(--radius, 20px) * .6); background: var(--th, #1C1C24); border: 1px solid var(--line-2, #2E2E38); color: var(--ink, #fff); font: 600 13px/1.45 'Pretendard', system-ui, sans-serif; box-shadow: 0 10px 30px -12px rgba(0, 0, 0, .45); }
   .pf-rotate[hidden] { display: none; }
   .pf-rotate .tx { flex: 1; min-width: 0; }
-  .pf-rotate a { color: #fff; font-weight: 800; }
-  .pf-rotate button { all: unset; cursor: pointer; flex: none; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; background: rgba(255, 255, 255, .14); font-size: 14px; }
-  .pf-rotate button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .pf-rotate a { color: var(--ink, #fff); font-weight: 800; }
+  .pf-rotate button { all: unset; cursor: pointer; flex: none; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; background: color-mix(in srgb, var(--ink, #fff) 14%, transparent); font-size: 14px; }
+  .pf-rotate button:focus-visible { outline: 2px solid var(--ink, #fff); outline-offset: 2px; }
 
   /* ── 개요 격자(dialog). 닫혀 있으면 UA 기본 display:none ── */
-  .pf-ov { width: min(1200px, 94vw); height: min(88vh, 940px); max-width: none; max-height: none; padding: 0; border: 1px solid #24242C; border-radius: 20px;
-    background: #0E0E13; color: #F4F4F6; box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .9); font-family: 'Pretendard', system-ui, sans-serif; color-scheme: dark; }
+  .pf-ov { width: min(1200px, 94vw); height: min(88vh, 940px); max-width: none; max-height: none; padding: 0; border: 1px solid var(--line, #24242C); border-radius: var(--radius, 20px);
+    background: var(--bg, #0E0E13); color: var(--ink, #F4F4F6); box-shadow: 0 30px 80px -20px var(--shadow, rgba(0, 0, 0, .9)); font-family: 'Pretendard', system-ui, sans-serif; }
   .pf-ov[open] { display: flex; flex-direction: column; overflow: hidden; }
   .pf-ov::backdrop { background: rgba(0, 0, 0, .72); }
-  .pf-ov-head { display: flex; align-items: center; gap: 14px; padding: 14px 18px 14px 24px; background: #131318; border-bottom: 1px solid #24242C; flex: none; }
+  .pf-ov-head { display: flex; align-items: center; gap: 14px; padding: 14px 18px 14px 24px; background: var(--card, #131318); border-bottom: 1px solid var(--line, #24242C); flex: none; }
   .pf-ov-head h2 { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: -.01em; }
-  .pf-ov-head h2 small { font-size: 14px; font-weight: 600; color: #9A9AA6; margin-left: 6px; }
-  .pf-ov-hint { margin: 0 0 0 auto; font-size: 13px; color: #9A9AA6; }
-  .pf-ov-close { all: unset; cursor: pointer; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 999px; border: 1px solid #2E2E38; background: #15151B; font-size: 16px; }
+  .pf-ov-head h2 small { font-size: 14px; font-weight: 600; color: var(--muted, #9A9AA6); margin-left: 6px; }
+  .pf-ov-hint { margin: 0 0 0 auto; font-size: 13px; color: var(--muted, #9A9AA6); }
+  .pf-ov-close { all: unset; cursor: pointer; width: 34px; height: 34px; display: grid; place-items: center; border-radius: var(--pill, 999px); border: 1px solid var(--line-2, #2E2E38); background: var(--card, #15151B); font-size: 16px; }
   .pf-ov-close:hover { border-color: var(--accent-ink, #6D9AF1); color: var(--accent-ink, #6D9AF1); }
   .pf-ov-close:focus-visible { outline: 2px solid var(--accent-ink, #6D9AF1); outline-offset: 2px; }
   .pf-ov-grid { flex: 1; overflow: auto; padding: 8px 24px 28px; display: grid; grid-template-columns: repeat(auto-fill, minmax(208px, 1fr)); gap: 10px 16px; align-content: start; }
-  .pf-ov-sec { grid-column: 1 / -1; margin: 14px 0 0; padding-bottom: 6px; border-bottom: 1px solid #24242C; font-size: 13px; font-weight: 800; color: var(--accent-ink, #6D9AF1); letter-spacing: .02em; }
-  .pf-ov-item { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; gap: 6px; padding: 6px; border-radius: 10px; min-width: 0; }
+  .pf-ov-sec { grid-column: 1 / -1; margin: 14px 0 0; padding-bottom: 6px; border-bottom: 1px solid var(--line, #24242C); font-size: 13px; font-weight: 800; color: var(--accent-ink, #6D9AF1); letter-spacing: .02em; }
+  .pf-ov-item { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; gap: 6px; padding: 6px; border-radius: calc(var(--radius, 20px) * .5); min-width: 0; }
   .pf-ov-item:hover { background: var(--accent-soft, #101A31); }
   .pf-ov-item:focus-visible { outline: 2px solid var(--accent-ink, #6D9AF1); outline-offset: 1px; background: var(--accent-soft, #101A31); }
-  .pf-ov-thumb { position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 6px; background: #0A0A0D;
-    box-shadow: 0 0 0 1px #24242C; }
+  .pf-ov-thumb { position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 6px; background: var(--bg, #0A0A0D);
+    box-shadow: 0 0 0 1px var(--line, #24242C); }
   .pf-ov-item[aria-current="true"] .pf-ov-thumb { outline: 3px solid var(--accent, #2F6FEB); outline-offset: 2px; }
   .pf-ov-thumb > .pf-scene { position: absolute; left: 0; top: 0; margin: 0; transform: scale(var(--ov-k, .16)); transform-origin: 0 0; pointer-events: none; box-shadow: none; }
-  .pf-ov-cap { display: flex; gap: 6px; min-width: 0; font-size: 12px; line-height: 1.35; color: #9A9AA6; }
-  .pf-ov-cap b { flex: none; color: #F4F4F6; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .pf-ov-cap { display: flex; gap: 6px; min-width: 0; font-size: 12px; line-height: 1.35; color: var(--muted, #9A9AA6); }
+  .pf-ov-cap b { flex: none; color: var(--ink, #F4F4F6); font-weight: 800; font-variant-numeric: tabular-nums; }
   .pf-ov-cap span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .pf-ov-item .pf-ov-id { margin-top: -4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 11px/1.3 'D2Coding', ui-monospace, monospace; color: #85858F; }   /* 미리보기에서만 */
+  .pf-ov-item .pf-ov-id { margin-top: -4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 11px/1.3 'D2Coding', ui-monospace, monospace; color: var(--faint, #85858F); }   /* 미리보기에서만 */
 
   @media (prefers-reduced-motion: reduce) {
     html[data-view="deck"] .pf-deck > .pf-scene.pf-enter { animation: none; }

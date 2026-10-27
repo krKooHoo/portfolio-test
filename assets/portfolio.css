@@ -4,6 +4,7 @@
    · 강조(profile.md 강조색 → PF.applyTheme가 --accent·--accent-ink·--accent-fill·--accent-soft와 짝 색 --accent-2·--accent-3을 맞춤)
    · 강조 그러데이션(--grad: 글자, --glow: 번호 배지·광채). 영문 라벨·영문 이름은 Montserrat(--display), 한글은 Pretendard
    인쇄(A4 = 흰 종이)는 맨 아래 @media print에서 밝은 색으로 되돌림(강조색은 PF.applyTheme의 '-p' 값)
+   테마 손잡이(--t-*)는 theme/theme.css(/portfolio-theme가 씀)에서 받습니다. 비어 있으면 아래 기본값 = 어두운 기본 테마
    760px 미만은 한 열(가로 스크롤 없음). 인쇄는 A4 세로: 프로젝트마다 새 쪽, 카드·행은 쪽 사이에서 잘리지 않게, 버튼 대신 칠 수 있는 주소
    ───────────────────────────────────────────────────────────── */
 :root {
@@ -12,15 +13,17 @@
   --accent-ink: color-mix(in srgb, var(--accent) 64%, #fff);
   --accent-soft: color-mix(in srgb, var(--accent) 16%, var(--paper));
   --accent-2: #8C2FEB; --accent-2-ink: #BA82F3; --accent-2-fill: #8C2FEB; --accent-3: #EB2FBD;
-  --ink: #F4F4F6; --body: #BDBDC7; --muted: #9A9AA6; --line: #24242C; --line-2: #3D3D48;
-  --paper: #0A0A0D; --tint: #0E0E13; --surface: #131318; --surface-2: #1A1A21; --mark: #1D1D25;
-  --grad: linear-gradient(90deg, var(--accent-ink), var(--accent-2-ink));
-  --glow: linear-gradient(160deg, var(--accent-fill) 0%, var(--accent-2-fill) 62%, var(--accent-3) 130%);
+  --ink: var(--t-ink, #F4F4F6); --body: var(--t-body, #BDBDC7); --muted: var(--t-muted, #9A9AA6); --line: var(--t-line, #24242C); --line-2: var(--t-line-2, #3D3D48);
+  --paper: var(--t-bg, #0A0A0D); --surface: var(--t-surface, #131318);
+  --tint: color-mix(in srgb, var(--ink) 2%, var(--paper)); --surface-2: color-mix(in srgb, var(--ink) 4%, var(--surface)); --mark: color-mix(in srgb, var(--ink) 9%, var(--paper));
+  --grad: var(--t-grad, linear-gradient(90deg, var(--accent-ink), var(--accent-2-ink)));
+  --glow: var(--t-badge, linear-gradient(160deg, var(--accent-fill) 0%, var(--accent-2-fill) 62%, var(--accent-3) 130%));
+  --fx: var(--t-glow, 1);                                        /* 배경 광채 세기 0~1 */
   --sans: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --display: 'Montserrat', var(--sans);
+  --display: var(--t-display, 'Montserrat'), var(--sans);
   --mono: 'D2Coding', Consolas, monospace;
-  --wrap: 1120px; --pad: clamp(16px, 4vw, 40px); --radius: 20px; --top-h: 60px;
-  color-scheme: dark;
+  --wrap: 1120px; --pad: clamp(16px, 4vw, 40px); --radius: var(--t-radius, 20px); --pill: var(--t-pill, 999px); --top-h: 60px;
+  color-scheme: var(--t-scheme, dark);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -39,22 +42,24 @@ code { font-family: var(--mono); font-size: .88em; background: var(--accent-soft
 .print-only { display: none; }
 .url { font-family: var(--mono); font-size: .92em; overflow-wrap: anywhere; word-break: break-all; }
 .loading { max-width: var(--wrap); margin: 0 auto; padding: 96px var(--pad); color: var(--muted); }
-.skip-link { position: absolute; left: 12px; top: -60px; z-index: 50; padding: 10px 14px; border-radius: 999px;
+.skip-link { position: absolute; left: 12px; top: -60px; z-index: 50; padding: 10px 14px; border-radius: var(--pill);
              background: var(--accent-fill); color: #fff; font-weight: 700; text-decoration: none; }
 .skip-link:focus { top: 12px; }
 /* 강조 그러데이션 글자(영문 라벨·영문 이름). 인쇄에서는 단색으로 되돌림(배경 그래픽을 끈 인쇄에서 글자가 사라지지 않게) */
 .eyebrow, .hero h1 .en, .fk { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+/* 영문 라벨 글꼴(--display)의 숫자는 늘 같은 높이로(세리프 글꼴의 낮은 숫자 01 → o1 방지) */
+.eyebrow, .fk, .n, .hero-mark, .hero h1 .en { font-variant-numeric: lining-nums; }
 
 /* 안내(데이터 없음·file:// 등) — PF.notice */
 .notice { max-width: 640px; margin: 96px auto; padding: 32px 36px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow-wrap: anywhere; }
 .notice h1 { font-size: 22px; margin-bottom: 12px; }
 .notice p + p, .notice ol { margin-top: 10px; }
 .notice ol { padding-left: 22px; list-style: decimal; }
-.notice pre { margin: 12px 0; padding: 12px 14px; background: var(--paper); border: 1px solid var(--line); color: #E6E6E6; border-radius: 10px; font-family: var(--mono); }
+.notice pre { margin: 12px 0; padding: 12px 14px; background: var(--paper); border: 1px solid var(--line); color: var(--body); border-radius: calc(var(--radius) * .5); font-family: var(--mono); }
 .notice .pf-note-err { color: var(--muted); font-size: 13px; margin-top: 14px; }
 
 /* 버튼: 알약 모양. 기본은 외곽선, primary는 강조색 칠 + 광채 */
-.btn { display: inline-flex; align-items: center; gap: 2px; padding: 10px 18px; border-radius: 999px; border: 1px solid var(--line-2);
+.btn { display: inline-flex; align-items: center; gap: 2px; padding: 10px 18px; border-radius: var(--pill); border: 1px solid var(--line-2);
        background: transparent; color: var(--ink); font: inherit; font-size: 14px; font-weight: 700; line-height: 1.2;
        text-decoration: none; max-width: 100%; overflow-wrap: anywhere; cursor: pointer;
        transition: border-color .15s, background .15s, box-shadow .15s, color .15s; }   /* 긴 이메일·링크 이름은 칸 안에서 줄바꿈(좁은 화면 가로 스크롤 방지) */
@@ -88,12 +93,12 @@ code { font-family: var(--mono); font-size: .88em; background: var(--accent-soft
 
 /* ① 머리: 뒤에 크게 깔린 영문 이름(장식) · 광채 */
 .hero { position: relative; overflow-x: clip; padding: clamp(96px, 14vw, 176px) 0 clamp(64px, 9vw, 112px);
-        background: radial-gradient(48% 70% at 92% 6%, color-mix(in srgb, var(--accent-2) 24%, transparent), transparent 72%),
-                    radial-gradient(40% 55% at 70% 46%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%); }
+        background: radial-gradient(48% 70% at 92% 6%, color-mix(in srgb, var(--accent-2) calc(24% * var(--fx)), transparent), transparent 72%),
+                    radial-gradient(40% 55% at 70% 46%, color-mix(in srgb, var(--accent) calc(14% * var(--fx)), transparent), transparent 70%); }
 .hero > .wrap { position: relative; z-index: 1; }
 .hero-mark { position: absolute; z-index: 0; left: 0; right: 0; top: clamp(20px, 3vw, 36px); max-width: calc(var(--wrap) + 160px); margin: 0 auto;
              padding: 0 var(--pad); font-family: var(--display); font-size: clamp(56px, 12.5vw, 176px); font-weight: 800; line-height: .9;
-             letter-spacing: -.02em; text-transform: uppercase; overflow-wrap: anywhere; pointer-events: none; user-select: none;
+             letter-spacing: -.02em; text-transform: uppercase; overflow-wrap: anywhere; pointer-events: none; user-select: none; opacity: var(--t-mark, 1);
              background: linear-gradient(180deg, var(--mark) 30%, transparent 98%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 .hero-top { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
 .upd { font-size: 13px; font-weight: 600; color: var(--muted); }
@@ -113,14 +118,14 @@ code { font-family: var(--mono); font-size: .88em; background: var(--accent-soft
 .skill h3 { font-size: 19px; font-weight: 800; }
 .skill ul { display: grid; gap: 8px; }
 .skill li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; font-size: 15.5px; line-height: 1.6; color: var(--body); }
-.chip { display: inline-block; padding: 1px 10px; border-radius: 999px; background: transparent; border: 1px solid var(--line-2);
+.chip { display: inline-block; padding: 1px 10px; border-radius: var(--pill); background: transparent; border: 1px solid var(--line-2);
         font-size: 12.5px; font-weight: 700; color: var(--accent-ink); text-decoration: none; max-width: 100%; overflow-wrap: anywhere; transition: border-color .15s; }
 .chip:hover { border-color: var(--accent-ink); }
 
 /* ④-1 프로젝트 소개: 한 단 밝은 판 위에 대표 이미지 · 메타 */
 .tagline { margin: -18px 0 32px; max-width: 48rem; font-size: clamp(16px, 1.9vw, 18px); color: var(--muted); }
 .pi { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; align-items: start;
-      padding: clamp(18px, 3vw, 36px); background: var(--surface); border: 1px solid var(--line); border-radius: 28px; }
+      padding: clamp(18px, 3vw, 36px); background: var(--surface); border: 1px solid var(--line); border-radius: calc(var(--radius) * 1.4); }
 .cover { display: flex; align-items: center; justify-content: center; height: clamp(240px, 42vw, 400px); padding: 12px;
          background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .cover img { max-height: 100%; width: auto; height: auto; border-radius: 8px; }
@@ -131,7 +136,7 @@ code { font-family: var(--mono); font-size: .88em; background: var(--accent-soft
 .intent .k { color: var(--accent-ink); }
 .intent p + p { margin-top: 6px; font-size: 15px; line-height: 1.75; color: var(--body); }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 24px; }
-.tags li { padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line-2); color: var(--ink); font-size: 12.5px; font-weight: 600; }
+.tags li { padding: 4px 12px; border-radius: var(--pill); border: 1px solid var(--line-2); color: var(--ink); font-size: 12.5px; font-weight: 600; }
 .pi-r .btns { margin-top: 28px; }
 
 /* ④-2 기능 소개: 화면 왼쪽 · 설명과 [발표 덱에서 보기] 오른쪽 */
@@ -141,9 +146,9 @@ code { font-family: var(--mono); font-size: .88em; background: var(--accent-soft
 .shot-m { display: flex; align-items: center; justify-content: center; padding: 14px; }
 .shot-m img { height: auto; max-height: 340px; object-fit: contain; border-radius: 8px; }   /* width 속성(data w/h)으로 받기 전에도 자리를 잡고, 최대 높이에 걸리면 비율 유지(contain) */
 .shot figcaption { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
-.n { flex: none; padding: 2px 8px; border-radius: 999px; background: var(--glow); color: #fff; font-family: var(--display); font-size: 11.5px; font-weight: 800;
+.n { flex: none; padding: 2px 8px; border-radius: var(--pill); background: var(--glow); color: #fff; font-family: var(--display); font-size: 11.5px; font-weight: 800;
      -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-.shot.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 18px 48px -18px color-mix(in srgb, var(--accent-2) 70%, transparent); }
+.shot.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 18px 48px -18px color-mix(in srgb, var(--accent-2) calc(70% * var(--fx)), transparent); }
 .flist { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .flist li { display: grid; grid-template-columns: 1fr; gap: 12px; padding: 22px 24px; border-top: 1px solid var(--line); transition: background .15s, box-shadow .15s; }
 .flist li:first-child { border-top: 0; }
@@ -151,7 +156,7 @@ code { font-family: var(--mono); font-size: .88em; background: var(--accent-soft
 .fk { width: fit-content; font-family: var(--display); font-size: 11.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-ink); }
 .flist h3 { margin-top: 4px; font-size: 18px; font-weight: 800; line-height: 1.35; }
 .flist .fr-t p:not(.fk) { margin-top: 6px; font-size: 15px; line-height: 1.65; color: var(--body); }
-.pill { display: inline-flex; align-items: center; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line-2); background: transparent;
+.pill { display: inline-flex; align-items: center; padding: 8px 14px; border-radius: var(--pill); border: 1px solid var(--line-2); background: transparent;
         font-size: 13px; font-weight: 700; color: var(--ink); text-decoration: none; white-space: nowrap; transition: border-color .15s, background .15s, color .15s; }
 .pill:hover, li.on .pill { border-color: var(--accent-ink); background: var(--accent-soft); color: var(--accent-ink); }
 .fe-r .btns { margin-top: 20px; }
@@ -168,8 +173,8 @@ code { font-family: var(--mono); font-size: .88em; background: var(--accent-soft
 .g-l a, .ct-lk .row a { font-size: 14px; font-weight: 700; color: var(--accent-ink); text-decoration: none; white-space: nowrap; }
 
 /* ⑥ 연락처: 아래에서 올라오는 광채 */
-.contact { background: radial-gradient(70% 90% at 50% 125%, color-mix(in srgb, var(--accent-2) 30%, transparent), transparent 70%),
-                       radial-gradient(40% 60% at 15% 120%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 70%); }
+.contact { background: radial-gradient(70% 90% at 50% 125%, color-mix(in srgb, var(--accent-2) calc(30% * var(--fx)), transparent), transparent 70%),
+                       radial-gradient(40% 60% at 15% 120%, color-mix(in srgb, var(--accent) calc(20% * var(--fx)), transparent), transparent 70%); }
 .ct { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px; margin-top: 18px; }
 .ct-name { font-size: clamp(32px, 4.6vw, 48px); font-weight: 800; letter-spacing: -.03em; line-height: 1.15; margin-bottom: 16px; }
 .ct-me p + p { margin-top: 6px; }

@@ -27,6 +27,7 @@ Fork로 만든 레포든, 파일을 복사해 만든 레포든 똑같이 동작�
 | 물어봄 | `README.md` | 수강생이 고치지 않았으면 교체. 고쳤으면 묻고, 기본은 **수강생 것을 유지** |
 | 추가만 | `.gitignore` | 템플릿에만 있는 줄을 끝에 더함(지우거나 바꾸지 않음, 순서는 템플릿과 달라도 됨) |
 | 추가만 | `.claude/launch.json` | 이름(`name`)이 없는 구성만 더함 |
+| 없을 때만 | `theme/theme.css` | 내 레포에 **없을 때만** 템플릿 것(빈 기본 테마)을 만듦. 있으면 수강생의 테마(`/portfolio-theme`)이므로 읽지도 비교하지도 않고 그대로 둠 |
 | 금지 | `src/`, `profile.md`, `data/`, `custom/`, `report.md`, `report-intake.md`, 위 표에 없는 모든 경로 | 읽기만 하고 절대 바꾸지 않음 |
 
 `profile.md`·`data/`는 형식이 처음 버전부터 호환되므로 바꿀 필요가 없습니다(바뀐 안내는 마무리에서 알려 줌).
@@ -80,6 +81,7 @@ git -C "$R" log --format= --raw --no-abbrev --no-renames "$TPL" -- "<경로>" | 
   거의 모든 파일이 "수강생수정"으로 나오면 템플릿의 다른 브랜치에서 만든 레포일 수 있습니다. 그때는 판별을 믿지 말고 "직접 고친 파일이 있나요?"라고 물어 답대로 합니다.
 - `.gitignore`: `git -C "$R" show "$TPL:.gitignore"`의 줄 중 내 `.gitignore`에 없는 줄(주석은 그 아래 항목과 함께).
 - `.claude/launch.json`: 두 파일을 Read로 읽어 이름이 없는 구성.
+- `theme/theme.css`: `test -e "$R/theme/theme.css"`로 **있는지만** 봅니다. 없고 템플릿에 있으면 "새 파일"(빈 기본 테마)로 셉니다. 있으면 목록에서 뺍니다(내용을 비교하지 않음).
 - `profile.md` 안내 변화(바꾸지 않고 알리기만): `LAST_TPL`이 있으면 `git -C "$R" diff $LAST_TPL $TPL -- profile.md`(템플릿 옛 버전 ↔ 새 버전). 없으면 템플릿 `profile.md`와 내 `profile.md`를 Read로 비교해 **템플릿에만 있는 설정 항목(`- 이름:` 꼴)과 안내 주석(`<!-- -->`)**만 고릅니다(수강생이 쓴 값의 차이는 무시).
 
 ## 4. 보여 주고 동의 받기 (한 번에)
@@ -90,7 +92,7 @@ git -C "$R" log --format= --raw --no-abbrev --no-renames "$TPL" -- "<경로>" | 
 템플릿 <sha 7자리>로 업데이트합니다. (지난 업데이트: <LAST_TPL 7자리 또는 처음>)
 <변경 소개: 템플릿 커밋 제목 몇 줄>
 - 바뀌는 파일 N개, 새 파일 N개, 지워지는 파일 N개: <짧은 목록>
-- 그대로 두는 것: src/, profile.md, data/, custom/ (+ 남겨 두는 내 파일: <목록>)
+- 그대로 두는 것: src/, profile.md, data/, custom/, theme/theme.css(있으면) (+ 남겨 두는 내 파일: <목록>)
 - README.md: <템플릿 그대로라 교체 / 직접 고치셨습니다 — 유지할까요, 템플릿 것으로 바꿀까요?(기본: 유지)>
 - .gitignore에 더할 줄: <목록>
 진행할까요?
@@ -114,6 +116,7 @@ git -C "$R" rm -q -- <지울 D 파일…>
 
 - `.gitignore`: 더할 줄을 Edit 도구로 끝에 덧붙입니다(Edit 도구는 파일의 기존 줄 끝(CRLF/LF)을 따름 — `echo >>`로 붙이지 않음). 기존 줄은 지우거나 바꾸지 않습니다.
 - `.claude/launch.json`: 이름이 없는 구성만 Edit 도구로 `configurations` 배열에 더합니다.
+- `theme/theme.css`: §3에서 "없음"이었을 때만 `git -C "$R" checkout "$TPL" -- theme/theme.css`. 있으면 아무것도 하지 않습니다(새 렌더러가 이 파일을 싣으므로, 없으면 콘솔에 404가 남음).
 - 경로가 많으면 여러 번에 나눠 실행합니다.
 
 **확인**
@@ -121,7 +124,7 @@ git -C "$R" rm -q -- <지울 D 파일…>
 git -C "$R" diff --stat "$TPL" -- <교체한 파일…>             # 비어 있어야 함
 git -C "$R" status --short
 ```
-- `src/`·`profile.md`·`data/`·`custom/`이 `status`에 나오면 **잘못된 것**입니다. 멈추고, 갱신한 파일과 **status에 나온 그 경로들**을 `git -C "$R" restore --source=HEAD --staged --worktree -- <경로…>`로 함께 되돌린 뒤 알립니다.
+- `src/`·`profile.md`·`data/`·`custom/`·(원래 있던) `theme/theme.css`가 `status`에 나오면 **잘못된 것**입니다. 멈추고, 갱신한 파일과 **status에 나온 그 경로들**을 `git -C "$R" restore --source=HEAD --staged --worktree -- <경로…>`로 함께 되돌린 뒤 알립니다.
 
 ## 6. 커밋 (동의 받은 뒤)
 
@@ -132,7 +135,7 @@ R="<레포 절대 경로>"; TPL="<sha>"
 # §1에서 부트스트랩 파일이 "새 파일(A 또는 ??)"로 나왔을 때만: 먼저 따로 커밋(되돌리기를 해도 이 명령이 남게)
 git -C "$R" commit -q -m "portfolio-update 명령 받기" -- .claude/skills/portfolio-update
 # 업데이트 커밋: 파일 단위로만 add(폴더째 add -A 하면 아직 커밋 안 한 내 파일까지 들어감)
-git -C "$R" add -- <교체한 A·M 파일…> .gitignore [.claude/launch.json]
+git -C "$R" add -- <교체한 A·M 파일…> .gitignore [.claude/launch.json] [theme/theme.css — 이번에 새로 만든 경우만]
 git -C "$R" commit -q -m "템플릿 업데이트 (<sha 7자리>)" -m "Template-Version: $TPL"
 ```
 

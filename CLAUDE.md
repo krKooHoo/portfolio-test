@@ -24,6 +24,7 @@
 ├── project.html             # 🖥 고정 렌더러 — 발표 덱 (?p=<폴더 이름>, data/의 deck이 가리키는 기술 문서 원문 블록을 그대로 그림)
 ├── doc.html                 # 🖥 고정 렌더러 — 상세 기술문서 (?p=<폴더 이름>, src/의 기술 문서 md를 직접 읽음)
 ├── assets/                  # 🖥 렌더러 CSS·JS (포트폴리오 문서·덱 키트·장면 키트·상세 문서·md-blocks.js = 기술 문서 md 해석과 원문 블록 찾기, 발표 덱·상세 문서 공용)
+├── theme/theme.css          # 🎨 /portfolio-theme 결과 — 색·모양·영문 글꼴 손잡이(--t-*). 세 페이지가 마지막에 싣음. 비어 있으면 기본 테마, /portfolio-update가 건드리지 않음
 ├── custom/                  # 🎨 /portfolio-custom 결과 (직접 생성 모드)
 ├── report.md                # 📋 점검 리포트 (git 제외, 로컬 전용)
 └── report-intake.md         # 📋 /portfolio-intake 리포트 (git 제외 — 비밀값 위치·작성자 정보)
@@ -46,6 +47,8 @@ flowchart LR
     B --> D["data/*.json"]
     B --> R["report.md"]
     D --> I["index.html 포트폴리오 문서 · project.html 발표 덱 · doc.html 상세 문서"]
+    T["/portfolio-theme"] -->|"레퍼런스 스크린샷 → 손잡이"| TC["theme/theme.css"]
+    TC -->|"색·모양·영문 글꼴"| I
     S -.->|"기술 문서 md (doc.html 전문 · project.html은 deck이 가리키는 원문 블록)"| I
     D -.->|"직접 입력 시만"| C["/portfolio-custom → custom/index.html"]
 ```
@@ -57,6 +60,7 @@ flowchart LR
 | `/portfolio-build [폴더]` | 소스를 읽어 `data/` 생성 + 점검 리포트 + 미리보기. 폴더를 주면 그 프로젝트만 |
 | `/portfolio-check [폴더]` | 기술 문서를 가이드 기준으로 점검만 (데이터는 안 건드림) |
 | `/portfolio-edit [폴더] [장면] [요청]` | 발표 덱 장면 하나의 배치(틀·원문 블록 고르기·줄 범위·나누기·합치기·숨기기·순서)를 고침. `src/<NN>/deck-edits.json`에 써서 다시 빌드해도 남음. 말로 요청해도 되지만 **장면 카드로 확인받은 뒤에만** 씀. 내용(사실·설명) 문제는 기술 문서로 안내 |
+| `/portfolio-theme [되돌리기\|요청]` | 첨부한 웹페이지 스크린샷에서 색·모양·영문 글꼴·효과를 정해진 규칙으로 뽑아 `theme/theme.css`에 씀(세 페이지가 함께 바뀜). 렌더러는 안 건드림. 말로 "이 사이트 느낌으로", "버튼 덜 둥글게"라고 해도 됨 |
 | `/portfolio-custom [디자인 요청]` | 직접 생성 모드. **사용자가 직접 입력했을 때만** 실행 |
 | `/portfolio-update [되돌리기]` | 템플릿 원본에서 렌더러·스킬·`format/`·`CLAUDE.md`만 받아 반영(`src/`·`profile.md`·`data/`·`custom/`은 안 건드림). **사용자가 직접 입력했을 때만** 실행 |
 | `/portfolio-intake <레포 주소\|폴더>` | GitHub 레포에서 핵심 `.cs`·재료집(사실 + 질문)·촬영 목록을 `src/<NN>/`에 만듦. 기술 문서는 만들지 않음. **사용자가 직접 입력했을 때만** 실행 |
@@ -76,7 +80,8 @@ flowchart LR
    발표 덱의 **장면 배치**(기술 문서를 읽는 사람에게는 달라질 필요가 없는 것: 틀·어떤 원문 블록을 보일지·나누기·합치기·숨기기·순서)는
    `/portfolio-edit`가 `src/<NN>/deck-edits.json`에 씁니다. 이 파일도 소스이고, 글은 원문 그대로이거나 줄인 것(→ "확인해 주세요")뿐입니다.
 5. **렌더러는 건드리지 않는다.** `index.html`, `project.html`, `doc.html`, `assets/`는 사용자가 요청할 때만 수정합니다.
-   디자인 변경 요청은 ① `profile.md`의 강조색 ② `/portfolio-custom` 순으로 안내합니다.
+   디자인 변경 요청은 ① `profile.md`의 강조색 ② `/portfolio-theme`(레퍼런스 화면 → `theme/theme.css`, 색·모양·영문 글꼴) ③ `/portfolio-custom`(배치까지 새로) 순으로 안내합니다.
+   `theme/theme.css`는 렌더러가 아니라 수강생의 테마 파일입니다(`/portfolio-theme`가 씀).
 6. **경로는 상대경로, 대소문자 정확히.** GitHub Pages(리눅스)는 대소문자를 구분합니다.
 
 ## 판단 기준 (format/)

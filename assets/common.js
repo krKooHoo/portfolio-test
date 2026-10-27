@@ -94,11 +94,11 @@ const PF = (() => {
     if (!a.querySelector('.pf-newtab-icon')) a.insertAdjacentHTML('beforeend', NEWTAB);
   }
 
-  // ── 강조색(profile.md "강조색") → 색 토큰 ──
-  //   화면은 어두운 테마(검은 바탕 + 강조색 → 보랏빛 그러데이션): 글자에 쓰는 강조색은 어두운 바탕 대비 7:1 이상이 되게 밝게,
+  // ── 강조색(profile.md "강조색", theme/theme.css의 --t-accent가 있으면 그 색) → 색 토큰 ──
+  //   글자에 쓰는 강조색은 화면 바탕(--t-bg, 없으면 어두운 기본 바탕) 대비 7:1 이상이 되게 바탕 반대쪽(어두운 바탕이면 밝게, 밝은 바탕이면 어둡게)으로,
   //   흰 글자를 올리는 칠은 4.5:1 이상이 되게 어둡게 맞춤. --accent-2 = 강조색의 색상을 보라(285°) 쪽으로 50° 돌린 짝(파랑 → 보라, 주황 → 분홍),
-  //   --accent-3 = 같은 쪽으로 95°(광채)
-  //   흰 종이에 찍는 A4 인쇄(포트폴리오 문서·상세 문서)는 '-p'가 붙은 값을 씀(portfolio.css·doc.css의 @media print). 발표 덱은 인쇄도 어두운 장면 그대로
+  //   --accent-3 = 같은 쪽으로 95°(광채). theme.css에 --t-accent-2·--t-accent-3이 있으면 그 색
+  //   흰 종이에 찍는 A4 인쇄(포트폴리오 문서·상세 문서)는 '-p'가 붙은 값을 씀(portfolio.css·doc.css의 @media print). 발표 덱은 인쇄도 화면 장면 그대로
   const hexRgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
   const rgbHex = (c) => '#' + c.map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('').toUpperCase();
   const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);           // t = b 쪽 비율
@@ -119,27 +119,32 @@ const PF = (() => {
     const [r1, g1, b1] = h < 60 ? [C, X, 0] : h < 120 ? [X, C, 0] : h < 180 ? [0, C, X] : h < 240 ? [0, X, C] : h < 300 ? [X, 0, C] : [C, 0, X];
     return [r1 + m, g1 + m, b1 + m].map((v) => v * 255);
   }
-  const DARK_BG = [10, 10, 13];                                           // 어두운 바탕(--bg #0A0A0D)
-  function themeTokens(hex) {
-    if (!/^#[0-9a-f]{6}$/i.test(hex || '')) return null;
+  const DARK_BG = [10, 10, 13];                                           // 어두운 기본 바탕(--bg #0A0A0D)
+  const isHex = (v) => /^#[0-9a-f]{6}$/i.test(v || '');
+  function themeTokens(hex, { bg, a2, a3 } = {}) {
+    if (!isHex(hex)) return null;
     const A = hexRgb(hex), WHITE = [255, 255, 255], BLACK = [0, 0, 0];
+    const BG = isHex(bg) ? hexRgb(bg) : DARK_BG, far = contrast(BG, WHITE) >= contrast(BG, BLACK) ? WHITE : BLACK;
     const fillOf = (c) => { let f = c; for (let t = 0; t <= 1 && contrast(f, WHITE) < 4.5; t += 0.02) f = mix(c, BLACK, t); return f; };   // 흰 글자를 올리는 칠(표 머리·배지·버튼)
     // 인쇄(흰 종이): 글자용 진한 강조색은 흰 바탕 6.5:1·옅은 칠 6:1 이상(작은 글자 4.5:1에 여유)
     const softP = mix(A, WHITE, 0.91), chipP = mix(A, WHITE, 0.82), midP = mix(A, WHITE, 0.45);
     let inkP = A;
     for (let t = 0; t <= 1 && (contrast(inkP, WHITE) < 6.5 || contrast(inkP, softP) < 6); t += 0.02) inkP = mix(A, BLACK, t);
-    // 화면(어두운 바탕): 글자용 밝은 강조색은 바탕 7:1·옅은 칠 6:1 이상
+    // 화면: 글자용 강조색은 바탕 7:1·옅은 칠 6:1 이상(바탕 반대쪽 = far로 섞음)
     const dir = ((285 - (hueOf(A) ?? 285) + 540) % 360) - 180 < 0 ? -1 : 1;
-    const A2 = hueShift(A, 50 * dir), A3 = hueShift(A, 95 * dir);
-    const soft = mix(A, DARK_BG, 0.84), chip = mix(A, DARK_BG, 0.72), mid = mix(A, DARK_BG, 0.35);
-    const lift = (c) => { let x = c; for (let t = 0; t <= 1 && (contrast(x, DARK_BG) < 7 || contrast(x, soft) < 6); t += 0.02) x = mix(c, WHITE, t); return x; };
+    const A2 = isHex(a2) ? hexRgb(a2) : hueShift(A, 50 * dir), A3 = isHex(a3) ? hexRgb(a3) : hueShift(A, 95 * dir);
+    const soft = mix(A, BG, 0.84), chip = mix(A, BG, 0.72), mid = mix(A, BG, 0.35);
+    const lift = (c) => { let x = c; for (let t = 0; t <= 1 && (contrast(x, BG) < 7 || contrast(x, soft) < 6); t += 0.02) x = mix(c, far, t); return x; };
     const T = { '--accent': A, '--accent-ink': lift(A), '--accent-fill': fillOf(A), '--accent-soft': soft, '--accent-chip': chip, '--accent-mid': mid,
                 '--accent-2': A2, '--accent-2-ink': lift(A2), '--accent-2-fill': fillOf(A2), '--accent-3': A3,
                 '--accent-ink-p': inkP, '--accent-fill-p': contrast(A, WHITE) >= 4.5 ? A : inkP, '--accent-soft-p': softP, '--accent-chip-p': chipP, '--accent-mid-p': midP };
     return Object.fromEntries(Object.entries(T).map(([k, v]) => [k, rgbHex(v)]));
   }
+  // theme/theme.css의 테마 손잡이(없으면 빈 글자)
+  const themeVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   function applyTheme(hex) {
-    const t = themeTokens(hex);
+    const accent = themeVar('--t-accent');
+    const t = themeTokens(isHex(accent) ? accent : hex, { bg: themeVar('--t-bg'), a2: themeVar('--t-accent-2'), a3: themeVar('--t-accent-3') });
     if (t) Object.entries(t).forEach(([k, v]) => document.documentElement.style.setProperty(k, v));
     return t;
   }

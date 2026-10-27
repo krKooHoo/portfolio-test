@@ -1,0 +1,43 @@
+/* ─────────────────────────────────────────────────────────────
+   테마 (theme/theme.css) — /portfolio-theme가 만듦 · {날짜 YYYY-MM-DD}
+   참고한 화면: {스크린샷을 한 줄로 — 사이트·회사 이름, 로고, 문구는 적지 않음}
+   뽑은 인상: {예: 검은 바탕 · 파랑→보라 그러데이션 · 둥근 큰 카드 · 알약 버튼 · 굵은 기하학 영문}
+   값을 고쳐도 됩니다(저장 → 새로고침). 손잡이 설명: .claude/skills/portfolio-theme/rules.md
+   이 파일은 /portfolio-update가 건드리지 않습니다. 기본 테마로 되돌리기: /portfolio-theme 되돌리기
+   ───────────────────────────────────────────────────────────── */
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/{패키지}@5.3.0/latin-700.css");   /* 영문 라벨 글꼴 — Montserrat·Pretendard면 두 줄 모두 지움 */
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/{패키지}@5.3.0/latin-800.css");
+
+:root {
+  /* ① 바탕과 글자 — 바탕 대비: 제목 12 · 본문 7 · 보조 4.5 이상(check-theme.py가 확인) */
+  --t-scheme: {dark|light};     /* 바탕이 어두우면 dark, 밝으면 light */
+  --t-bg: #RRGGBB;              /* 페이지·장면 바탕 */
+  --t-surface: #RRGGBB;         /* 카드·판(바탕에서 한 단) */
+  --t-ink: #RRGGBB;             /* 제목·강한 글자 */
+  --t-body: #RRGGBB;            /* 본문 */
+  --t-muted: #RRGGBB;           /* 보조 글자(날짜·캡션) */
+  --t-line: #RRGGBB;            /* 얇은 구분선·카드 테두리 */
+  --t-line-2: #RRGGBB;          /* 알약 버튼·태그 테두리(구분선보다 한 단 진하게) */
+
+  /* ② 강조색 — 이 줄을 지우면 profile.md의 강조색을 씀. 글자용 진하기·흰 글자 칠은 페이지가 자동으로 맞춤 */
+  --t-accent: #RRGGBB;
+  --t-accent-2: #RRGGBB;        /* 그러데이션 둘째 색 — 강조가 한 색이면 --t-accent와 같은 값(지우면 보랏빛 쪽 짝 색이 자동으로 생김) */
+  --t-accent-3: #RRGGBB;        /* 광채 셋째 색 — 강조가 한 색이면 --t-accent와 같은 값 */
+
+  /* ③ 모양 */
+  --t-radius: {N}px;            /* 큰 카드 모서리(작은 모서리는 이 값의 비율) — 0 각진 · 8 단정 · 20 둥근 · 28 아주 둥근 */
+  --t-pill: {N}px;              /* 버튼·태그·칩 모서리 — 999px 알약 · 6px 둥근 네모 · 0px 네모 */
+  --t-shadow: {색};             /* 떠 있는 카드·창 그림자 — 어두운 바탕 rgb(0 0 0 / .8) · 밝은 바탕 rgb(20 22 30 / .16) */
+
+  /* ④ 영문 라벨 글꼴(PORTFOLIO·CHAPTER 같은 눈썹 글자, 머리 뒤 큰 영문 이름) — 한글은 늘 Pretendard */
+  --t-display: '{글꼴 이름}';
+
+  /* ⑤ 효과 */
+  --t-grad: {그러데이션};        /* 영문 라벨 글자색 — 2색: linear-gradient(90deg, var(--accent-ink), var(--accent-2-ink)) · 단색: linear-gradient(var(--accent-ink), var(--accent-ink)) */
+  --t-badge: {칠};              /* 번호 배지 칠 — 광채: linear-gradient(160deg, var(--accent-fill) 0%, var(--accent-2-fill) 62%, var(--accent-3) 130%) · 단색: var(--accent-fill) */
+  --t-glow: {0~1};              /* 배경에 번지는 빛 — 0 없음 · .5 은은 · 1 기본 */
+  --t-mark: {0~1};              /* 포트폴리오 문서 머리 뒤 큰 영문 이름 — 0 숨김 · 1 보임 */
+
+  /* ⑥ 다이어그램 판 — 밝은 바탕이면 카드 색과 같게, 어두운 바탕이면 이 줄을 지움(기본 #F4F5FA). 판은 늘 밝게 */
+  --t-diagram: #RRGGBB;
+}
