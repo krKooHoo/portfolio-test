@@ -8,7 +8,7 @@
 
   // 글꼴: 굵기마다 load + 각각 catch → fonts.ready, 상한 8초. 실패하면 data-pf-font="fallback"(늦게 들어오면 페이지가 다시 그림)
   async function loadFonts(sample = '가나다ABC123', ms = 8000) {
-    const want = ['400', '600', '700', '800'].map((w) => `${w} 16px Pretendard`).concat(['400 14px D2Coding']);
+    const want = ['400', '600', '700', '800'].map((w) => `${w} 16px Pretendard`).concat(['700 16px Montserrat', '800 16px Montserrat', '400 14px D2Coding']);   // Montserrat = 영문 라벨(눈썹 글자·목차 머리)
     const errs = [];
     const CODE_SAMPLE = 'public void {}();=<>[]0Oil|';                    // 코드 블록 글자(영문·기호)로도 받음 — 한글 표본만으로는 코드 글꼴 조각이 늦게 올 수 있음
     const all = Promise.all(want.map((f) => document.fonts.load(f, /D2Coding/.test(f) ? sample + CODE_SAMPLE : sample).then((r) => { if (!r.length) errs.push(f + ' (일치 없음)'); }).catch((e) => errs.push(f + ' ' + e))))
@@ -173,7 +173,7 @@
     if (document.documentElement.dataset.pfFont !== 'fallback' || !document.fonts) return;
     let done = false;
     document.fonts.addEventListener('loadingdone', () => {
-      if (done || !document.fonts.check('700 16px Pretendard', '가') || !document.fonts.check('400 14px D2Coding', '{}();')) return;
+      if (done || !document.fonts.check('700 16px Pretendard', '가') || !document.fonts.check('800 16px Montserrat', 'A') || !document.fonts.check('400 14px D2Coding', '{}();')) return;
       done = true;
       window.PFScene.track(render().then(() => window.PFScene.refresh()));
     });

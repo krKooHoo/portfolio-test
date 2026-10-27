@@ -84,7 +84,7 @@
     const out = [];
 
     // ① 머리: 이름 · 영문 이름 · 한 줄 정체성 · 연락처
-    out.push(`<section id="cover" class="hero"><div class="wrap">
+    out.push(`<section id="cover" class="hero"><p class="hero-mark no-print" aria-hidden="true">${esc(prof.nameEn || nameT)}</p><div class="wrap">
       <div class="hero-top"><p class="eyebrow">PORTFOLIO</p>${pf.generatedAt ? `<p class="upd">업데이트 ${esc(pf.generatedAt)}</p>` : ''}</div>
       <h1>${esc(nameT)}${prof.nameEn ? `<span class="en" lang="en">${esc(prof.nameEn)}</span>` : ''}</h1>
       ${prof.headline ? `<p class="headline">${inline(prof.headline)}</p>` : ''}
