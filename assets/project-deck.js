@@ -4,7 +4,8 @@
 //   여기서 원문을 찾아 **그대로** 그립니다(PF.md, 규칙은 .claude/skills/portfolio-build/schema.md 「발표 덱」). 장면 글은 deck의 글 조각뿐입니다.
 //   deck이 없는 예전 데이터는 highlights·troubleshooting·screenshots·retro로 자동 구성하고 장면마다 띠로 알립니다.
 //   옛 주소(#s=hl-n·ts-n·shots·more, #pf-*)는 가까운 장면으로 넘기고, 옛 기술 문서 제목 앵커는 상세 문서로 보냅니다(결정 G3).
-//   상세 문서 링크는 표지와 맺음 장면에만 둡니다(결정 G1). 새 문장·수치를 만들지 않습니다(장면 이름·라벨은 UI 글자).
+//   상세 문서 링크는 표지와 맺음 장면에만 둡니다(결정 G1). 새 문장·수치를 만들지 않습니다(장면 이름·라벨은 UI 글자 — 문구 표 PF.t).
+//   data의 탭·카드 라벨은 PF.tab()·PF.label()로 보여 주기만 바꾸고, 칩 색(FLOW)은 data 값 그대로 판정합니다.
 //   주석의 설계 근거(docs/design/…, 결정 F·G·Q 번호)는 템플릿 유지관리용 maintainer 브랜치에 있습니다. 이 레포에 없어도 정상입니다.
 (() => {
   const Q = new URLSearchParams(location.search);
@@ -35,11 +36,17 @@
   PFScene.track(start().catch((err) => {
     info.errors.push(String(err && err.stack || err));
     deck.replaceChildren(PF.msgScene({ title: '페이지를 그리지 못했습니다', html: `<p>${esc(err && err.message || err)}</p>` }));
-  }).finally(() => { PF.dropMeasure(); mmdHost?.remove(); PFScene.mount({ deck: '#deck', hint: link({ href: id ? PF.docUrl(id) : 'index.html', label: '휴대폰에서는 상세 문서가 읽기 편합니다', kind: 'page' }) }); mark('mounted'); }));
+  }).finally(async () => {
+    await PF.loadStrings();                                            // 아래 띠(HUD)도 문구 표로 — 안내 장면으로 끝난 경우에도
+    info.strings = PF.stringsReport();
+    PF.dropMeasure(); mmdHost?.remove();
+    PFScene.mount({ deck: '#deck', hint: link({ href: id ? PF.docUrl(id) : 'index.html', label: esc(PF.t('deck.mobile-doc')), kind: 'page' }) }); mark('mounted');
+  }));
 
   async function start() {
     mark('start');
     if (PF.isFile()) { deck.replaceChildren(PF.msgScene({ title: '로컬 서버로 열어 주세요', html: PF.FILE_HELP })); return; }
+    const strings = PF.loadStrings();
     const back = `<p>${link({ href: 'index.html', label: '← 포트폴리오로', kind: 'page' })}</p>`;
     if (!id) { deck.replaceChildren(PF.msgScene({ title: '프로젝트를 고르세요', html: `<p>주소 끝에 <code>?p=폴더이름</code>을 붙여 주세요.</p>${back}` })); return; }
     const pf = await PF.loadJSON('data/portfolio.json').catch(() => ({}));
@@ -57,6 +64,7 @@
     }
     const P = PF.md.parse(md, p.id);
     info.headings = P.headings.length;
+    await strings;
     mark('data');
     const render = () => renderAll(pf, p, P);
     await render();
@@ -158,7 +166,7 @@
     if (k === 'code') {
       const all = codeLines(v.el).length, [a, b] = chunk;
       const lang = LANG[langOf(v.el)] || '';
-      const part = a > 1 || b < all ? `${a}~${b}줄 / 전체 ${all}줄` : '';
+      const part = a > 1 || b < all ? PF.t('deck.code-lines', { a, b, all }) : '';
       return `<figure class="vbox" data-kind="code"><div class="vmedia"><div class="fit-in"><pre>${codeHtml(v.el, a, b)}</pre></div></div>${cap([lang, part].filter(Boolean).map(esc).join(' · '))}${warn}</figure>`;
     }
     if (k === 'table') {
@@ -179,10 +187,10 @@
   const txt = (t) => (t && typeof t === 'object' ? t.text : t) || '';
   const ncards = (points, { row = false, num = true, two = false } = {}) => (points.length
     ? `<div class="cards${row ? ' row' : ''}${two ? ' two' : ''}" style="--n:${Math.min(points.length, 4)}">${points.map((pt, i) =>
-      `<div class="ncard${num ? '' : ' nonum'}">${num ? `<span class="num" aria-hidden="true">${i + 1}</span>` : ''}<div>${pt.label ? `<span class="lb">${esc(pt.label)}</span>` : ''}<p>${inline(txt(pt))}</p></div></div>`).join('')}</div>` : '');
-  const FLOW = { '문제': '', '원인': '', '해결': 'accent', '결과': 'ok', '배운 점': '' };
+      `<div class="ncard${num ? '' : ' nonum'}">${num ? `<span class="num" aria-hidden="true">${i + 1}</span>` : ''}<div>${pt.label ? `<span class="lb">${esc(PF.label(pt.label))}</span>` : ''}<p>${inline(txt(pt))}</p></div></div>`).join('')}</div>` : '');
+  const FLOW = { '문제': '', '원인': '', '해결': 'accent', '결과': 'ok', '배운 점': '' };   // data 값 → 칩 색(보이는 글자만 PF.label로 바뀜)
   const flowHtml = (points, dir) => `<div class="flow ${dir}" style="--n:${Math.min(points.length, 4)}">${points.map((pt) =>
-    `<div class="fstep${pt.label === '결과' ? ' res' : ''}">${pt.label ? `<span class="labelchip${FLOW[pt.label] ? ' ' + FLOW[pt.label] : ''}">${esc(pt.label)}</span>` : ''}<p>${inline(txt(pt))}</p></div>`).join('')}</div>`;
+    `<div class="fstep${pt.label === '결과' ? ' res' : ''}">${pt.label ? `<span class="labelchip${FLOW[pt.label] ? ' ' + FLOW[pt.label] : ''}">${esc(PF.label(pt.label))}</span>` : ''}<p>${inline(txt(pt))}</p></div>`).join('')}</div>`;
   function bodyHtml(sl, vs, variant) {
     const points = sl.points || [];
     const vis = (list) => `<div class="vis">${list.join('')}</div>`;
@@ -192,7 +200,7 @@
       return `<div class="dk dk-text${tight}">${ncards(points, { two: points.length >= 3 && !variant.stack, num: sl.layout !== 'overview' })}</div>`;
     }
     if (sl.layout === 'screens') {
-      return `<div class="dk scr-row${tight}" style="--n:${vs.length}">${vs.map((v, i) => `<div class="fe-card">${vis([v])}${points[i] ? `<p class="fe-k">FEATURE ${String(i + 1).padStart(2, '0')}</p>${points[i].label ? `<h3>${esc(points[i].label)}</h3>` : ''}${txt(points[i]) ? `<p>${inline(txt(points[i]))}</p>` : ''}` : ''}</div>`).join('')}</div>`;
+      return `<div class="dk scr-row${tight}" style="--n:${vs.length}">${vs.map((v, i) => `<div class="fe-card">${vis([v])}${points[i] ? `<p class="fe-k">${esc(PF.t('en.feature'))} ${String(i + 1).padStart(2, '0')}</p>${points[i].label ? `<h3>${esc(PF.label(points[i].label))}</h3>` : ''}${txt(points[i]) ? `<p>${inline(txt(points[i]))}</p>` : ''}` : ''}</div>`).join('')}</div>`;
     }
     if (sl.layout === 'problem') {
       if (variant.stack || !points.length) return `<div class="dk dk-stack${tight}">${vis(vs)}${points.length ? flowHtml(points, 'row') : ''}</div>`;
@@ -262,7 +270,7 @@
     info.notes = []; info.overflow = []; info.unresolved = [];
     const name = pf.profile?.name || '';
     const foot = `${name ? name + ' · ' : ''}${p.title}`;
-    document.title = `${p.title} · 발표 덱${name ? ' · ' + name : ''}`;
+    document.title = `${p.title} · ${PF.t('name.deck')}${name ? ' · ' + name : ''}`;
     info.fonts = await PF.loadFonts();
     mark('fonts');
     const model = modelOf(p, P);
@@ -273,13 +281,12 @@
     const used = new Set(['cover', 'toc', 'retro', 'end']);
 
     // 표지 = 프로젝트 소개 템플릿(PF.projectIntro, 결정 G4). 상세 문서 링크는 표지·맺음에만(G1)
-    const K = { 'GitHub': 'REPOSITORY', '시연 영상': 'GAMEPLAY' };
     const cards = [
-      ...ext.map((l) => ({ k: K[l.label] || 'LINK', label: l.label, href: l.url, kind: 'external', visible: shortUrl(l.url) })),
-      { k: 'TECH DOC', label: '상세 기술문서', href: PF.docUrl(p.id), kind: 'page', visible: PF.visibleUrl(PF.docUrl(p.id)) },
-      { k: 'PORTFOLIO', label: '포트폴리오', href: 'index.html', kind: 'page', visible: PF.visibleUrl('') },
+      ...ext.map((l) => ({ k: PF.extEn(l), label: l.label, href: l.url, kind: 'external', visible: shortUrl(l.url) })),
+      { k: PF.t('en.techdoc'), label: PF.t('name.doc'), href: PF.docUrl(p.id), kind: 'page', visible: PF.visibleUrl(PF.docUrl(p.id)) },
+      { k: PF.t('en.portfolio'), label: PF.t('name.portfolio'), href: 'index.html', kind: 'page', visible: PF.visibleUrl('') },
     ];
-    const cover = await PF.projectIntro(p, { id: 'cover', titleTag: 'h1', eyebrow: 'PROJECT · 발표 덱', links: cards, foot, sec: '표지', stats: info.overflow });
+    const cover = await PF.projectIntro(p, { id: 'cover', titleTag: 'h1', eyebrow: PF.t('deck.cover-eyebrow'), links: cards, foot, sec: PF.t('deck.cover'), stats: info.overflow });
     if (auto) cover.querySelector('.pf-foot > span').insertAdjacentHTML('beforeend', '<span class="pf-autoband" data-pf-ui="note">예전 데이터로 자동 구성 — /portfolio-build를 다시 실행하면 발표 덱이 됩니다</span>');
 
     // 장 → 장 표지 + 장면들
@@ -294,7 +301,7 @@
         if (!PF.keyOk(sl.key)) err = `key-invalid: "${sl.key || ''}"`;
         if (used.has(sid)) { err = `key-invalid: "${sl.key}" 중복`; sid = `d${ci + 1}-${si + 1}`; }
         used.add(sid);
-        const rl = [sl.tab, `${si + 1}/${c.slides.length}`].filter(Boolean).join(' · ');
+        const rl = [PF.tab(sl.tab), `${si + 1}/${c.slides.length}`].filter(Boolean).join(' · ');
         const scenes = slideScenes(sl, sid, { chapter: c.title || '', rlabel: rl, foot, auto, err });
         scenes.forEach((s) => used.add(s.id));
         slides.push({ sl, scenes });
@@ -353,9 +360,9 @@
     const make = (mode) => {
       const s = PF.scene({ id: chId, tpl: 'CH', kind: 'bare', cls: mode === 'compact' ? 'compact' : '', foot, sec: c.title, group: c.title, stitle: c.title });
       const roomy = mode === 'roomy';
-      const list = slides.map((x, i) => item(String(i + 1), txt(x.sl.title) || c.title, x.sl.tab || '', x.scenes[0].id, roomy ? txt(x.sl.lead) : '')).join('');
-      PF.body(s).innerHTML = `<div class="toprow"><span class="pf-eyebrow long">${esc(ptitle)}</span><span class="rl">장면 ${slides.length}개</span></div>
-        <div class="ch-mid"><div><p class="ch-no">CHAPTER ${String(ci + 1).padStart(2, '0')}</p><h2 class="ch-t">${esc(c.title)}</h2>${DOT}</div>
+      const list = slides.map((x, i) => item(String(i + 1), txt(x.sl.title) || c.title, PF.tab(x.sl.tab), x.scenes[0].id, roomy ? txt(x.sl.lead) : '')).join('');
+      PF.body(s).innerHTML = `<div class="toprow"><span class="pf-eyebrow long">${esc(ptitle)}</span><span class="rl">${esc(PF.t('deck.ch-count', { n: slides.length }))}</span></div>
+        <div class="ch-mid"><div><p class="ch-no">${esc(PF.t('en.chapter'))} ${String(ci + 1).padStart(2, '0')}</p><h2 class="ch-t">${esc(c.title)}</h2>${DOT}</div>
         <div class="ch-list t-P2${mode === 'normal' ? '' : ' ' + mode}"><ol class="toc-list${roomy ? '' : ' sub'}">${list}</ol></div></div>`;
       return band(s, auto);
     };
@@ -365,14 +372,14 @@
   }
 
   function tocScene(p, foot, items, retro, auto) {
-    const rows = [...items.map((x, i) => [String(i + 1).padStart(2, '0'), x.c.title, `장면 ${x.n}장`, x.chId]),
-      retro.length && [String(items.length + 1).padStart(2, '0'), '결과와 회고', '달성 · 아쉬운 점 → 개선 계획', retro[0].id],
-      [String(items.length + (retro.length ? 2 : 1)).padStart(2, '0'), '더 보기', '상세 기술문서 · 링크', 'end']].filter(Boolean);
+    const rows = [...items.map((x, i) => [String(i + 1).padStart(2, '0'), x.c.title, PF.t('deck.toc-count', { n: x.n }), x.chId]),
+      retro.length && [String(items.length + 1).padStart(2, '0'), PF.t('deck.retro'), PF.t('deck.retro-desc'), retro[0].id],
+      [String(items.length + (retro.length ? 2 : 1)).padStart(2, '0'), PF.t('deck.more'), PF.t('deck.more-desc'), 'end']].filter(Boolean);
     const make = (compact) => {
-      const s = PF.scene({ id: 'toc', tpl: 'P2', kind: 'bare', cls: compact ? 'compact' : '', foot, sec: '목차', stitle: '목차' });
+      const s = PF.scene({ id: 'toc', tpl: 'P2', kind: 'bare', cls: compact ? 'compact' : '', foot, sec: PF.t('name.toc'), stitle: PF.t('name.toc') });
       const half = rows.length > 7 ? Math.ceil(rows.length / 2) : rows.length;
       const col = (list) => `<section><ol class="toc-list">${list.map((r) => item(...r)).join('')}</ol></section>`;
-      PF.body(s).innerHTML = `<div class="toc-top"><p class="toc-h">CONTENTS</p><p class="toc-sub">${esc(p.title)}</p></div>${DOT}<div class="toc-cols${rows.length > 7 ? '' : ' one'}">${col(rows.slice(0, half))}${rows.length > half ? col(rows.slice(half)) : ''}</div>`;
+      PF.body(s).innerHTML = `<div class="toc-top"><p class="toc-h">${esc(PF.t('en.contents'))}</p><p class="toc-sub">${esc(p.title)}</p></div>${DOT}<div class="toc-cols${rows.length > 7 ? '' : ' one'}">${col(rows.slice(0, half))}${rows.length > half ? col(rows.slice(half)) : ''}</div>`;
       return band(s, auto);
     };
     for (const compact of [false, true]) { const s = make(compact); if (PF.fitsM(s)) return s; }
@@ -384,10 +391,11 @@
     const ach = r.achieved || [], reg = r.regrets || [], plan = r.plans || [];
     if (!ach.length && !reg.length && !plan.length) return [];
     const n = Math.max(reg.length, plan.length);
-    const achHtml = ach.length ? `<div class="rt-ach card"><p class="rt-h ok">✓ 달성</p><ul>${ach.map((x) => `<li>${inline(x)}</li>`).join('')}</ul></div>` : '';
-    const pairHtml = n ? `<table class="mini"><thead><tr><th scope="col">△ 아쉬운 점</th><th scope="col">→ 개선 계획</th></tr></thead><tbody>${Array.from({ length: n }, (_, i) => `<tr><td>${inline(reg[i] || '')}</td><td class="p">${inline(plan[i] || '')}</td></tr>`).join('')}</tbody></table>` : '';
+    const achHtml = ach.length ? `<div class="rt-ach card"><p class="rt-h ok">✓ ${esc(PF.t('deck.achieved'))}</p><ul>${ach.map((x) => `<li>${inline(x)}</li>`).join('')}</ul></div>` : '';
+    const pairHtml = n ? `<table class="mini"><thead><tr><th scope="col">△ ${esc(PF.t('deck.regrets'))}</th><th scope="col">→ ${esc(PF.t('deck.plans'))}</th></tr></thead><tbody>${Array.from({ length: n }, (_, i) => `<tr><td>${inline(reg[i] || '')}</td><td class="p">${inline(plan[i] || '')}</td></tr>`).join('')}</tbody></table>` : '';
     const make = (html, one, i, cnt) => {
-      const s = PF.scene({ id: i === 0 ? 'retro' : `retro-${i + 1}`, tpl: 'P6', eyebrow: '결과 · 회고', rlabel: p.title, title: '결과와 회고', sub: cnt > 1 ? `${i + 1}/${cnt}` : '', foot, sec: '결과와 회고', group: '결과와 회고' });
+      const s = PF.scene({ id: i === 0 ? 'retro' : `retro-${i + 1}`, tpl: 'P6', eyebrow: PF.t('deck.retro-eyebrow'), rlabel: p.title, title: PF.t('deck.retro'), sub: cnt > 1 ? `${i + 1}/${cnt}` : '', foot,
+        sec: PF.t('deck.retro'), group: PF.t('deck.retro') });
       PF.body(s).innerHTML = `<div class="pf-fill"><div class="rt${one ? ' one' : ''}">${html}</div></div>`;
       return band(s, auto);
     };
@@ -400,14 +408,13 @@
   // 맺음: 상세 기술문서(전문) · 바깥 링크 · 포트폴리오. 덱 → 상세 문서 링크는 표지와 여기에만(G1)
   function endScene(p, foot, ext, auto) {
     const card = (k, label, href, kind, visible, primary) => `<div class="lcard${primary ? ' primary' : ''}">${link({ href, kind, label: `<span class="lc-k">${esc(k)}</span><span class="lc-t">${esc(label)}</span><span class="url">${esc(visible)}</span>` })}</div>`;
-    const K = { 'GitHub': 'REPOSITORY', '시연 영상': 'GAMEPLAY' };
     const make = () => {
-      const s = PF.scene({ id: 'end', tpl: 'EN', kind: 'bare', foot, sec: '더 보기', stitle: '상세 기술문서와 링크' });
-      PF.body(s).innerHTML = `<div class="toprow"><span class="pf-eyebrow">MORE</span><span class="rl">${esc(PF.teamLabel(p.team))}</span></div>
+      const s = PF.scene({ id: 'end', tpl: 'EN', kind: 'bare', foot, sec: PF.t('deck.more'), stitle: PF.t('deck.end-title') });
+      PF.body(s).innerHTML = `<div class="toprow"><span class="pf-eyebrow">${esc(PF.t('en.more'))}</span><span class="rl">${esc(PF.teamLabel(p.team))}</span></div>
         <div class="en-mid"><div><h2 class="en-t">${esc(p.title)}</h2>${p.tagline ? `<p class="tagline">${inline(p.tagline)}</p>` : ''}${DOT}</div>
-        <div class="en-links">${card('TECH DOC', '상세 기술문서 — 코드·다이어그램·설계 과정 전문', PF.docUrl(p.id), 'page', PF.visibleUrl(PF.docUrl(p.id)), true)}
-          ${ext.map((l) => card(K[l.label] || 'LINK', l.label, l.url, 'external', shortUrl(l.url))).join('')}
-          ${card('PORTFOLIO', '← 포트폴리오', 'index.html', 'page', PF.visibleUrl(''))}</div></div>`;
+        <div class="en-links">${card(PF.t('en.techdoc'), PF.t('deck.end-doc'), PF.docUrl(p.id), 'page', PF.visibleUrl(PF.docUrl(p.id)), true)}
+          ${ext.map((l) => card(PF.extEn(l), l.label, l.url, 'external', shortUrl(l.url))).join('')}
+          ${card(PF.t('en.portfolio'), PF.t('ui.back'), 'index.html', 'page', PF.visibleUrl(''))}</div></div>`;
       return band(s, auto);
     };
     return PF.guard(make(), PFScene.refUrl('end'), info.overflow);

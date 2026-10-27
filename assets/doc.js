@@ -4,12 +4,15 @@
 //   문서 처리 순서: marked 12.0.2(gfm) → 상대경로 → GitHub식 slug(PF.slugger) — 여기까지 md-blocks.js(PF.md.parse, 발표 덱과 같은 규칙) → 목차 → Mermaid 11.4.1 → highlight.js 11.9.0
 //   주소: #<제목 slug>(발표 덱·옛 project.html 조각이 이 형식으로 옴) · #sec=<절 제목>(제목을 찾아 #<slug>로 바꿈)
 //   발표 덱으로: 머리 [발표 덱 ↗](새 탭). 예전의 절 머리 칩·목차 ★(덱 장면 연결)는 없앴습니다(결정 G1)
-//   내용은 data/projects/<폴더>.json + src/<폴더>/<기술 문서>만 씁니다. 여기 있는 글자는 UI 문구뿐입니다.
+//   내용은 data/projects/<폴더>.json + src/<폴더>/<기술 문서>만 씁니다. UI 문구는 문구 표(PF.t, assets/strings.js + theme/strings.tsv)에서 옵니다.
+//   점검: PFDoc.report() — 문구 표 점검(strings)
 (async () => {
   const root = document.getElementById('app');
+  window.PFDoc = Object.assign(window.PFDoc || {}, { report: () => ({ page: 'doc', ready: document.documentElement.dataset.docReady === '1', strings: PF.stringsReport() }) });
   if (PF.guardFileProtocol(root)) return;
 
   const { esc, inline, link, markNewTab } = PF;
+  const T = (k, v) => esc(PF.t(k, v));                                 // HTML에 넣는 문구
   const html = document.documentElement;
   const Q = new URLSearchParams(location.search);
   const id = Q.get('p');
@@ -21,8 +24,9 @@
   let releaseHold = null;                                            // 도착한 제목 붙잡기(hold) 해제 함수
 
   if (!id) { PF.notice(root, '프로젝트를 고르세요', `<p>주소 끝에 <code>?p=폴더이름</code>을 붙여 주세요.</p>${back}`); return done(); }
-  const pf = await PF.loadJSON('data/portfolio.json').catch(() => ({}));
+  const [pf] = await Promise.all([PF.loadJSON('data/portfolio.json').catch(() => ({})), PF.loadStrings()]);
   PF.applyTheme(pf.settings?.accent);
+  document.querySelector('.skip-link')?.replaceChildren(PF.t('ui.skip'));
   let p;
   try {
     p = await PF.loadJSON(`data/projects/${encodeURIComponent(id)}.json`);
@@ -31,60 +35,60 @@
     return done();
   }
   const name = pf.profile?.name || '';
-  document.title = `${p.title} — 상세 기술문서${name ? ' · ' + name : ''}`;
+  document.title = `${p.title} — ${PF.t('name.doc')}${name ? ' · ' + name : ''}`;
 
   // ── 뼈대 ──
   const metaRows = (p.meta || []).map((m) => `<div><dt>${esc(m.label)}</dt><dd>${inline(m.value)}</dd></div>`).join('') +
-    (p.team?.role ? `<div class="role"><dt>내 역할</dt><dd>${inline(p.team.role)}</dd></div>` : '');
+    (p.team?.role ? `<div class="role"><dt>${T('name.role')}</dt><dd>${inline(p.team.role)}</dd></div>` : '');
   const ext = [
     PF.isUrl(p.links?.github) && link({ href: p.links.github, label: 'GitHub', kind: 'external', cls: 'btn' }),
-    PF.isUrl(p.links?.video) && link({ href: p.links.video, label: '시연 영상', kind: 'external', cls: 'btn' }),
+    PF.isUrl(p.links?.video) && link({ href: p.links.video, label: T('name.video'), kind: 'external', cls: 'btn' }),
     ...(p.links?.extra || []).filter((l) => PF.isUrl(l.url)).map((l) => link({ href: l.url, label: esc(l.label), kind: 'external', cls: 'btn' })),
   ].filter(Boolean);
-  const deckBtn = link({ href: deckUrl(), label: '발표 덱', kind: 'page', cls: 'btn primary' });
+  const deckBtn = link({ href: deckUrl(), label: T('name.deck'), kind: 'page', cls: 'btn primary' });
   const tags = (p.tags || []).length ? `<ul class="tags">${p.tags.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '';
 
   root.innerHTML = `
     <header class="doc-head">
       <div class="doc-head-in">
-        <p class="crumb">${link({ href: 'index.html', label: '← 포트폴리오', kind: 'page' })}<span aria-hidden="true">›</span><b>${esc(p.title)} — 상세 기술문서</b></p>
+        <p class="crumb">${link({ href: 'index.html', label: T('ui.back'), kind: 'page' })}<span aria-hidden="true">›</span><b>${esc(p.title)} — ${T('name.doc')}</b></p>
         <nav class="head-nav" aria-label="프로젝트 링크">
           ${deckBtn}${ext.join('')}
-          <span class="newtab-note">링크는 새 탭에서 열립니다</span>
+          <span class="newtab-note">${T('ui.newtab')}</span>
         </nav>
       </div>
     </header>
     <div class="print-only print-urls"></div>
     <div class="doc-page">
-      <nav class="toc" id="toc" aria-label="문서 목차"><p class="toc-title">목차</p><div class="toc-links" id="toc-links"></div></nav>
+      <nav class="toc" id="toc" aria-label="문서 목차"><p class="toc-title">${T('name.toc')}</p><div class="toc-links" id="toc-links"></div></nav>
       <main class="doc-main" id="main" tabindex="-1">
         <div class="doc-intro">
-          <p class="eyebrow">상세 기술문서</p>
+          <p class="eyebrow">${T('name.doc')}</p>
           <h1>${esc(p.title)}</h1>
           ${p.tagline ? `<p class="tagline">${inline(p.tagline)}</p>` : ''}
           <dl class="meta-line">${metaRows}</dl>
           ${tags}
-          <details class="glance" id="glance"><summary>한눈에 · 링크</summary>
+          <details class="glance" id="glance"><summary>${T('doc.glance')}</summary>
             <div class="glance-body"><div class="actions">${deckBtn}${ext.join('')}</div>
-            <p class="newtab-note">링크는 새 탭에서 열립니다. 발표 덱은 PC에서 보기 좋습니다.</p></div>
+            <p class="newtab-note">${T('doc.deck-note')}</p></div>
           </details>
         </div>
         <article class="md" id="doc"><p class="loading">기술 문서를 불러오는 중…</p></article>
       </main>
       <aside class="rail" aria-label="프로젝트 정보">
-        <section class="rail-card"><p class="rail-title">이 프로젝트</p><dl class="rail-meta">${metaRows}</dl>
+        <section class="rail-card"><p class="rail-title">${T('doc.rail-project')}</p><dl class="rail-meta">${metaRows}</dl>
           <div class="actions">${deckBtn}${ext.join('')}</div></section>
-        <section class="rail-card" id="rail-now" aria-live="polite"><p class="rail-title">지금 읽는 절</p><p class="now-title">—</p><div class="now-body"></div></section>
+        <section class="rail-card" id="rail-now" aria-live="polite"><p class="rail-title">${T('doc.rail-now')}</p><p class="now-title">—</p><div class="now-body"></div></section>
         <section class="rail-card rail-misc">
-          ${link({ href: srcPath(p.doc), label: '원문 마크다운', kind: 'file' })}
-          ${PF.isUrl(p.links?.github) ? link({ href: p.links.github, label: '원문 GitHub', kind: 'external' }) : ''}
-          <a href="#top" class="to-top">맨 위로 ↑</a>
+          ${link({ href: srcPath(p.doc), label: T('doc.raw-md'), kind: 'file' })}
+          ${PF.isUrl(p.links?.github) ? link({ href: p.links.github, label: T('doc.raw-github'), kind: 'external' }) : ''}
+          <a href="#top" class="to-top">${T('doc.top')} ↑</a>
         </section>
       </aside>
     </div>
-    <div class="doc-fab" role="group" aria-label="빠른 이동"><button type="button" class="fab-toc" aria-haspopup="dialog">목차</button><a class="fab-top" href="#top" aria-label="맨 위로">↑</a></div>
-    <dialog class="toc-dialog" aria-label="문서 목차"><div class="toc-dialog-head"><p class="toc-title">목차</p><button type="button" class="btn dlg-close">닫기</button></div><div class="toc-links"></div></dialog>
-    <footer class="doc-foot"><span>© ${esc(name)}</span>${link({ href: 'index.html', label: '← 포트폴리오', kind: 'page' })}</footer>`;
+    <div class="doc-fab" role="group" aria-label="빠른 이동"><button type="button" class="fab-toc" aria-haspopup="dialog">${T('name.toc')}</button><a class="fab-top" href="#top" aria-label="맨 위로">↑</a></div>
+    <dialog class="toc-dialog" aria-label="문서 목차"><div class="toc-dialog-head"><p class="toc-title">${T('name.toc')}</p><button type="button" class="btn dlg-close">${T('ui.close')}</button></div><div class="toc-links"></div></dialog>
+    <footer class="doc-foot"><span>© ${esc(name)}</span>${link({ href: 'index.html', label: T('ui.back'), kind: 'page' })}</footer>`;
 
   // 좁은 화면(< 720px)에서는 "한눈에" 상자를 접어 둠
   document.getElementById('glance').open = !matchMedia('(max-width: 719.98px)').matches;
@@ -113,7 +117,7 @@
     // ④ 제목 찾기(#sec=<절 제목> 딥링크용, PF.resolveHeading: 정확히 일치 → 앞부분 양방향 일치, 여럿이면 문서 순서상 첫 번째)
     const list = headings.map((h) => ({ text: htext(h), el: h }));
     const resolve = (title) => PF.resolveHeading(list, title)?.el || null;
-    window.PFDoc = { resolve };
+    window.PFDoc = Object.assign(window.PFDoc || {}, { resolve });
 
     const tocHtml = headings.filter((h) => h.tagName === 'H2' || h.tagName === 'H3')
       .map((h) => `<a class="${h.tagName.toLowerCase()}" href="#${esc(h.id)}">${esc(htext(h))}</a>`).join('');
@@ -145,10 +149,10 @@
       div.id = `mmd-${n++}`;
       div.textContent = code.textContent;
       const acc = /^\s*accTitle\s*:\s*(.+)$/m.exec(code.textContent)?.[1]?.trim();
-      fig.dataset.label = acc || `다이어그램 ${n}`;
+      fig.dataset.label = acc || PF.t('doc.diagram-n', { n });
       fig.appendChild(div);
-      fig.insertAdjacentHTML('beforeend', `<div class="mmd-bar"><details class="mmd-src"><summary>다이어그램 원문</summary><pre><code>${esc(code.textContent)}</code></pre></details>` +
-        `<button type="button" class="mmd-zoom">크게 보기</button></div>`);
+      fig.insertAdjacentHTML('beforeend', `<div class="mmd-bar"><details class="mmd-src"><summary>${T('doc.diagram-src')}</summary><pre><code>${esc(code.textContent)}</code></pre></details>` +
+        `<button type="button" class="mmd-zoom">${T('doc.zoom')}</button></div>`);
       (code.closest('pre') || code).replaceWith(fig);
       figs.push(fig);
     });
@@ -221,11 +225,11 @@
         if (k < 0) { urls.push(a.href); k = urls.length - 1; }
         a.insertAdjacentHTML('afterend', `<sup class="print-only fn">[${k + 1}]</sup>`);
       });
-      if (urls.length) doc.insertAdjacentHTML('beforeend', `<section class="print-only link-list"><p class="ll-title">링크 목록</p><ol>${urls.map((u) => `<li>${esc(u)}</li>`).join('')}</ol></section>`);
+      if (urls.length) doc.insertAdjacentHTML('beforeend', `<section class="print-only link-list"><p class="ll-title">${T('doc.links-list')}</p><ol>${urls.map((u) => `<li>${esc(u)}</li>`).join('')}</ol></section>`);
     }
     const here = new URL(location.href); here.hash = '';
     const deckAbs = new URL(deckUrl(), location.href).href;
-    document.querySelector('.print-urls').innerHTML = `<p>웹에서 보기: ${esc(here.href)}</p><p>발표 덱: ${esc(deckAbs)}</p>`;
+    document.querySelector('.print-urls').innerHTML = `<p>${T('doc.print-web')}: ${esc(here.href)}</p><p>${T('name.deck')}: ${esc(deckAbs)}</p>`;
 
     // ⑩ 목차 현재 위치(스크롤 기준) + 레일 "지금 읽는 절"
     trackSection(headings.filter((h) => h.tagName === 'H2' || h.tagName === 'H3'));
@@ -275,7 +279,7 @@
       if (c === cur && cur !== undefined) return;
       cur = c;
       links.forEach((a) => { a.classList.remove('active'); a.removeAttribute('aria-current'); });
-      if (!c) { nowTitle.textContent = '문서 처음'; nowBody.innerHTML = '<p class="now-none">절 제목을 지나면 여기에 지금 읽는 절이 보입니다.</p>'; return; }
+      if (!c) { nowTitle.textContent = PF.t('doc.start'); nowBody.innerHTML = `<p class="now-none">${T('doc.now-none')}</p>`; return; }
       const a = links.get(c.id);
       if (a) {
         a.classList.add('active'); a.setAttribute('aria-current', 'location');
@@ -297,7 +301,7 @@
     const dlg = document.createElement('dialog');
     dlg.className = 'lightbox';
     dlg.setAttribute('aria-label', '크게 보기');
-    dlg.innerHTML = '<div class="lb-stage"></div><p class="lb-cap"></p><button type="button" class="btn lb-close">닫기 (Esc)</button>';
+    dlg.innerHTML = `<div class="lb-stage"></div><p class="lb-cap"></p><button type="button" class="btn lb-close">${T('ui.close-esc')}</button>`;
     dlg.addEventListener('click', (e) => { if (e.target === dlg || e.target.closest('.lb-close') || e.target.tagName === 'IMG') dlg.close(); });
     document.body.appendChild(dlg);
     return ({ src, svg, caption }) => {

@@ -167,12 +167,14 @@
   const DOT = '<div class="dotrule" aria-hidden="true"><span class="ln"></span><span class="dot"></span></div>';
   const imgTag = (src, alt, d, cls = '') => `<img${cls ? ` class="${cls}"` : ''} src="${esc(src)}" alt="${esc(alt)}" loading="lazy" decoding="async"${d ? ` width="${d.w}" height="${d.h}"` : ''}>`;
 
-  // 프로젝트 외부 링크(시연 영상 · GitHub · 그 밖의 링크) — data 순서 그대로
+  // 프로젝트 외부 링크(시연 영상 · GitHub · 그 밖의 링크) — data 순서 그대로. type으로 영문 라벨을 고름(보이는 이름은 문구 표에서 바뀔 수 있음)
   const extLinks = (p) => [
-    PF.isUrl(p.links?.video) && { label: '시연 영상', url: p.links.video },
-    PF.isUrl(p.links?.github) && { label: 'GitHub', url: p.links.github },
-    ...(p.links?.extra || []).filter((l) => PF.isUrl(l.url)).map((l) => ({ label: l.label, url: l.url, extra: true })),
+    PF.isUrl(p.links?.video) && { type: 'video', label: PF.t('name.video'), url: p.links.video },
+    PF.isUrl(p.links?.github) && { type: 'github', label: 'GitHub', url: p.links.github },
+    ...(p.links?.extra || []).filter((l) => PF.isUrl(l.url)).map((l) => ({ type: 'extra', label: l.label, url: l.url, extra: true })),
   ].filter(Boolean);
+  const EXT_EN = { video: 'en.gameplay', github: 'en.repo' };
+  const extEn = (l) => PF.t(EXT_EN[l.type] || 'en.link');
 
   // 늦게 들어온 글꼴로 다시 그리기(R0 설계 공백 1: 게이트의 fonts.ready는 그리기만 지키고 측정·나눔은 지키지 못함)
   function refitOnLateFont(render) {
@@ -360,15 +362,17 @@
 
   // ── 프로젝트 소개 장면(발표 덱 표지, 결정 G4): 큰 대표 이미지 · 메타 격자 · 개발 의도 · 링크 카드 · 태그 ──
   //   글: title · tagline · meta · team.role · intent · tags(data 그대로). 링크: [{ k, label, href, kind, visible }]
-  const META_EN = { '장르': 'GENRE', '기간': 'DURATION', '개발 기간': 'DURATION', '인원': 'TEAM', '팀': 'TEAM', '팀 구성': 'TEAM', '환경': 'ENVIRONMENT', '개발 환경': 'ENVIRONMENT', '엔진': 'ENGINE', '플랫폼': 'PLATFORM' };
-  const metaEn = (label) => META_EN[String(label || '').replace(/\s+/g, ' ').trim()] || '';
-  async function projectIntro(p, { id, titleTag = 'h2', eyebrow = 'PROJECT', links = [], foot = '', sec = '', group = '', stats, tpl = 'P1' }) {
+  //   메타 이름(data의 meta[].label, 기술 문서의 말) → 영문 라벨 키
+  const META_EN = { '장르': 'en.meta-genre', '기간': 'en.meta-duration', '개발 기간': 'en.meta-duration', '인원': 'en.meta-team', '팀': 'en.meta-team', '팀 구성': 'en.meta-team',
+                    '환경': 'en.meta-env', '개발 환경': 'en.meta-env', '엔진': 'en.meta-engine', '플랫폼': 'en.meta-platform' };
+  const metaEn = (label) => { const k = META_EN[String(label || '').replace(/\s+/g, ' ').trim()]; return k ? PF.t(k) : ''; };
+  async function projectIntro(p, { id, titleTag = 'h2', eyebrow = PF.t('en.project'), links = [], foot = '', sec = '', group = '', stats, tpl = 'P1' }) {
     const d = p.cover ? (p.coverSize?.w ? p.coverSize : await imageSize(PF.srcPath(p.id, p.cover))) : null;
     const ar = d ? d.w / d.h : null;
     const variant = !p.cover || !ar ? 'nocover' : ar < 0.9 ? 'portrait' : 'landscape';
     const meta = (p.meta || []).map((m) => `<div class="mi"><dt class="meta-k">${metaEn(m.label) ? `${esc(metaEn(m.label))} · ` : ''}${esc(m.label)}</dt><dd>${inline(m.value)}</dd></div>`);
-    if (p.team?.role) meta.push(`<div class="mi wide role"><dt class="meta-k">ROLE · 내 역할</dt><dd>${inline(p.team.role)}</dd></div>`);
-    const intent = p.intent?.text ? `<div class="intent"><p class="lc-k">INTENT · 개발 의도</p><p class="it">${inline(p.intent.text)}</p></div>` : '';
+    if (p.team?.role) meta.push(`<div class="mi wide role"><dt class="meta-k">${esc(PF.t('en.role'))} · ${esc(PF.t('name.role'))}</dt><dd>${inline(p.team.role)}</dd></div>`);
+    const intent = p.intent?.text ? `<div class="intent"><p class="lc-k">${esc(PF.t('en.intent'))} · ${esc(PF.t('name.intent'))}</p><p class="it">${inline(p.intent.text)}</p></div>` : '';
     const cards = links.map((l) => `<div class="lcard">${PF.link({ href: l.href, kind: l.kind, label: `<span class="lc-k">${esc(l.k)}</span><span class="lc-t">${esc(l.label)}</span><span class="url">${esc(l.visible)}</span>` })}</div>`).join('');
     const tags = (p.tags || []).length ? `<ul class="tags">${p.tags.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '';
     const cover = p.cover ? `<div class="media pi-cover"${ar ? ` style="aspect-ratio:${ar.toFixed(4)}"` : ''}>${imgTag(PF.srcPath(p.id, p.cover), p.title, d)}</div>` : '';
@@ -402,5 +406,5 @@
   }
 
   Object.assign(PF, { sleep, loadFonts, imageSize, measureRoot, dropMeasure, scene, body, fitsScene, fitsM, pack, shrinkOrClip, guard, msgScene, DOT, imgTag, extLinks, refitOnLateFont,
-                      projectIntro, note, fillOf, noteFill, vband, fitVisuals, visScore, minFonts, deckSceneNear, FLOOR });
+                      projectIntro, note, fillOf, noteFill, vband, fitVisuals, visScore, minFonts, deckSceneNear, FLOOR, extEn });
 })();

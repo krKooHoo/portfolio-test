@@ -23,8 +23,9 @@
 ├── index.html               # 🖥 고정 렌더러 — 포트폴리오 문서 (아래로 읽는 한 페이지, A4 인쇄 = 제출 PDF)
 ├── project.html             # 🖥 고정 렌더러 — 발표 덱 (?p=<폴더 이름>, data/의 deck이 가리키는 기술 문서 원문 블록을 그대로 그림)
 ├── doc.html                 # 🖥 고정 렌더러 — 상세 기술문서 (?p=<폴더 이름>, src/의 기술 문서 md를 직접 읽음)
-├── assets/                  # 🖥 렌더러 CSS·JS (포트폴리오 문서·덱 키트·장면 키트·상세 문서·md-blocks.js = 기술 문서 md 해석과 원문 블록 찾기, 발표 덱·상세 문서 공용)
+├── assets/                  # 🖥 렌더러 CSS·JS (포트폴리오 문서·덱 키트·장면 키트·상세 문서·md-blocks.js = 기술 문서 md 해석과 원문 블록 찾기, 발표 덱·상세 문서 공용 · strings.js = UI 문구 기본값과 문구 표 읽기)
 ├── theme/theme.css          # 🎨 /portfolio-theme 결과 — 색·모양·영문 글꼴 손잡이(--t-*). 세 페이지가 마지막에 싣음. 비어 있으면 기본 테마, /portfolio-update가 건드리지 않음
+├── theme/strings.tsv        # ✍ 문구 표(스트링 테이블) — 절 이름·버튼·라벨 문구. 수강생이 맨 끝 "내 문구" 칸을 직접 고침(빈 칸 = 기본 문구). /portfolio-update는 없을 때만 만듦
 ├── custom/                  # 🎨 /portfolio-custom 결과 (직접 생성 모드)
 ├── report.md                # 📋 점검 리포트 (git 제외, 로컬 전용)
 └── report-intake.md         # 📋 /portfolio-intake 리포트 (git 제외 — 비밀값 위치·작성자 정보)
@@ -49,6 +50,7 @@ flowchart LR
     D --> I["index.html 포트폴리오 문서 · project.html 발표 덱 · doc.html 상세 문서"]
     T["/portfolio-theme"] -->|"레퍼런스 스크린샷 → 손잡이"| TC["theme/theme.css"]
     TC -->|"색·모양·영문 글꼴"| I
+    SR["theme/strings.tsv 문구 표"] -->|"절 이름·버튼·라벨 문구"| I
     S -.->|"기술 문서 md (doc.html 전문 · project.html은 deck이 가리키는 원문 블록)"| I
     D -.->|"직접 입력 시만"| C["/portfolio-custom → custom/index.html"]
 ```
@@ -80,8 +82,11 @@ flowchart LR
    발표 덱의 **장면 배치**(기술 문서를 읽는 사람에게는 달라질 필요가 없는 것: 틀·어떤 원문 블록을 보일지·나누기·합치기·숨기기·순서)는
    `/portfolio-edit`가 `src/<NN>/deck-edits.json`에 씁니다. 이 파일도 소스이고, 글은 원문 그대로이거나 줄인 것(→ "확인해 주세요")뿐입니다.
 5. **렌더러는 건드리지 않는다.** `index.html`, `project.html`, `doc.html`, `assets/`는 사용자가 요청할 때만 수정합니다.
-   디자인 변경 요청은 ① `profile.md`의 강조색 ② `/portfolio-theme`(레퍼런스 화면 → `theme/theme.css`, 색·모양·영문 글꼴) ③ `/portfolio-custom`(배치까지 새로) 순으로 안내합니다.
-   `theme/theme.css`는 렌더러가 아니라 수강생의 테마 파일입니다(`/portfolio-theme`가 씀).
+   디자인 변경 요청은 ① `profile.md`의 강조색 ② `theme/strings.tsv`(문구 표 — 절 이름·버튼·라벨 문구) ③ `/portfolio-theme`(레퍼런스 화면 → `theme/theme.css`, 색·모양·영문 글꼴) ④ `/portfolio-custom`(배치까지 새로) 순으로 안내합니다.
+   `theme/theme.css`·`theme/strings.tsv`는 렌더러가 아니라 수강생의 파일입니다(테마는 `/portfolio-theme`가 씀).
+   **문구 표**는 UI 문구만 바꿉니다(사실·설명은 기술 문서). 수강생이 직접 고치는 것이 기본이고, "고쳐 줘"라고 하면 그 줄의 맨 끝 "내 문구" 칸만 고칩니다
+   (키·보이는 곳·기본 문구 칸, 칸 사이 탭은 그대로. `{name.deck}`처럼 점이 있는 자리표시는 다른 줄의 문구, `{n}`처럼 점이 없는 자리표시는 페이지가 넣는 값이라 지우지 않음).
+   기본 문구 자체는 `assets/strings.js`(렌더러)에 있습니다.
 6. **경로는 상대경로, 대소문자 정확히.** GitHub Pages(리눅스)는 대소문자를 구분합니다.
 
 ## 판단 기준 (format/)
@@ -110,3 +115,7 @@ flowchart LR
   포트폴리오 문서(`index.html`)는 장면이 없는 흐르는 페이지라 빨간 띠가 없고, `await PFPage.whenReady()` 뒤 `PFPage.report()`
   (깨진 이미지 `images.broken`·가로 넘침 `overflowX`·`errors`)를 봅니다. headless는 `index.html?pf-audit=1`로 같은 방법입니다.
   발표 덱의 빨간 띠(원문 블록을 찾지 못함·여러 곳·바뀜)도 `audit`에 함께 나오고, `info.mode`가 `auto`면 예전 데이터로 자동 구성된 덱이므로 `/portfolio-build`를 다시 실행하도록 안내합니다.
+- 문구 표(`theme/strings.tsv`)가 제대로 읽혔는지는 세 페이지 report의 `strings`로 봅니다 — 포트폴리오 문서 `PFPage.report().strings`, 발표 덱 `PFScene.report().info.strings`,
+  상세 문서 `PFDoc.report().strings`. `issues`의 `type`: `spaces`(탭 대신 공백 — 그 줄은 기본 문구) · `unknown-key` · `duplicate` · `default-edited`(기본 문구 칸을 고침) ·
+  `extra-cols` · `too-long`(권장 글자 수 초과) · `hangul-in-en`(영문 라벨 칸에 한글) · `missing-var`/`unknown-var`/`unknown-ref`/`ref-loop`(자리표시) · `encoding`(CP949·UTF-16) · `no-file`.
+  `line`이 그 표의 줄 번호입니다. 줄마다 무엇을 고치면 되는지 `detail`대로 알려 줍니다.

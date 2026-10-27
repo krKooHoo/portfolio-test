@@ -1,6 +1,6 @@
 // 포트폴리오 렌더러 공통 유틸 — index.html(포트폴리오 문서) · project.html(발표 덱) · doc.html(상세 문서)가 함께 씁니다.
 // 데이터: data/portfolio.json, data/projects/<폴더 이름>.json(/portfolio-build가 생성), src/<폴더>/<기술 문서>.md
-// 이 파일은 글을 만들지 않습니다. 화면에 나오는 내용은 모두 위 데이터에서 오고, 여기 있는 글자는 UI 문구뿐입니다.
+// 이 파일은 글을 만들지 않습니다. 화면에 나오는 내용은 모두 위 데이터에서 오고, UI 문구(절 이름·버튼·라벨)는 assets/strings.js의 문구 표(PF.t)에서 옵니다.
 // 주석의 설계 근거(docs/design/…의 portfolio-structure·deck-vs-scroll·01 §, R0, 결정 F·Q·# 번호)와 원본 시안(spikes/…)은 템플릿 유지관리용 maintainer 브랜치에 있습니다. 이 레포에 없어도 정상입니다.
 const PF = (() => {
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -33,7 +33,7 @@ const PF = (() => {
   const visibleUrl = (rel) => { let u = siteBase() + String(rel).replace(/#.*$/, ''); try { u = decodeURI(u); } catch { /* 그대로 */ } return u; };
 
   const metaValue = (p, label) => (p.meta || []).find((m) => m.label === label)?.value || '';
-  const teamLabel = (team) => (team?.type === 'team' ? `팀 프로젝트${team.size ? ' · ' + team.size : ''}` : '개인 프로젝트');
+  const teamLabel = (team) => (team?.type === 'team' ? `${PFStr.t('name.team')}${team.size ? ' · ' + team.size : ''}` : PFStr.t('name.solo'));
 
   // GitHub와 같은 제목 앵커 규칙(github-slugger). slug는 이 함수만 만듭니다(빌드·Claude가 손으로 계산하지 않음)
   function slugger() {
@@ -172,7 +172,10 @@ const PF = (() => {
   }
   function noData(root, err) { notice(root, '아직 포트폴리오 데이터가 없습니다', noDataHtml(err)); }
 
+  // ── 문구 표(assets/strings.js): t(키, 값) · tab(data의 탭 값) · label(data의 카드 라벨 값) · 페이지 시작 때 loadStrings()로 theme/strings.tsv를 읽음 ──
+  const { t, tab, label, load: loadStrings, report: stringsReport } = PFStr;
+
   return { esc, inline, isUrl, shortUrl, loadJSON, loadText, encodePath, srcPath, projectUrl, docUrl, siteBase, visibleUrl, metaValue, teamLabel,
            slugger, normTitle, resolveHeading, keyOk, deckSceneFor, headingsOf, ICON, NEWTAB, link, markNewTab, themeTokens, applyTheme, contrast, hexRgb,
-           FILE_HELP, noDataHtml, isFile, notice, guardFileProtocol, noData };
+           FILE_HELP, noDataHtml, isFile, notice, guardFileProtocol, noData, t, tab, label, loadStrings, stringsReport };
 })();

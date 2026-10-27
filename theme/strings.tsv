@@ -1,0 +1,124 @@
+﻿키	보이는 곳 (권장 길이)	기본 문구	내 문구
+#	사용법: 맨 끝 "내 문구" 칸에 바꿀 글을 쓰면 세 페이지에 반영됩니다. 비워 두면 기본 문구. 키·보이는 곳·기본 문구 칸은 고치지 않습니다		
+#	{name.deck}처럼 점이 있는 { }는 다른 줄의 문구를 끌어 쓰고, {n}처럼 점이 없는 { }는 페이지가 숫자 등을 넣는 자리입니다(지우지 마세요)		
+name.portfolio	공통 · 포트폴리오 문서의 이름(브라우저 탭 제목·발표 덱 링크 카드) · 10자	포트폴리오	
+name.deck	공통 · 발표 덱의 이름(버튼·링크·탭 제목) · 8자	발표 덱	
+name.doc	공통 · 상세 기술문서의 이름(버튼·링크·탭 제목) · 10자	상세 기술문서	
+name.doc-short	공통 · 상세 기술문서의 짧은 이름(한눈에 보기 링크·발표 덱 휴대폰 안내) · 6자	상세 문서	
+name.video	공통 · 시연 영상 링크 · 8자	시연 영상	
+name.role	공통 · 프로젝트 정보의 역할 항목 · 8자	내 역할	
+name.role-short	포트폴리오 문서 · 한눈에 보기의 역할 항목 · 4자	역할	
+name.intent	포트폴리오 문서 프로젝트 소개 · 발표 덱 표지 · 8자	개발 의도	
+name.team	공통 · 팀 프로젝트 표시(인원이 있으면 뒤에 · 인원) · 8자	팀 프로젝트	
+name.solo	공통 · 개인 프로젝트 표시 · 8자	개인 프로젝트	
+name.toc	발표 덱 목차 장면 · 상세 문서 목차 · 4자	목차	
+page.updated	포트폴리오 문서 · 맨 위 오른쪽 날짜 · 16자	업데이트 {date}	
+page.intro	포트폴리오 문서 · 절 제목 · 12자	자기소개	
+page.stack	포트폴리오 문서 · 절 제목 · 12자	기술 스택	
+page.stack-note	포트폴리오 문서 · 기술 스택 절 오른쪽 · 16자	근거 프로젝트와 함께	
+page.project-no	포트폴리오 문서 · 프로젝트 절 위 작은 글 · 20자	{en.project} {no} / {total}	
+page.features	포트폴리오 문서 · 기능 절 위 작은 글(프로젝트 번호 뒤) · 8자	기능 소개	
+page.see-in-deck	포트폴리오 문서 · 기능마다 버튼 · 12자	{name.deck}에서 보기	
+page.deck-all	포트폴리오 문서 · 기능 절 아래 버튼 · 10자	{name.deck} 전체	
+page.glance	포트폴리오 문서 · 한눈에 보기 절 제목 · 12자	프로젝트 요약	
+page.nav-intro	포트폴리오 문서 · 맨 위 메뉴 · 6자	소개	
+page.nav-stack	포트폴리오 문서 · 맨 위 메뉴 · 6자	{page.stack}	
+page.nav-projects	포트폴리오 문서 · 맨 위 메뉴 · 6자	프로젝트	
+page.nav-glance	포트폴리오 문서 · 맨 위 메뉴 · 6자	한눈에 보기	
+page.nav-contact	포트폴리오 문서 · 맨 위 메뉴 · 6자	연락처	
+page.print-email	포트폴리오 문서 · 인쇄(PDF) 연락처 이름 · 6자	이메일	
+page.print-web	포트폴리오 문서 · 인쇄(PDF) 연락처 이름 · 10자	웹 {name.portfolio}	
+en.portfolio	포트폴리오 문서 맨 위 · 발표 덱 링크 카드 · 영문 칸 · 14자	PORTFOLIO	
+en.about	포트폴리오 문서 · 자기소개 절 위 · 영문 칸 · 14자	ABOUT ME	
+en.skills	포트폴리오 문서 · 기술 스택 절 위 · 영문 칸 · 14자	SKILLS	
+en.project	포트폴리오 문서 프로젝트 절 위 · 발표 덱 표지 · 영문 칸 · 10자	PROJECT	
+en.feature	포트폴리오 문서 기능 목록 · 발표 덱 화면 카드(뒤에 번호) · 영문 칸 · 10자	FEATURE	
+en.glance	포트폴리오 문서 · 한눈에 보기 절 위 · 영문 칸 · 14자	AT A GLANCE	
+en.contact	포트폴리오 문서 · 맨 아래 연락처 · 영문 칸 · 14자	CONTACT	
+en.chapter	발표 덱 · 장 표지(뒤에 번호) · 영문 칸 · 10자	CHAPTER	
+en.contents	발표 덱 · 목차 장면 제목 · 영문 칸 · 12자	CONTENTS	
+en.more	발표 덱 · 맺음 장면 왼쪽 위 · 영문 칸 · 10자	MORE	
+en.techdoc	발표 덱 · 상세 기술문서 링크 카드 · 영문 칸 · 12자	TECH DOC	
+en.link	발표 덱 · 그 밖의 링크 카드 · 영문 칸 · 12자	LINK	
+en.repo	발표 덱 · GitHub 링크 카드 · 영문 칸 · 12자	REPOSITORY	
+en.gameplay	발표 덱 · 시연 영상 링크 카드 · 영문 칸 · 12자	GAMEPLAY	
+en.role	발표 덱 표지 · 역할 항목 앞 · 영문 칸 · 10자	ROLE	
+en.intent	발표 덱 표지 · 개발 의도 앞 · 영문 칸 · 10자	INTENT	
+en.meta-genre	발표 덱 표지 · 메타 '장르' 앞 · 영문 칸 · 12자	GENRE	
+en.meta-duration	발표 덱 표지 · 메타 '기간'·'개발 기간' 앞 · 영문 칸 · 12자	DURATION	
+en.meta-team	발표 덱 표지 · 메타 '인원'·'팀'·'팀 구성' 앞 · 영문 칸 · 12자	TEAM	
+en.meta-env	발표 덱 표지 · 메타 '환경'·'개발 환경' 앞 · 영문 칸 · 12자	ENVIRONMENT	
+en.meta-engine	발표 덱 표지 · 메타 '엔진' 앞 · 영문 칸 · 12자	ENGINE	
+en.meta-platform	발표 덱 표지 · 메타 '플랫폼' 앞 · 영문 칸 · 12자	PLATFORM	
+deck.cover	발표 덱 · 표지 장면 이름(아래 띠·개요) · 8자	표지	
+deck.cover-eyebrow	발표 덱 · 표지 왼쪽 위 · 20자	{en.project} · {name.deck}	
+deck.ch-count	발표 덱 · 장 표지 오른쪽 위 · 10자	장면 {n}개	
+deck.toc-count	발표 덱 · 목차 줄 설명 · 10자	장면 {n}장	
+deck.retro	발표 덱 · 회고 장면 제목·목차 · 12자	결과와 회고	
+deck.retro-eyebrow	발표 덱 · 회고 장면 왼쪽 위 · 12자	결과 · 회고	
+deck.retro-desc	발표 덱 · 목차의 회고 줄 설명 · 24자	{deck.achieved} · {deck.regrets} → {deck.plans}	
+deck.achieved	발표 덱 · 회고 카드 머리(앞에 ✓) · 6자	달성	
+deck.regrets	발표 덱 · 회고 표 머리(앞에 △) · 8자	아쉬운 점	
+deck.plans	발표 덱 · 회고 표 머리(앞에 →) · 8자	개선 계획	
+deck.more	발표 덱 · 맺음 장면 이름(아래 띠·목차) · 8자	더 보기	
+deck.more-desc	발표 덱 · 목차의 맺음 줄 설명 · 16자	{name.doc} · 링크	
+deck.end-title	발표 덱 · 맺음 장면 제목(개요). 조사(와/과)를 이름에 맞게 · 16자	{name.doc}와 링크	
+deck.end-doc	발표 덱 · 맺음 장면 큰 링크 카드 · 30자	{name.doc} — 코드·다이어그램·설계 과정 전문	
+deck.code-lines	발표 덱 · 나뉜 코드 아래 · 20자	{a}~{b}줄 / 전체 {all}줄	
+deck.mobile-doc	발표 덱 · 휴대폰 세로 화면 안내. 조사(가/이)를 이름에 맞게 · 24자	휴대폰에서는 {name.doc-short}가 읽기 편합니다	
+tab.overview	발표 덱 · 장면 머리 오른쪽 라벨·장 표지 목록 · 6자	개요	
+tab.structure	발표 덱 · 장면 머리 오른쪽 라벨·장 표지 목록 · 6자	구조	
+tab.flow	발표 덱 · 장면 머리 오른쪽 라벨·장 표지 목록 · 6자	흐름	
+tab.impl	발표 덱 · 장면 머리 오른쪽 라벨·장 표지 목록 · 6자	구현	
+tab.choice	발표 덱 · 장면 머리 오른쪽 라벨·장 표지 목록 · 6자	선택	
+tab.trouble	발표 덱 · 장면 머리 오른쪽 라벨·장 표지 목록 · 6자	문제 해결	
+tab.result	발표 덱 · 장면 머리 오른쪽 라벨·장 표지 목록 · 6자	결과	
+label.feature	발표 덱 · 카드 라벨 · 6자	기능	
+label.impl	발표 덱 · 카드 라벨 · 6자	구현	
+label.reason	발표 덱 · 카드 라벨 · 6자	이유	
+label.problem	발표 덱 · 문제 해결 칩 · 6자	문제	
+label.cause	발표 덱 · 문제 해결 칩 · 6자	원인	
+label.solution	발표 덱 · 문제 해결 칩(강조색) · 6자	해결	
+label.result	발표 덱 · 문제 해결 칩(초록) · 6자	결과	
+label.lesson	발표 덱 · 문제 해결 칩 · 6자	배운 점	
+doc.glance	상세 문서 · 제목 아래 접는 상자 · 10자	한눈에 · 링크	
+doc.deck-note	상세 문서 · 한눈에 상자 안내. 조사(은/는)를 이름에 맞게 · 40자	{ui.newtab}. {name.deck}은 PC에서 보기 좋습니다.	
+doc.rail-project	상세 문서 · 오른쪽 칸 제목 · 10자	이 프로젝트	
+doc.rail-now	상세 문서 · 오른쪽 칸 제목 · 10자	지금 읽는 절	
+doc.raw-md	상세 문서 · 오른쪽 칸 링크 · 10자	원문 마크다운	
+doc.raw-github	상세 문서 · 오른쪽 칸 링크 · 12자	원문 GitHub	
+doc.top	상세 문서 · 오른쪽 칸 링크(뒤에 ↑) · 6자	맨 위로	
+doc.start	상세 문서 · 지금 읽는 절(맨 위에 있을 때) · 10자	문서 처음	
+doc.now-none	상세 문서 · 지금 읽는 절(맨 위에 있을 때) · 30자	절 제목을 지나면 여기에 지금 읽는 절이 보입니다.	
+doc.diagram-n	상세 문서 · 크게 보기 창의 다이어그램 이름(원문에 accTitle이 없을 때) · 12자	다이어그램 {n}	
+doc.diagram-src	상세 문서 · 다이어그램 아래 접는 상자 · 10자	다이어그램 원문	
+doc.zoom	상세 문서 · 다이어그램 아래 버튼 · 8자	크게 보기	
+doc.links-list	상세 문서 · 인쇄(PDF) 문서 끝 · 10자	링크 목록	
+doc.print-web	상세 문서 · 인쇄(PDF) 맨 위 주소 이름 · 10자	웹에서 보기	
+ui.pdf	포트폴리오 문서 맨 위 버튼 · 발표 덱 아래 띠 · 8자	PDF로 저장	
+ui.pdf-short	발표 덱 · 아래 띠(좁은 화면) · 4자	PDF	
+ui.pages	발표 덱 · 아래 띠 PDF 버튼 옆 쪽 수 · 5자	{n}쪽	
+ui.preparing	포트폴리오 문서 · PDF 버튼을 누른 뒤 · 8자	준비 중…	
+ui.newtab	발표 덱 아래 띠 · 상세 문서 맨 위 · 16자	링크는 새 탭에서 열립니다	
+ui.back	상세 문서 맨 위·맨 아래 · 발표 덱 맺음 카드 · 12자	← {name.portfolio}	
+ui.skip	세 페이지 · 키보드 Tab을 처음 누르면 보이는 링크 · 12자	본문으로 건너뛰기	
+ui.prev	발표 덱 · 아래 띠 ‹ 버튼 툴팁 · 16자	이전 (←)	
+ui.next	발표 덱 · 아래 띠 › 버튼 툴팁 · 20자	다음 (→, Space, 휠)	
+ui.overview	발표 덱 · 아래 띠 버튼 · 4자	개요	
+ui.overview-tip	발표 덱 · 개요 버튼 툴팁 · 20자	모든 슬라이드 보기 (O)	
+ui.to-scroll	발표 덱 · 아래 띠 보기 버튼(슬라이드 보기일 때) · 8자	한 번에 보기	
+ui.to-scroll-short	발표 덱 · 아래 띠 보기 버튼(좁은 화면) · 4자	전체	
+ui.to-scroll-tip	발표 덱 · 보기 버튼 툴팁 · 40자	모든 슬라이드를 세로로 이어서 보기(찾기 Ctrl+F가 모든 장에 닿음)	
+ui.to-deck	발표 덱 · 아래 띠 보기 버튼(한 번에 보기일 때) · 8자	슬라이드로 보기	
+ui.to-deck-short	발표 덱 · 아래 띠 보기 버튼(좁은 화면) · 4자	슬라이드	
+ui.to-deck-tip	발표 덱 · 보기 버튼 툴팁 · 20자	한 번에 한 장씩 보기	
+ui.print-anyway	발표 덱 · 아래 띠(그림을 다 받지 못했을 때) · 8자	그래도 인쇄	
+ui.not-ready	발표 덱 · 아래 띠 알림 · 30자	아직 다 그리지 못했습니다(이미지 {done}/{total})	
+ui.loading-images	발표 덱 · PDF 저장을 기다리는 동안 · 24자	이미지 {done}/{total} 불러오는 중	
+ui.print-wait	발표 덱 · PDF 저장을 기다리는 동안 · 12자	인쇄 준비 중…	
+ui.ov-title	발표 덱 · 개요 창 제목 · 10자	슬라이드 개요	
+ui.ov-count	발표 덱 · 개요 창 제목 옆 · 5자	{n}장	
+ui.ov-hint	발표 덱 · 개요 창 안내 · 30자	화살표로 고르고 Enter · 닫기 Esc	
+ui.rotate	발표 덱 · 휴대폰 세로 화면 안내 · 24자	가로로 돌리면 더 크게 보입니다.	
+ui.close	상세 문서 · 목차 창 버튼 · 4자	닫기	
+ui.close-esc	상세 문서 · 크게 보기 창 버튼 · 8자	닫기 (Esc)	

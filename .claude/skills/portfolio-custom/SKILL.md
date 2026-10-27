@@ -26,6 +26,7 @@ disable-model-invocation: true
 - **데이터는 `fetch('../data/portfolio.json')`로 읽어 렌더**합니다. JSON 내용을 HTML에 복사해 넣지 않습니다
   → 다음에 `/portfolio-build`만 다시 하면 이 페이지도 자동으로 최신이 됩니다.
 - 내용은 데이터에 있는 것만. 문구를 새로 지어내지 않습니다 (섹션 제목·버튼 문구 같은 UI 텍스트는 예외).
+  UI 텍스트는 문구 표 `theme/strings.tsv`를 따릅니다: 맨 끝 "내 문구" 칸이 있으면 그 문구, 비어 있으면 기본 문구(`assets/strings.js`의 같은 키). 표에 없는 자리만 새로 정합니다.
 - 프로젝트 페이지는 새로 만들지 않고 `format/05` 규칙 3대로 링크합니다: 발표 덱 `../project.html?p=<id>`, 상세 기술문서 `../doc.html?p=<id>`.
 - 이미지 경로: `../src/<id>/<cover 또는 screenshots[].src>` (상대경로).
 - 강조색은 `settings.accent`를 기본으로 하되, 디자인 요청에 다른 색이 있으면 그 색.
